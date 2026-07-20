@@ -303,6 +303,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 
@@ -396,6 +407,58 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
 
   <p>每一節都採用相同的版面：左邊是「視覺化畫布」與「控制列」，右邊是「即時統計」、「對應虛擬碼（pseudo-code）」與「複雜度分析」。請大膽地按 <span class="pill pill-green">▶ 開始</span> 看完整動畫，或按 <span class="pill pill-blue">→ 單步</span> 一格一格觀察。</p>
+
+<h3 id="dx-srch">講義完整實作：三種搜尋的 Python 全文</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 07 · sequential_search</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">sequential_search</span>(a_list, item):</span>
+<span class="line">    pos = <span class="num">0</span></span>
+<span class="line">    <span class="kw">while</span> pos &lt; <span class="fn">len</span>(a_list):</span>
+<span class="line">        <span class="kw">if</span> a_list[pos] == item:</span>
+<span class="line">            <span class="kw">return</span> <span class="kw">True</span></span>
+<span class="line">        pos = pos + <span class="num">1</span></span>
+<span class="line">    <span class="kw">return</span> <span class="kw">False</span></span>
+<span class="line"> </span>
+<span class="line">test_list = [<span class="num">54</span>, <span class="num">26</span>, <span class="num">93</span>, <span class="num">17</span>, <span class="num">77</span>, <span class="num">31</span>, <span class="num">44</span>, <span class="num">55</span>, <span class="num">20</span>, <span class="num">65</span>]</span>
+<span class="line"><span class="fn">print</span>(sequential_search(test_list, <span class="num">44</span>))</span>
+<span class="line"><span class="fn">print</span>(sequential_search(test_list, <span class="num">50</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>True
+False</pre></div>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 07 · binary_search：迴圈版與遞迴版</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">binary_search</span>(a_list, item):</span>
+<span class="line">    first = <span class="num">0</span></span>
+<span class="line">    last = <span class="fn">len</span>(a_list) - <span class="num">1</span></span>
+<span class="line">    <span class="kw">while</span> first &lt;= last:</span>
+<span class="line">        midpoint = (first + last) // <span class="num">2</span></span>
+<span class="line">        <span class="kw">if</span> a_list[midpoint] == item:</span>
+<span class="line">            <span class="kw">return</span> <span class="kw">True</span></span>
+<span class="line">        <span class="kw">elif</span> item &lt; a_list[midpoint]:</span>
+<span class="line">            last = midpoint - <span class="num">1</span></span>
+<span class="line">        <span class="kw">else</span>:</span>
+<span class="line">            first = midpoint + <span class="num">1</span></span>
+<span class="line">    <span class="kw">return</span> <span class="kw">False</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">binary_search_rec</span>(a_list, item):</span>
+<span class="line">    <span class="kw">if</span> <span class="fn">len</span>(a_list) == <span class="num">0</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="kw">False</span></span>
+<span class="line">    midpoint = (<span class="fn">len</span>(a_list) - <span class="num">1</span>) // <span class="num">2</span></span>
+<span class="line">    <span class="kw">if</span> a_list[midpoint] == item:</span>
+<span class="line">        <span class="kw">return</span> <span class="kw">True</span></span>
+<span class="line">    <span class="kw">if</span> item &lt; a_list[midpoint]:</span>
+<span class="line">        <span class="kw">return</span> binary_search_rec(a_list[:midpoint], item)</span>
+<span class="line">    <span class="kw">return</span> binary_search_rec(a_list[midpoint + <span class="num">1</span>:], item)</span>
+<span class="line"> </span>
+<span class="line">test_list = [<span class="num">17</span>, <span class="num">20</span>, <span class="num">26</span>, <span class="num">31</span>, <span class="num">44</span>, <span class="num">54</span>, <span class="num">55</span>, <span class="num">65</span>, <span class="num">77</span>, <span class="num">93</span>]</span>
+<span class="line"><span class="fn">print</span>(binary_search(test_list, <span class="num">44</span>), binary_search(test_list, <span class="num">50</span>))</span>
+<span class="line"><span class="fn">print</span>(binary_search_rec(test_list, <span class="num">44</span>), binary_search_rec(test_list, <span class="num">50</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>True False
+True False</pre></div>
+  <p class="dx-note">遞迴版每層都用切片 a_list[:midpoint] <strong>複製</strong>半條串列：好懂，但切片本身是 O(k)，反而毀了 O(log n)。實務上用迴圈版，或改傳索引範圍（first, last）而不是切片。自我檢測區 Q1 的「中點取 (長度-1)//2」講的就是遞迴版。</p>
+</div>
 </section>
 
 
@@ -760,6 +823,75 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <span class="info-label">小實驗</span>
     試試<strong>用「線性探查」</strong>把 <code>54, 26, 93, 17, 77, 31, 44, 55, 20</code> 全部插入：你會發現 44、55、20 都會發生碰撞，被推到別的槽去。再切換到<strong>「鏈結法」</strong>清空、重做一次，會看到撞到的 item 直接掛在槽下面，不會佔走別人的位置。
   </div>
+
+<h3 id="dx-hash">講義完整範例：從雜湊函數到 Map 的使用畫面</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 07 · 兩種雜湊函數對照</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">remainder_method</span>(item, divisor):</span>
+<span class="line">    <span class="kw">return</span> item % divisor</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">midsquare_method</span>(item, divisor):</span>
+<span class="line">    squared = <span class="fn">str</span>(item ** <span class="num">2</span>)</span>
+<span class="line">    <span class="kw">if</span> <span class="fn">len</span>(squared) % <span class="num">2</span> != <span class="num">0</span>:          <span class="com"># 位數補齊，才好取正中間</span></span>
+<span class="line">        squared = <span class="str">"</span><span class="str">0</span><span class="str">"</span> + squared</span>
+<span class="line">    middle = <span class="fn">len</span>(squared) // <span class="num">2</span></span>
+<span class="line">    mid_digits = <span class="fn">int</span>(squared[<span class="fn">max</span>(<span class="num">0</span>, middle - <span class="num">1</span>):middle + <span class="num">1</span>])</span>
+<span class="line">    <span class="kw">return</span> mid_digits % divisor</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span><span class="str">'</span><span class="str">Item</span><span class="str">'</span><span class="str">:</span><span class="str">&gt;6</span><span class="str">}</span><span class="str">{</span><span class="str">'</span><span class="str">Remainder</span><span class="str">'</span><span class="str">:</span><span class="str">&gt;11</span><span class="str">}</span><span class="str">{</span><span class="str">'</span><span class="str">Mid-Square</span><span class="str">'</span><span class="str">:</span><span class="str">&gt;12</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"><span class="kw">for</span> item in [<span class="num">54</span>, <span class="num">26</span>, <span class="num">93</span>, <span class="num">17</span>]:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>item<span class="str">:</span><span class="str">&gt;6</span><span class="str">}</span><span class="str">{</span>remainder_method(item, <span class="num">11</span>)<span class="str">:</span><span class="str">&gt;11</span><span class="str">}</span><span class="str">{</span>midsquare_method(item, <span class="num">11</span>)<span class="str">:</span><span class="str">&gt;12</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>  Item  Remainder  Mid-Square
+    54         10           3
+    26          4           1
+    93          5           9
+    17          6           6</pre></div>
+  <p class="dx-note">平方取中：54² = 2916，取中間兩位 91，再 91 % 11 = 3。同一批鍵、兩種函數，落點完全不同：雜湊函數的選擇直接決定碰撞多寡。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 07 · 線性探查的最終快照</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">items = [<span class="num">54</span>, <span class="num">26</span>, <span class="num">93</span>, <span class="num">17</span>, <span class="num">77</span>, <span class="num">31</span>, <span class="num">44</span>, <span class="num">55</span>, <span class="num">20</span>]</span>
+<span class="line">hash_table = [<span class="kw">None</span>] * <span class="num">11</span></span>
+<span class="line"><span class="kw">for</span> item in items:</span>
+<span class="line">    hash_index = item % <span class="num">11</span></span>
+<span class="line">    <span class="kw">while</span> hash_table[hash_index] is not <span class="kw">None</span>:   <span class="com"># 碰撞就往下找（線性探查）</span></span>
+<span class="line">        hash_index = (hash_index + <span class="num">1</span>) % <span class="num">11</span></span>
+<span class="line">    hash_table[hash_index] = item</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">for</span> idx, item in <span class="fn">enumerate</span>(hash_table):</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>idx<span class="str">}</span><span class="str">:</span><span class="str">{</span>item<span class="str">}</span><span class="str">"</span>, end=<span class="str">"</span><span class="str">  </span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>()</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>0:77  1:44  2:55  3:20  4:26  5:93  6:17  7:None  8:None  9:31  10:54  </pre></div>
+  <p class="dx-note">值得手算一次：44 想進 0（44 % 11 = 0）但 77 已入住，探查到 1；55 探查到 2；20 想進 9，被一路擋到 3。這串「探查鏈」就是群聚（clustering）的長相。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 07 · HashTable 類別的 put / get 使用畫面</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.searching <span class="kw">import</span> HashTable</span>
+<span class="line"> </span>
+<span class="line">h = HashTable(size=<span class="num">11</span>)</span>
+<span class="line">h[<span class="num">54</span>], h[<span class="num">26</span>] = <span class="str">"</span><span class="str">cat</span><span class="str">"</span>,  <span class="str">"</span><span class="str">dog</span><span class="str">"</span></span>
+<span class="line">h[<span class="num">93</span>], h[<span class="num">17</span>] = <span class="str">"</span><span class="str">lion</span><span class="str">"</span>, <span class="str">"</span><span class="str">tiger</span><span class="str">"</span></span>
+<span class="line">h[<span class="num">77</span>], h[<span class="num">31</span>] = <span class="str">"</span><span class="str">bird</span><span class="str">"</span>, <span class="str">"</span><span class="str">cow</span><span class="str">"</span></span>
+<span class="line">h[<span class="num">44</span>], h[<span class="num">55</span>] = <span class="str">"</span><span class="str">goat</span><span class="str">"</span>, <span class="str">"</span><span class="str">pig</span><span class="str">"</span></span>
+<span class="line">h[<span class="num">20</span>] = <span class="str">"</span><span class="str">chicken</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(h._slots)</span>
+<span class="line"><span class="fn">print</span>(h._data)</span>
+<span class="line"><span class="fn">print</span>(h[<span class="num">20</span>], h[<span class="num">17</span>])</span>
+<span class="line">h[<span class="num">20</span>] = <span class="str">"</span><span class="str">duck</span><span class="str">"</span>           <span class="com"># 同鍵：換值</span></span>
+<span class="line"><span class="fn">print</span>(h[<span class="num">20</span>])</span>
+<span class="line"><span class="fn">print</span>(h[<span class="num">99</span>])             <span class="com"># 不在表裡：None</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[77, 44, 55, 20, 26, 93, 17, None, None, 31, 54]
+[&#x27;bird&#x27;, &#x27;goat&#x27;, &#x27;pig&#x27;, &#x27;chicken&#x27;, &#x27;dog&#x27;, &#x27;lion&#x27;, &#x27;tiger&#x27;, None, None, &#x27;cow&#x27;, &#x27;cat&#x27;]
+chicken tiger
+duck
+    raise KeyError(f&quot;{key} is not in the table&quot;)
+KeyError: &#x27;99 is not in the table&#x27;</pre></div>
+  <p class="dx-note">h[54] = 'cat' 這種語法靠 __setitem__ / __getitem__ 轉接到 put / get。_slots 的排列跟上一張卡完全一致：類別只是把「鍵探查」和「值跟著住進同一格」包起來。put 遇到同鍵是<strong>更新</strong>不是再探查，get 沿著同一條探查鏈找、繞回起點就回 None。</p>
+</div>
 </section>
 
 
@@ -835,6 +967,22 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       <span class="line">            <span class="kw">break</span>    <span class="com"># 已經排序好，可以離開</span></span>
     </div>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">使用畫面＋逐 pass 實跑輸出</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">a_list = [<span class="num">4</span>, <span class="num">14</span>, <span class="num">5</span>, <span class="num">21</span>, <span class="num">29</span>, <span class="num">12</span>, <span class="num">16</span>]</span>
+<span class="line">bubble_sort(a_list)</span>
+<span class="line"><span class="fn">print</span>(a_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（每個 pass 一行）</span><pre>[4, 14, 5, 21, 29, 12, 16]
+[4, 5, 14, 21, 12, 16, 29]
+[4, 5, 14, 12, 16, 21, 29]
+[4, 5, 12, 14, 16, 21, 29]
+[4, 5, 12, 14, 16, 21, 29]
+[4, 5, 12, 14, 16, 21, 29]
+[4, 5, 12, 14, 16, 21, 29]</pre></div>
+  <p class="dx-note"><span id="dx-bub"></span>每一行是「該 pass 開始前」的內容：最大的值一輪一輪往右浮。最後一行是排序完成的結果。頁面上方的 bubble_sort_short 版本：某一輪完全沒交換就提前收工。</p>
+</div>
 </section>
 
 <!-- ============================================================ -->
@@ -894,6 +1042,25 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <span class="info-label">vs. 氣泡</span>
     <strong>比較次數相同</strong>都是 $O(n^2)$，但 selection sort <strong>每輪最多交換一次</strong>，氣泡排序每輪可能交換很多次。當「交換成本」很高（例如要移動的物件很大）時，selection sort 表現會比 bubble sort 好。
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">使用畫面＋逐 pass 實跑輸出</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">a_list = [<span class="num">11</span>, <span class="num">7</span>, <span class="num">12</span>, <span class="num">14</span>, <span class="num">19</span>, <span class="num">1</span>, <span class="num">6</span>, <span class="num">18</span>, <span class="num">8</span>, <span class="num">20</span>]</span>
+<span class="line">selection_sort(a_list)</span>
+<span class="line"><span class="fn">print</span>(a_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（每個 pass 一行）</span><pre>[11, 7, 12, 14, 19, 1, 6, 18, 8, 20]
+[1, 7, 12, 14, 19, 11, 6, 18, 8, 20]
+[1, 6, 12, 14, 19, 11, 7, 18, 8, 20]
+[1, 6, 7, 14, 19, 11, 12, 18, 8, 20]
+[1, 6, 7, 8, 19, 11, 12, 18, 14, 20]
+[1, 6, 7, 8, 11, 19, 12, 18, 14, 20]
+[1, 6, 7, 8, 11, 12, 19, 18, 14, 20]
+[1, 6, 7, 8, 11, 12, 14, 18, 19, 20]
+[1, 6, 7, 8, 11, 12, 14, 18, 19, 20]
+[1, 6, 7, 8, 11, 12, 14, 18, 19, 20]</pre></div>
+  <p class="dx-note"><span id="dx-sel"></span>跟氣泡排序同樣 O(n²) 次比較，但每輪只交換一次：觀察每行開頭，已排序的前綴一格一格長大。</p>
+</div>
 </section>
 
 <!-- ============================================================ -->
@@ -952,6 +1119,22 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <span class="info-label">為什麼適合「幾乎排序好」的資料？</span>
     insertion sort 處理已排序資料時非常快：每個 key 只需要一次比較就能確認位置，時間複雜度降到 $O(n)$。如果你正在「<strong>插入新資料到已排序的 list</strong>」這個情境，insertion sort 是最自然的選擇。
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">使用畫面＋逐 pass 實跑輸出</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">a_list = [<span class="num">9</span>, <span class="num">2</span>, <span class="num">5</span>, <span class="num">5</span>, <span class="num">7</span>, <span class="num">9</span>, <span class="num">1</span>]</span>
+<span class="line">insertion_sort(a_list)</span>
+<span class="line"><span class="fn">print</span>(a_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（每個 pass 一行）</span><pre>[9, 2, 5, 5, 7, 9, 1]
+[2, 9, 5, 5, 7, 9, 1]
+[2, 5, 9, 5, 7, 9, 1]
+[2, 5, 5, 9, 7, 9, 1]
+[2, 5, 5, 7, 9, 9, 1]
+[2, 5, 5, 7, 9, 9, 1]
+[1, 2, 5, 5, 7, 9, 9]</pre></div>
+  <p class="dx-note"><span id="dx-ins"></span>cur_val 抽出來、比它大的往右挪、找到洞再放回去：注意這裡是「挪動」不是「交換」。重複值 5、9 的相對順序不變：插入排序是穩定排序。</p>
+</div>
 </section>
 
 
@@ -1039,6 +1222,19 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
         <span style="color:#61afef;">print</span>(<span style="color:#98c379;">&quot;After increments of size&quot;</span>, sublist_count,
               <span style="color:#98c379;">&quot;the list is&quot;</span>, a_list)
         sublist_count = sublist_count // <span style="color:#d19a66;">2</span></pre>
+
+<div class="deck-extra">
+  <div class="dx-label">使用畫面＋逐 pass 實跑輸出</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">a_list = [<span class="num">5</span>, <span class="num">16</span>, <span class="num">20</span>, <span class="num">12</span>, <span class="num">3</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">17</span>, <span class="num">19</span>, <span class="num">7</span>, <span class="num">11</span>]</span>
+<span class="line">shell_sort(a_list)</span>
+<span class="line"><span class="fn">print</span>(a_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（每個 pass 一行）</span><pre>After increments of size 5 the list is [5, 9, 17, 12, 3, 8, 16, 20, 19, 7, 11]
+After increments of size 2 the list is [3, 7, 5, 8, 11, 9, 16, 12, 17, 20, 19]
+After increments of size 1 the list is [3, 5, 7, 8, 9, 11, 12, 16, 17, 19, 20]
+[3, 5, 7, 8, 9, 11, 12, 16, 17, 19, 20]</pre></div>
+  <p class="dx-note"><span id="dx-shl"></span>gap 從 n//2 一路砍半到 1。gap=1 那一輪就是普通的插入排序，但這時序列已經「幾乎有序」，所以很便宜。</p>
+</div>
 </section>
 
 
@@ -1111,6 +1307,28 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <span class="info-label">代價：額外空間</span>
     merge sort 需要<strong>額外 $O(n)$ 的暫存空間</strong>來存 L、R 半段（實作中需額外配置 L、R 兩段暫存 list）。處理超大資料時，這個記憶體開銷可能成為問題。
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">使用畫面＋逐 pass 實跑輸出</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">a_list = [<span class="num">54</span>, <span class="num">26</span>, <span class="num">93</span>, <span class="num">17</span>]</span>
+<span class="line">merge_sort(a_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（每個 pass 一行）</span><pre>Splitting [54, 26, 93, 17]
+Splitting [54, 26]
+Splitting [54]
+Merging [54]
+Splitting [26]
+Merging [26]
+Merging [26, 54]
+Splitting [93, 17]
+Splitting [93]
+Merging [93]
+Splitting [17]
+Merging [17]
+Merging [17, 93]
+Merging [17, 26, 54, 93]</pre></div>
+  <p class="dx-note"><span id="dx-mrg"></span>Splitting 一路劈到單元素（基底情況），Merging 從最小的開始兩兩合併回來。最後一行 Merging 就是排序結果。切片複製讓它需要 O(n) 的額外空間。</p>
+</div>
 </section>
 
 
@@ -1222,6 +1440,21 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       同一份 {54, 26, 93, 17, 77, 31, 44, 55, 20}：升冪得 17 20 26 31 44 54 55 77 93、降冪得 93 77 55 54 44 31 26 20 17。分割的想法一套通吃，變的只有「誰算放錯邊」。</div>
     </div>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">使用畫面＋逐 pass 實跑輸出</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">a_list = [<span class="num">54</span>, <span class="num">26</span>, <span class="num">93</span>, <span class="num">17</span>, <span class="num">77</span>, <span class="num">31</span>, <span class="num">44</span>, <span class="num">55</span>, <span class="num">20</span>]</span>
+<span class="line">quick_sort(a_list)</span>
+<span class="line"><span class="fn">print</span>(a_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（每個 pass 一行）</span><pre>[31, 26, 20, 17, 44, 54, 77, 55, 93]
+[17, 26, 20, 31, 44, 54, 77, 55, 93]
+[17, 26, 20, 31, 44, 54, 77, 55, 93]
+[17, 20, 26, 31, 44, 54, 77, 55, 93]
+[17, 20, 26, 31, 44, 54, 55, 77, 93]
+[17, 20, 26, 31, 44, 54, 55, 77, 93]</pre></div>
+  <p class="dx-note"><span id="dx-qck"></span>每一行是一次 partition 之後的全貌：第一行 pivot 54 落定（左邊全 ≤ 54、右邊全 ≥ 54），之後輪流處理左右子區段，每行都多一個「就定位」的 pivot。</p>
+</div>
 </section>
 
 
