@@ -315,6 +315,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 
@@ -560,6 +571,25 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <span class="info-label">小提醒</span>
     本章後續所有演算法（BFS/DFS/Dijkstra/Prim）都建立在<strong>相鄰串列</strong>實作之上。Vertex 類別在不同節中會擴充不同欄位（如 <code>color</code>, <code>distance</code>, <code>previous</code>, <code>discovery_time</code>, <code>closing_time</code>），但底層結構不變。
   </div>
+
+<h3 id="dx-rep">講義完整範例：Graph 類別的使用畫面</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 08 · 建頂點、加邊、走訪相鄰串列</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.graphs <span class="kw">import</span> Graph</span>
+<span class="line"> </span>
+<span class="line">g = Graph()</span>
+<span class="line">g.add_edge(<span class="num">0</span>, <span class="num">1</span>, <span class="num">5</span>); g.add_edge(<span class="num">0</span>, <span class="num">5</span>, <span class="num">2</span>); g.add_edge(<span class="num">1</span>, <span class="num">2</span>, <span class="num">4</span>)</span>
+<span class="line">g.add_edge(<span class="num">2</span>, <span class="num">3</span>, <span class="num">9</span>); g.add_edge(<span class="num">3</span>, <span class="num">4</span>, <span class="num">7</span>); g.add_edge(<span class="num">3</span>, <span class="num">5</span>, <span class="num">3</span>)</span>
+<span class="line">g.add_edge(<span class="num">4</span>, <span class="num">0</span>, <span class="num">1</span>); g.add_edge(<span class="num">5</span>, <span class="num">4</span>, <span class="num">8</span>); g.add_edge(<span class="num">5</span>, <span class="num">2</span>, <span class="num">1</span>)</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">for</span> v in g:</span>
+<span class="line">    <span class="kw">for</span> w in v.get_neighbors():</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">(</span><span class="str">{</span>v.get_key()<span class="str">}</span><span class="str">, </span><span class="str">{</span>w.get_key()<span class="str">}</span><span class="str">, </span><span class="str">{</span>v.get_neighbor(w)<span class="str">}</span><span class="str">)</span><span class="str">"</span>, end=<span class="str">"</span><span class="str"> </span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>()</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>(0, 1, 5) (0, 5, 2) (1, 2, 4) (5, 4, 8) (5, 2, 1) (2, 3, 9) (3, 4, 7) (3, 5, 3) (4, 0, 1) </pre></div>
+  <p class="dx-note">每組 (from, to, weight) 對應一條有向邊。add_edge 會自動把不存在的頂點補進圖裡，這就是相鄰串列版（dict of dict）的「用多少存多少」。</p>
+</div>
 </section>
 
 
@@ -638,6 +668,62 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <strong>(1) 最短路徑樹：</strong>沿著 <code>previous</code> 指標往回走，可以重建從任何可達頂點回到起點的<strong>最少邊數路徑</strong>。<br>
     <strong>(2) 一次解多個問題：</strong>一次 BFS 同時得到起點到「所有可達頂點」的最短距離，不需要重新跑 $|V|$ 次！
   </div>
+
+<h3 id="dx-bfs">講義完整範例：Word Ladder 的實際執行</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 08 · build_graph + bfs + traverse：從 fool 爬到 sage</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Queue</span>
+<span class="line"><span class="kw">from</span> pythonds3.graphs <span class="kw">import</span> Graph</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">build_graph</span>(words):</span>
+<span class="line">    buckets = {}</span>
+<span class="line">    the_graph = Graph()</span>
+<span class="line">    <span class="kw">for</span> word in words:</span>
+<span class="line">        <span class="kw">for</span> i, _ in <span class="fn">enumerate</span>(word):</span>
+<span class="line">            bucket = <span class="str">f</span><span class="str">"</span><span class="str">{</span>word[:i]<span class="str">}</span><span class="str">_</span><span class="str">{</span>word[i + <span class="num">1</span>:]<span class="str">}</span><span class="str">"</span></span>
+<span class="line">            buckets.setdefault(bucket, <span class="fn">set</span>()).add(word)</span>
+<span class="line">    <span class="kw">for</span> similar_words in buckets.values():</span>
+<span class="line">        <span class="kw">for</span> word1 in similar_words:</span>
+<span class="line">            <span class="kw">for</span> word2 in similar_words - {word1}:</span>
+<span class="line">                the_graph.add_edge(word1, word2)</span>
+<span class="line">    <span class="kw">return</span> the_graph</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">bfs</span>(start):</span>
+<span class="line">    start.distance = <span class="num">0</span></span>
+<span class="line">    start.previous = <span class="kw">None</span></span>
+<span class="line">    vert_queue = Queue()</span>
+<span class="line">    vert_queue.enqueue(start)</span>
+<span class="line">    <span class="kw">while</span> vert_queue.size() &gt; <span class="num">0</span>:</span>
+<span class="line">        current = vert_queue.dequeue()</span>
+<span class="line">        <span class="kw">for</span> neighbor in current.get_neighbors():</span>
+<span class="line">            <span class="kw">if</span> neighbor.color == <span class="str">"</span><span class="str">white</span><span class="str">"</span>:</span>
+<span class="line">                neighbor.color = <span class="str">"</span><span class="str">gray</span><span class="str">"</span></span>
+<span class="line">                neighbor.distance = current.distance + <span class="num">1</span></span>
+<span class="line">                neighbor.previous = current</span>
+<span class="line">                vert_queue.enqueue(neighbor)</span>
+<span class="line">        current.color = <span class="str">"</span><span class="str">black</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">traverse</span>(starting_vertex):</span>
+<span class="line">    current = starting_vertex</span>
+<span class="line">    <span class="kw">while</span> current:</span>
+<span class="line">        <span class="fn">print</span>(current.key, end=<span class="str">"</span><span class="str">"</span>)</span>
+<span class="line">        <span class="kw">if</span> current.previous:</span>
+<span class="line">            <span class="fn">print</span>(<span class="str">"</span><span class="str">-&gt;</span><span class="str">"</span>, end=<span class="str">"</span><span class="str">"</span>)</span>
+<span class="line">        current = current.previous</span>
+<span class="line"> </span>
+<span class="line">g = build_graph([<span class="str">"</span><span class="str">fool</span><span class="str">"</span>, <span class="str">"</span><span class="str">cool</span><span class="str">"</span>, <span class="str">"</span><span class="str">pool</span><span class="str">"</span>, <span class="str">"</span><span class="str">poll</span><span class="str">"</span>, <span class="str">"</span><span class="str">pole</span><span class="str">"</span>, <span class="str">"</span><span class="str">pall</span><span class="str">"</span>, <span class="str">"</span><span class="str">fall</span><span class="str">"</span>,</span>
+<span class="line">                 <span class="str">"</span><span class="str">fail</span><span class="str">"</span>, <span class="str">"</span><span class="str">foil</span><span class="str">"</span>, <span class="str">"</span><span class="str">foul</span><span class="str">"</span>, <span class="str">"</span><span class="str">pope</span><span class="str">"</span>, <span class="str">"</span><span class="str">pale</span><span class="str">"</span>, <span class="str">"</span><span class="str">sale</span><span class="str">"</span>, <span class="str">"</span><span class="str">sage</span><span class="str">"</span>, <span class="str">"</span><span class="str">page</span><span class="str">"</span>])</span>
+<span class="line">bfs(g.get_vertex(<span class="str">"</span><span class="str">fool</span><span class="str">"</span>))</span>
+<span class="line">traverse(g.get_vertex(<span class="str">"</span><span class="str">sage</span><span class="str">"</span>))</span>
+<span class="line"><span class="fn">print</span>()</span>
+<span class="line"><span class="kw">for</span> key in <span class="fn">sorted</span>(g.get_vertices()):        <span class="com"># 單字（與 fool 的距離）</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>key<span class="str">}</span><span class="str">(</span><span class="str">{</span>g.get_vertex(key).distance<span class="str">}</span><span class="str">)</span><span class="str">"</span>, end=<span class="str">"</span><span class="str"> </span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>()</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">實跑輸出（回溯路徑可能因探索順序略異，長度必為 6 步）</span><pre>sage-&gt;sale-&gt;pale-&gt;pall-&gt;poll-&gt;pool-&gt;fool
+cool(1) fail(2) fall(3) foil(1) fool(0) foul(1) page(5) pale(4) pall(3) pole(3) poll(2) pool(1) pope(4) sage(6) sale(5) </pre></div>
+  <p class="dx-note">bucket 建圖是亮點：po_l 這種「挖一格」的鍵把只差一字母的字放進同一桶，避免 O(n²) 兩兩比對。traverse 印的是 previous 鏈：BFS 建好的其實是一棵「最短路徑樹」，任何字回溯到 fool 都是最短路。</p>
+</div>
 </section>
 
 
@@ -792,6 +878,58 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     DFS：<code>dfsVisit(neighbor)</code>：立刻遞迴下去處理鄰居。<br>
     這個小差異就決定了「廣度優先 vs 深度優先」的搜尋順序！
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 08 · DFSGraph：discovery / closing time 全表</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.graphs <span class="kw">import</span> Graph</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">class</span> DFSGraph(Graph):</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="fn">super</span>().<span class="fn">__init__</span>()</span>
+<span class="line">        <span class="fn">self</span>._time = <span class="num">0</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">dfs</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">for</span> vertex in <span class="fn">self</span>:</span>
+<span class="line">            vertex.color = <span class="str">"</span><span class="str">white</span><span class="str">"</span></span>
+<span class="line">            vertex.previous = -<span class="num">1</span></span>
+<span class="line">        <span class="kw">for</span> vertex in <span class="fn">self</span>:</span>
+<span class="line">            <span class="kw">if</span> vertex.color == <span class="str">"</span><span class="str">white</span><span class="str">"</span>:</span>
+<span class="line">                <span class="fn">self</span>.dfs_visit(vertex)</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">dfs_visit</span>(<span class="fn">self</span>, start):</span>
+<span class="line">        start.color = <span class="str">"</span><span class="str">gray</span><span class="str">"</span></span>
+<span class="line">        <span class="fn">self</span>._time = <span class="fn">self</span>._time + <span class="num">1</span></span>
+<span class="line">        start.discovery_time = <span class="fn">self</span>._time</span>
+<span class="line">        <span class="kw">for</span> next_vertex in start.get_neighbors():</span>
+<span class="line">            <span class="kw">if</span> next_vertex.color == <span class="str">"</span><span class="str">white</span><span class="str">"</span>:</span>
+<span class="line">                next_vertex.set_previous(start)</span>
+<span class="line">                <span class="fn">self</span>.dfs_visit(next_vertex)</span>
+<span class="line">        start.color = <span class="str">"</span><span class="str">black</span><span class="str">"</span></span>
+<span class="line">        <span class="fn">self</span>._time = <span class="fn">self</span>._time + <span class="num">1</span></span>
+<span class="line">        start.closing_time = <span class="fn">self</span>._time</span>
+<span class="line"> </span>
+<span class="line">g = DFSGraph()</span>
+<span class="line">g.add_edge(<span class="str">'</span><span class="str">A</span><span class="str">'</span>, <span class="str">'</span><span class="str">B</span><span class="str">'</span>); g.add_edge(<span class="str">'</span><span class="str">B</span><span class="str">'</span>, <span class="str">'</span><span class="str">C</span><span class="str">'</span>)</span>
+<span class="line">g.add_edge(<span class="str">'</span><span class="str">A</span><span class="str">'</span>, <span class="str">'</span><span class="str">D</span><span class="str">'</span>); g.add_edge(<span class="str">'</span><span class="str">B</span><span class="str">'</span>, <span class="str">'</span><span class="str">D</span><span class="str">'</span>)</span>
+<span class="line">g.add_edge(<span class="str">'</span><span class="str">D</span><span class="str">'</span>, <span class="str">'</span><span class="str">E</span><span class="str">'</span>); g.add_edge(<span class="str">'</span><span class="str">E</span><span class="str">'</span>, <span class="str">'</span><span class="str">B</span><span class="str">'</span>)</span>
+<span class="line">g.add_edge(<span class="str">'</span><span class="str">E</span><span class="str">'</span>, <span class="str">'</span><span class="str">F</span><span class="str">'</span>); g.add_edge(<span class="str">'</span><span class="str">F</span><span class="str">'</span>, <span class="str">'</span><span class="str">C</span><span class="str">'</span>)</span>
+<span class="line">g.dfs()</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span><span class="str">'</span><span class="str">Key</span><span class="str">'</span><span class="str">:</span><span class="str">^5</span><span class="str">}</span><span class="str">|</span><span class="str">{</span><span class="str">'</span><span class="str">Discover</span><span class="str">'</span><span class="str">:</span><span class="str">^10</span><span class="str">}</span><span class="str">|</span><span class="str">{</span><span class="str">'</span><span class="str">Closing</span><span class="str">'</span><span class="str">:</span><span class="str">^9</span><span class="str">}</span><span class="str">|</span><span class="str">{</span><span class="str">'</span><span class="str">Previous</span><span class="str">'</span><span class="str">:</span><span class="str">^10</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"><span class="kw">for</span> key in <span class="fn">sorted</span>(g.get_vertices()):</span>
+<span class="line">    v = g.get_vertex(key)</span>
+<span class="line">    prev = v.previous.key <span class="kw">if</span> v.previous not in (<span class="kw">None</span>, -<span class="num">1</span>) <span class="kw">else</span> <span class="str">"</span><span class="str">"</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>key<span class="str">:</span><span class="str">^5</span><span class="str">}</span><span class="str">|</span><span class="str">{</span>v.discovery_time<span class="str">:</span><span class="str">^10</span><span class="str">}</span><span class="str">|</span><span class="str">{</span>v.closing_time<span class="str">:</span><span class="str">^9</span><span class="str">}</span><span class="str">|</span><span class="str">{</span>prev<span class="str">:</span><span class="str">^10</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre> Key | Discover | Closing | Previous 
+  A  |    1     |   12    |          
+  B  |    2     |   11    |    A     
+  C  |    3     |    4    |    B     
+  D  |    5     |   10    |    B     
+  E  |    6     |    9    |    D     
+  F  |    7     |    8    |    E     </pre></div>
+  <p class="dx-note"><span id="dx-dfs"></span>對照括號性質：C 的 [3,4] 完全包在 B 的 [2,11] 裡（C 是 B 的子孫）；每個頂點的區間要嘛互相包住、要嘛完全分開，絕不交錯。E→B 那條邊指向還是灰色的祖先，是一條 back edge：它宣告圖裡有循環。</p>
+</div>
 </section>
 
 
@@ -941,6 +1079,57 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     這是 PDF 上的標準範例（雙向邊）：頂點 $\{u, v, w, x, y, z\}$，邊權如圖所示。從 $u$ 出發，正確的最短路徑樹如下：<br>
     <code>u→v: 2</code>　<code>u→x: 1</code>　<code>u→y: 2 (經 x)</code>　<code>u→w: 3 (經 y)</code>　<code>u→z: 3 (經 y)</code>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 08 · dijkstra + find_path 的使用畫面</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.graphs <span class="kw">import</span> Graph</span>
+<span class="line"><span class="kw">from</span> pythonds3.trees.priority_queue <span class="kw">import</span> PriorityQueue</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">dijkstra</span>(graph, start):</span>
+<span class="line">    pq = PriorityQueue()</span>
+<span class="line">    start.distance = <span class="num">0</span></span>
+<span class="line">    pq.heapify([(v.distance, v) <span class="kw">for</span> v in graph])</span>
+<span class="line">    <span class="kw">while</span> pq:</span>
+<span class="line">        distance, current_v = pq.delete()</span>
+<span class="line">        <span class="kw">for</span> next_v in current_v.get_neighbors():</span>
+<span class="line">            new_distance = current_v.distance + current_v.get_neighbor(next_v)</span>
+<span class="line">            <span class="kw">if</span> new_distance &lt; next_v.distance:</span>
+<span class="line">                next_v.distance = new_distance</span>
+<span class="line">                next_v.previous = current_v</span>
+<span class="line">                pq.change_priority(next_v, new_distance)   <span class="com"># decrease-key！</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">find_path</span>(graph, start_key, end_key):</span>
+<span class="line">    current = graph.get_vertex(end_key)</span>
+<span class="line">    path = []</span>
+<span class="line">    <span class="kw">while</span> current is not <span class="kw">None</span> and current != graph.get_vertex(start_key):</span>
+<span class="line">        path.append(current.key)</span>
+<span class="line">        current = current.previous</span>
+<span class="line">    <span class="kw">if</span> current is <span class="kw">None</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">"</span><span class="str">No path</span><span class="str">"</span></span>
+<span class="line">    path.append(start_key)</span>
+<span class="line">    path.reverse()</span>
+<span class="line">    <span class="kw">return</span> path</span>
+<span class="line"> </span>
+<span class="line">g = Graph()   <span class="com"># 講義的 6 頂點範例圖（雙向邊）</span></span>
+<span class="line"><span class="kw">for</span> a, b, w in [(<span class="str">'</span><span class="str">u</span><span class="str">'</span>,<span class="str">'</span><span class="str">v</span><span class="str">'</span>,<span class="num">2</span>), (<span class="str">'</span><span class="str">v</span><span class="str">'</span>,<span class="str">'</span><span class="str">w</span><span class="str">'</span>,<span class="num">3</span>), (<span class="str">'</span><span class="str">w</span><span class="str">'</span>,<span class="str">'</span><span class="str">z</span><span class="str">'</span>,<span class="num">5</span>), (<span class="str">'</span><span class="str">u</span><span class="str">'</span>,<span class="str">'</span><span class="str">x</span><span class="str">'</span>,<span class="num">1</span>), (<span class="str">'</span><span class="str">u</span><span class="str">'</span>,<span class="str">'</span><span class="str">w</span><span class="str">'</span>,<span class="num">5</span>),</span>
+<span class="line">                (<span class="str">'</span><span class="str">x</span><span class="str">'</span>,<span class="str">'</span><span class="str">v</span><span class="str">'</span>,<span class="num">2</span>), (<span class="str">'</span><span class="str">x</span><span class="str">'</span>,<span class="str">'</span><span class="str">w</span><span class="str">'</span>,<span class="num">3</span>), (<span class="str">'</span><span class="str">x</span><span class="str">'</span>,<span class="str">'</span><span class="str">y</span><span class="str">'</span>,<span class="num">1</span>), (<span class="str">'</span><span class="str">y</span><span class="str">'</span>,<span class="str">'</span><span class="str">w</span><span class="str">'</span>,<span class="num">1</span>), (<span class="str">'</span><span class="str">y</span><span class="str">'</span>,<span class="str">'</span><span class="str">z</span><span class="str">'</span>,<span class="num">1</span>)]:</span>
+<span class="line">    g.add_edge(a, b, w); g.add_edge(b, a, w)</span>
+<span class="line"> </span>
+<span class="line">dijkstra(g, g.get_vertex(<span class="str">'</span><span class="str">u</span><span class="str">'</span>))</span>
+<span class="line"><span class="kw">for</span> key in <span class="fn">sorted</span>(g.get_vertices()):   <span class="com"># 頂點: 距離 (previous)</span></span>
+<span class="line">    v = g.get_vertex(key)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>key<span class="str">}</span><span class="str">: </span><span class="str">{</span>v.distance<span class="str">}</span><span class="str"> (</span><span class="str">{</span>v.previous.key <span class="kw">if</span> v.previous <span class="kw">else</span> <span class="str">'</span><span class="str">'</span><span class="str">}</span><span class="str">)</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str"> -&gt; </span><span class="str">"</span>.join(find_path(g, <span class="str">'</span><span class="str">u</span><span class="str">'</span>, <span class="str">'</span><span class="str">z</span><span class="str">'</span>)))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>u: 0 ()
+v: 2 (u)
+w: 3 (y)
+x: 1 (u)
+y: 2 (x)
+z: 3 (y)
+u -&gt; x -&gt; y -&gt; z</pre></div>
+  <p class="dx-note"><span id="dx-dij"></span>最生動的一格是 w：直達邊 u→w 權重 5，但演算法最後給它 3（u→x→y→w）。「先到的不一定是最短的」，所以 Dijkstra 允許在頂點還在優先佇列裡時<strong>下修</strong>它的距離（change_priority 就是 decrease-key）。u 到 z 的最短路是 u → x → y → z，總長 3。</p>
+</div>
 </section>
 
 
@@ -1018,6 +1207,45 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <strong>Prim：</strong> <code>newD = w(u,v)</code>：只看 u 到 v 的<strong>單一邊權</strong>。<br>
     為什麼？因為 MST 不在乎「離起點多遠」，只在乎「下一個要連入樹的最便宜邊」。
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 08 · prim 的使用畫面：長出 MST</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> sys <span class="kw">as</span> _sys</span>
+<span class="line"><span class="kw">from</span> pythonds3.graphs <span class="kw">import</span> Graph</span>
+<span class="line"><span class="kw">from</span> pythonds3.trees.priority_queue <span class="kw">import</span> PriorityQueue</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">prim</span>(graph, start):</span>
+<span class="line">    pq = PriorityQueue()</span>
+<span class="line">    <span class="kw">for</span> vertex in graph:</span>
+<span class="line">        vertex.distance = _sys.maxsize</span>
+<span class="line">        vertex.previous = <span class="kw">None</span></span>
+<span class="line">    start.distance = <span class="num">0</span></span>
+<span class="line">    pq.heapify([(vertex.distance, vertex) <span class="kw">for</span> vertex in graph])</span>
+<span class="line">    <span class="kw">while</span> not pq.is_empty():</span>
+<span class="line">        distance, current_v = pq.delete()</span>
+<span class="line">        <span class="kw">for</span> next_v in current_v.get_neighbors():</span>
+<span class="line">            new_distance = current_v.get_neighbor(next_v)   <span class="com"># 只看邊權，不累加</span></span>
+<span class="line">            <span class="kw">if</span> next_v in pq and new_distance &lt; next_v.distance:</span>
+<span class="line">                next_v.previous = current_v</span>
+<span class="line">                next_v.distance = new_distance</span>
+<span class="line">                pq.change_priority(next_v, new_distance)</span>
+<span class="line"> </span>
+<span class="line">g = Graph()   <span class="com"># 講義的廣播範例圖（雙向邊）</span></span>
+<span class="line"><span class="kw">for</span> a, b, w in [(<span class="str">'</span><span class="str">A</span><span class="str">'</span>,<span class="str">'</span><span class="str">B</span><span class="str">'</span>,<span class="num">2</span>), (<span class="str">'</span><span class="str">A</span><span class="str">'</span>,<span class="str">'</span><span class="str">C</span><span class="str">'</span>,<span class="num">3</span>), (<span class="str">'</span><span class="str">B</span><span class="str">'</span>,<span class="str">'</span><span class="str">D</span><span class="str">'</span>,<span class="num">1</span>), (<span class="str">'</span><span class="str">B</span><span class="str">'</span>,<span class="str">'</span><span class="str">C</span><span class="str">'</span>,<span class="num">1</span>),</span>
+<span class="line">                (<span class="str">'</span><span class="str">B</span><span class="str">'</span>,<span class="str">'</span><span class="str">E</span><span class="str">'</span>,<span class="num">4</span>), (<span class="str">'</span><span class="str">D</span><span class="str">'</span>,<span class="str">'</span><span class="str">E</span><span class="str">'</span>,<span class="num">1</span>), (<span class="str">'</span><span class="str">C</span><span class="str">'</span>,<span class="str">'</span><span class="str">F</span><span class="str">'</span>,<span class="num">5</span>), (<span class="str">'</span><span class="str">E</span><span class="str">'</span>,<span class="str">'</span><span class="str">F</span><span class="str">'</span>,<span class="num">1</span>), (<span class="str">'</span><span class="str">F</span><span class="str">'</span>,<span class="str">'</span><span class="str">G</span><span class="str">'</span>,<span class="num">1</span>)]:</span>
+<span class="line">    g.add_edge(a, b, w); g.add_edge(b, a, w)</span>
+<span class="line"> </span>
+<span class="line">prim(g, g.get_vertex(<span class="str">'</span><span class="str">A</span><span class="str">'</span>))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">MST edges:</span><span class="str">"</span>, end=<span class="str">"</span><span class="str"> </span><span class="str">"</span>)</span>
+<span class="line"><span class="kw">for</span> key in <span class="fn">sorted</span>(g.get_vertices()):</span>
+<span class="line">    v = g.get_vertex(key)</span>
+<span class="line">    <span class="kw">if</span> v.previous is not <span class="kw">None</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">(</span><span class="str">{</span>v.previous.key<span class="str">}</span><span class="str">,</span><span class="str">{</span>v.key<span class="str">}</span><span class="str">)</span><span class="str">"</span>, end=<span class="str">"</span><span class="str"> </span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>()</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>MST edges: (A,B) (B,C) (B,D) (D,E) (E,F) (F,G) </pre></div>
+  <p class="dx-note"><span id="dx-prm"></span>六條邊、總權重 2+1+1+1+1+1 = 7，就是廣播訊息要走的樹。跟 Dijkstra 只差一行：new_distance 只看<strong>單條邊權</strong>、不累加路徑；「樹外頂點的入場券隨時可以換更便宜的」正是 Prim 的核心。</p>
+</div>
 </section>
 
 
