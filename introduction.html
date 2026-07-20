@@ -318,6 +318,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 <nav class="float-nav" id="floatNav" aria-label="章節導覽">
@@ -526,6 +537,62 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qBoolFeedback"></div>
 </div>
+
+<h3 id="dx-types">講義完整範例：把運算子親手跑一遍</h3>
+<p>下面三段是講義 01 的原始示範，值得抄進直譯器跑一次。第一段的重點是 <code>/</code> 是<strong>真除法</strong>：
+就算兩邊都是整數，結果也是 float；要整數除法得用 <code>//</code>。</p>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 算術運算子與兩種除法</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="fn">print</span>(<span class="num">2</span> + <span class="num">3</span> * <span class="num">4</span>)</span>
+<span class="line"><span class="fn">print</span>((<span class="num">2</span> + <span class="num">3</span>) * <span class="num">4</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="num">2</span> ** <span class="num">10</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="num">6</span> / <span class="num">3</span>)      <span class="com"># / 是真除法：結果一律 float</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">7</span> / <span class="num">3</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="num">7</span> // <span class="num">3</span>)     <span class="com"># // 才是整數除法（往下取整）</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">7</span> % <span class="num">3</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="num">2</span> ** <span class="num">100</span>)   <span class="com"># 整數任意精度：一位都不少</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>14
+20
+1024
+2.0
+2.3333333333333335
+2
+1
+1267650600228229401496703205376</pre></div>
+  <p class="dx-note">最後一行值得多看一眼：2<sup>100</sup> 每一位都是精確的。Python 的 int 是任意精度整數，沒有溢位這回事，代價是大數運算比固定寬度整數慢。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 比較運算子與連鎖比較</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="fn">print</span>(<span class="num">5</span> == <span class="num">10</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="num">10</span> &gt; <span class="num">5</span>)</span>
+<span class="line"><span class="fn">print</span>((<span class="num">5</span> &gt;= <span class="num">1</span>) and (<span class="num">5</span> &lt;= <span class="num">10</span>))</span>
+<span class="line"><span class="fn">print</span>((<span class="num">1</span> &lt; <span class="num">5</span>) or (<span class="num">10</span> &lt; <span class="num">1</span>))</span>
+<span class="line"><span class="fn">print</span>(<span class="num">1</span> &lt; <span class="num">5</span> &lt; <span class="num">10</span>)   <span class="com"># 連鎖比較：Python 真的懂數學課的寫法</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>False
+True
+True
+True
+True</pre></div>
+  <p class="dx-note">1 &lt; 5 &lt; 10 在 Python 是真正的「數學課寫法」：等價於 (1 &lt; 5) and (5 &lt; 10)。這是 Python 的貼心設計，別的語言多半不是這個意思。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 名字可以改綁任何物件</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">the_sum = <span class="num">0</span></span>
+<span class="line"><span class="fn">print</span>(the_sum)</span>
+<span class="line"> </span>
+<span class="line">the_sum = the_sum + <span class="num">1</span></span>
+<span class="line"><span class="fn">print</span>(the_sum)</span>
+<span class="line"> </span>
+<span class="line">the_sum = <span class="kw">True</span>   <span class="com"># 同一個名字改綁到 bool 物件</span></span>
+<span class="line"><span class="fn">print</span>(the_sum)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>0
+1
+True</pre></div>
+  <p class="dx-note">the_sum 先綁 int、後綁 bool，完全合法：Python 的變數是「名字」，型別跟著<strong>物件</strong>走、不跟著名字走。方便，但也表示打錯字綁錯東西時，直譯器不會攔你。</p>
+</div>
 </section>
 
 <section id="collections">
@@ -633,6 +700,129 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qStrFeedback"></div>
 </div>
+
+<h3 id="dx-coll">講義完整範例：五種容器逐一跑過</h3>
+<p>表格看熟之後，把講義的示範程式親手跑一遍，輸出先用腦袋預測再對答案。</p>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · list：增刪改</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">my_list = [<span class="num">1024</span>, <span class="num">3</span>, <span class="kw">True</span>, <span class="num">6.5</span>]</span>
+<span class="line">my_list.append(<span class="kw">False</span>)</span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line">my_list.insert(<span class="num">2</span>, <span class="num">4.5</span>)</span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"><span class="fn">print</span>(my_list.pop())     <span class="com"># 不給索引：拿走最後一個（會回傳！）</span></span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"><span class="fn">print</span>(my_list.pop(<span class="num">1</span>))</span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[1024, 3, True, 6.5, False]
+[1024, 3, 4.5, True, 6.5, False]
+False
+[1024, 3, 4.5, True, 6.5]
+3
+[1024, 4.5, True, 6.5]</pre></div>
+  <p class="dx-note">list 什麼型別都能混裝（1024、True、6.5 同住一屋）。pop() 會<strong>回傳</strong>被拿走的元素，這點跟很多語言不同：取值和移除一步完成。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · list 的整理術：sort、reverse、count、index</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">my_list = [<span class="num">1024</span>, <span class="num">3</span>, <span class="num">4.5</span>, <span class="num">6.5</span>]</span>
+<span class="line">my_list.sort()</span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line">my_list.reverse()</span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"><span class="fn">print</span>(my_list.count(<span class="num">6.5</span>))</span>
+<span class="line"><span class="fn">print</span>(my_list.index(<span class="num">4.5</span>))</span>
+<span class="line">my_list.remove(<span class="num">6.5</span>)      <span class="com"># 按值移除</span></span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"><span class="kw">del</span> my_list[<span class="num">0</span>]           <span class="com"># 按索引刪除</span></span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[3, 4.5, 6.5, 1024]
+[1024, 6.5, 4.5, 3]
+1
+2
+[1024, 4.5, 3]
+[4.5, 3]</pre></div>
+  <p class="dx-note">sort() 是就地排序、回傳 None：寫 my_list = my_list.sort() 是經典錯誤，會把串列弄丟。remove 按值、del 按索引，兩條路分清楚。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · string 的常用操作</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">my_name = <span class="str">"</span><span class="str">David</span><span class="str">"</span></span>
+<span class="line"><span class="fn">print</span>(my_name[<span class="num">3</span>])</span>
+<span class="line"><span class="fn">print</span>(my_name * <span class="num">2</span>)        <span class="com"># 重複</span></span>
+<span class="line"><span class="fn">print</span>(<span class="fn">len</span>(my_name))</span>
+<span class="line"><span class="fn">print</span>(my_name.upper())</span>
+<span class="line"><span class="fn">print</span>(my_name.center(<span class="num">10</span>))</span>
+<span class="line"><span class="fn">print</span>(my_name.find(<span class="str">"</span><span class="str">v</span><span class="str">"</span>))</span>
+<span class="line"><span class="fn">print</span>(my_name.split(<span class="str">"</span><span class="str">v</span><span class="str">"</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>i
+DavidDavid
+5
+DAVID
+  David   
+2
+[&#x27;Da&#x27;, &#x27;id&#x27;]</pre></div>
+  <p class="dx-note">字串是<strong>不可變</strong>的：upper()、center() 都回傳新字串，原字串動也不動。split 回傳 list，是文字處理的萬用刀。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · tuple：不可變的代價與保障</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">my_tuple = (<span class="num">2</span>, <span class="kw">True</span>, <span class="num">4.96</span>)</span>
+<span class="line"><span class="fn">print</span>(my_tuple)</span>
+<span class="line"><span class="fn">print</span>(<span class="fn">len</span>(my_tuple))</span>
+<span class="line"><span class="fn">print</span>(my_tuple[<span class="num">0</span>])</span>
+<span class="line"><span class="fn">print</span>(my_tuple[<span class="num">0</span>:<span class="num">2</span>])</span>
+<span class="line"> </span>
+<span class="line">my_tuple[<span class="num">1</span>] = <span class="kw">False</span>   <span class="com"># tuple 不可變：這行會爆</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（最後一行故意爆）</span><pre>(2, True, 4.96)
+3
+2
+(2, True)
+    ~~~~~~~~^^^
+TypeError: &#x27;tuple&#x27; object does not support item assignment</pre></div>
+  <p class="dx-note">tuple 幾乎就是「鎖起來的 list」：能索引、能切片、能重複，但不能改。最後一行的 TypeError 是保障：確定不會被改的資料，才能當 dict 的鍵、才容易被多處安心共用。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · set：去重、查成員、集合運算</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">my_set = {<span class="num">3</span>, <span class="num">6</span>, <span class="str">"</span><span class="str">cat</span><span class="str">"</span>, <span class="num">4.5</span>, <span class="kw">False</span>}</span>
+<span class="line">your_set = {<span class="num">99</span>, <span class="num">3</span>, <span class="num">100</span>}</span>
+<span class="line"><span class="fn">print</span>(my_set.union(your_set))         <span class="com"># 也可寫 my_set | your_set</span></span>
+<span class="line"><span class="fn">print</span>(my_set.intersection(your_set))  <span class="com"># my_set &amp; your_set</span></span>
+<span class="line"><span class="fn">print</span>(my_set.difference(your_set))    <span class="com"># my_set - your_set</span></span>
+<span class="line"><span class="fn">print</span>({<span class="num">3</span>, <span class="num">100</span>}.issubset(your_set))    <span class="com"># {3, 100} &lt;= your_set</span></span>
+<span class="line"> </span>
+<span class="line">my_set.add(<span class="str">"</span><span class="str">house</span><span class="str">"</span>)</span>
+<span class="line">my_set.remove(<span class="num">4.5</span>)</span>
+<span class="line"><span class="fn">print</span>(my_set)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>{False, 3, &#x27;cat&#x27;, 4.5, 6, 99, 100}
+{3}
+{False, &#x27;cat&#x27;, 4.5, 6}
+True
+{False, 3, &#x27;cat&#x27;, 6, &#x27;house&#x27;}</pre></div>
+  <p class="dx-note">集合運算有兩套寫法：方法名（union/intersection/difference/issubset）和運算子（| &amp; - &lt;=），效果相同。注意 set 印出來的順序不固定：它本來就是無序集合。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · dict：鍵值對、走訪、安全查詢</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">phone_ext = {<span class="str">"</span><span class="str">david</span><span class="str">"</span>: <span class="num">1410</span>, <span class="str">"</span><span class="str">brad</span><span class="str">"</span>: <span class="num">1137</span>, <span class="str">"</span><span class="str">roman</span><span class="str">"</span>: <span class="num">1171</span>}</span>
+<span class="line">phone_ext[<span class="str">"</span><span class="str">kent</span><span class="str">"</span>] = <span class="num">2001</span>              <span class="com"># 加新配對</span></span>
+<span class="line"><span class="fn">print</span>(<span class="fn">list</span>(phone_ext.keys()))</span>
+<span class="line"><span class="fn">print</span>(<span class="fn">list</span>(phone_ext.values()))</span>
+<span class="line"><span class="fn">print</span>(<span class="fn">list</span>(phone_ext.items()))</span>
+<span class="line"><span class="fn">print</span>(phone_ext.get(<span class="str">"</span><span class="str">alice</span><span class="str">"</span>))              <span class="com"># 不存在：回 None、不爆</span></span>
+<span class="line"><span class="fn">print</span>(phone_ext.get(<span class="str">"</span><span class="str">alice</span><span class="str">"</span>, <span class="str">"</span><span class="str">NO ENTRY</span><span class="str">"</span>))  <span class="com"># 給預設值</span></span>
+<span class="line"><span class="fn">print</span>(phone_ext[<span class="str">"</span><span class="str">alice</span><span class="str">"</span>])                  <span class="com"># [] 就沒這麼客氣了</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（最後一行故意爆）</span><pre>[&#x27;david&#x27;, &#x27;brad&#x27;, &#x27;roman&#x27;, &#x27;kent&#x27;]
+[1410, 1137, 1171, 2001]
+[(&#x27;david&#x27;, 1410), (&#x27;brad&#x27;, 1137), (&#x27;roman&#x27;, 1171), (&#x27;kent&#x27;, 2001)]
+None
+NO ENTRY
+          ~~~~~~~~~^^^^^^^^^
+KeyError: &#x27;alice&#x27;</pre></div>
+  <p class="dx-note">get() 是安全查詢：查無此鍵回 None 或你給的預設值；[] 查無此鍵直接 KeyError。純查詢用 get，確定存在才用 []。</p>
+</div>
 </section>
 
 <section id="io">
@@ -676,6 +866,58 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="寬度 10、小數 2 位、靠右、缺的位置用 0 填：24.00 前面補 5 個 0。冒號後的規格順序是「填充、對齊、寬度、.小數位、型別」。" onclick="quizCheck('qIo', this)"><span class="opt-letter">(A)</span> <code>0000024.00</code></div><div class="quiz-opt" data-correct="false" data-fb="別漏看寬度 10 和填充字元 0：不足的部分要補滿。" onclick="quizCheck('qIo', this)"><span class="opt-letter">(B)</span> <code>24.00</code></div><div class="quiz-opt" data-correct="false" data-fb="填 0 不填 #，而且 &gt; 是靠右：補在前面。" onclick="quizCheck('qIo', this)"><span class="opt-letter">(C)</span> <code>##24.00###</code></div>
   </div>
   <div class="quiz-feedback" id="qIoFeedback"></div>
+</div>
+
+<h3 id="dx-io">講義完整範例：輸入與格式化輸出</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · input 永遠給你字串</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">s_radius = <span class="fn">input</span>(<span class="str">"</span><span class="str">Please enter the radius of the circle </span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(s_radius)</span>
+<span class="line">radius = <span class="fn">float</span>(s_radius)   <span class="com"># 要算數，得自己轉型</span></span>
+<span class="line"><span class="fn">print</span>(radius)</span>
+<span class="line">diameter = <span class="num">2</span> * radius</span>
+<span class="line"><span class="fn">print</span>(diameter)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">示範執行（輸入 4.5）</span><pre>Please enter the radius of the circle 4.5
+4.5
+4.5
+9.0</pre></div>
+  <p class="dx-note">input() 回傳的<strong>一律是字串</strong>：s_radius 印出來像數字，其實是「'4.5'」。忘了 float() 轉型，2 * s_radius 會得到「'4.54.5'」（字串重複），這是新手第一大坑。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · f-string 的對齊全家餐</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">price = <span class="num">24</span></span>
+<span class="line">item = <span class="str">"</span><span class="str">banana</span><span class="str">"</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">The </span><span class="str">{</span>item<span class="str">:</span><span class="str">10</span><span class="str">}</span><span class="str"> costs </span><span class="str">{</span>price<span class="str">:</span><span class="str">10.2f</span><span class="str">}</span><span class="str"> cents</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">The </span><span class="str">{</span>item<span class="str">:</span><span class="str">&lt;10</span><span class="str">}</span><span class="str"> costs </span><span class="str">{</span>price<span class="str">:</span><span class="str">&lt;10.2f</span><span class="str">}</span><span class="str"> cents</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">The </span><span class="str">{</span>item<span class="str">:</span><span class="str">^10</span><span class="str">}</span><span class="str"> costs </span><span class="str">{</span>price<span class="str">:</span><span class="str">^10.2f</span><span class="str">}</span><span class="str"> cents</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">The </span><span class="str">{</span>item<span class="str">:</span><span class="str">&gt;10</span><span class="str">}</span><span class="str"> costs </span><span class="str">{</span>price<span class="str">:</span><span class="str">&gt;10.2f</span><span class="str">}</span><span class="str"> cents</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">The </span><span class="str">{</span>item<span class="str">:</span><span class="str">&gt;10</span><span class="str">}</span><span class="str"> costs </span><span class="str">{</span>price<span class="str">:</span><span class="str">&gt;010.2f</span><span class="str">}</span><span class="str"> cents</span><span class="str">"</span>)</span>
+<span class="line">itemdict = {<span class="str">"</span><span class="str">item</span><span class="str">"</span>: <span class="str">"</span><span class="str">banana</span><span class="str">"</span>, <span class="str">"</span><span class="str">price</span><span class="str">"</span>: <span class="num">24</span>}</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">Item:</span><span class="str">{</span>itemdict[<span class="str">'</span><span class="str">item</span><span class="str">'</span>]<span class="str">:</span><span class="str">.&gt;10</span><span class="str">}</span><span class="str">\n</span><span class="str">"</span> +</span>
+<span class="line">    <span class="str">f</span><span class="str">"</span><span class="str">Price:</span><span class="str">{</span><span class="str">'</span><span class="str">$</span><span class="str">'</span><span class="str">:</span><span class="str">.&gt;4</span><span class="str">}</span><span class="str">{</span>itemdict[<span class="str">'</span><span class="str">price</span><span class="str">'</span>]<span class="str">:</span><span class="str">5.2f</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>The banana     costs      24.00 cents
+The banana     costs 24.00      cents
+The   banana   costs   24.00    cents
+The     banana costs      24.00 cents
+The     banana costs 0000024.00 cents
+Item:....banana
+Price:...$24.00</pre></div>
+  <p class="dx-note">冒號後面是格式規格：寬度 10、&lt; 靠左、^ 置中、&gt; 靠右、010.2f 補零、.&gt;10 用點填滿。花括號裡直接放運算式（連 dict 取值都行）是 f-string 最好用的地方。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 三代格式化寫法同場</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">price = <span class="num">24</span></span>
+<span class="line">item = <span class="str">"</span><span class="str">banana</span><span class="str">"</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">The </span><span class="str">%s</span><span class="str"> costs </span><span class="str">%d</span><span class="str"> cents</span><span class="str">"</span> % (item, price))          <span class="com"># 格式化運算子（老）</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">The </span><span class="str">{}</span><span class="str"> costs </span><span class="str">{}</span><span class="str"> cents</span><span class="str">"</span>.format(item, price))      <span class="com"># str.format（中生代）</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">The </span><span class="str">{</span>item<span class="str">}</span><span class="str"> costs </span><span class="str">{</span>price<span class="str">}</span><span class="str"> cents</span><span class="str">"</span>)                 <span class="com"># f-string（現役）</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>The banana costs 24 cents
+The banana costs 24 cents
+The banana costs 24 cents</pre></div>
+  <p class="dx-note">% 運算子和 .format() 在舊程式碼裡到處都是，讀得懂就好；自己寫一律用 f-string：短、直觀、錯誤訊息清楚。</p>
 </div>
 </section>
 
@@ -728,6 +970,54 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qCtlFeedback"></div>
 </div>
+
+<h3 id="dx-ctrl">講義完整範例：巢狀迴圈、生成式與一個練習</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 巢狀 for：攤平字母</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">word_list = [<span class="str">"</span><span class="str">cat</span><span class="str">"</span>, <span class="str">"</span><span class="str">dog</span><span class="str">"</span>, <span class="str">"</span><span class="str">rabbit</span><span class="str">"</span>]</span>
+<span class="line">letter_list = []</span>
+<span class="line"><span class="kw">for</span> a_word in word_list:</span>
+<span class="line">    <span class="kw">for</span> a_letter in a_word:</span>
+<span class="line">        letter_list.append(a_letter)</span>
+<span class="line"><span class="fn">print</span>(letter_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[&#x27;c&#x27;, &#x27;a&#x27;, &#x27;t&#x27;, &#x27;d&#x27;, &#x27;o&#x27;, &#x27;g&#x27;, &#x27;r&#x27;, &#x27;a&#x27;, &#x27;b&#x27;, &#x27;b&#x27;, &#x27;i&#x27;, &#x27;t&#x27;]</pre></div>
+  <p class="dx-note">外層走訪每個單字、內層走訪單字裡的每個字母。這種「攤平」也能寫成生成式：[letter for word in word_list for letter in word]。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 串列生成式三段式</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">sq_list = []</span>
+<span class="line"><span class="kw">for</span> x in <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>):</span>
+<span class="line">    sq_list.append(x * x)</span>
+<span class="line"><span class="fn">print</span>(sq_list)</span>
+<span class="line"> </span>
+<span class="line">sq_list = [x * x <span class="kw">for</span> x in <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>)]           <span class="com"># 串列生成式：一行等價</span></span>
+<span class="line"><span class="fn">print</span>(sq_list)</span>
+<span class="line"> </span>
+<span class="line">sq_list = [x * x <span class="kw">for</span> x in <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>) <span class="kw">if</span> x % <span class="num">2</span> != <span class="num">0</span>]</span>
+<span class="line"><span class="fn">print</span>(sq_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+[1, 9, 25, 49, 81]</pre></div>
+  <p class="dx-note">生成式讀法固定：先看 for（資料從哪來）、再看 if（誰能留下）、最後看最前面的運算式（留下的變成什麼）。第三段只留奇數的平方。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 練習：把 average() 寫完</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">average</span>(a_list):</span>
+<span class="line">    <span class="kw">if</span> not a_list:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"</span><span class="str">List is empty</span><span class="str">"</span>)</span>
+<span class="line">        <span class="kw">return</span></span>
+<span class="line">    <span class="com"># 你的程式碼：算出 avg，及格與否放進 status（"pass"/"fail"），然後：</span></span>
+<span class="line">    <span class="com"># print(f"{status} (Average: {avg:.1f})")</span></span>
+<span class="line"> </span>
+<span class="line">average([<span class="num">99</span>, <span class="num">100</span>, <span class="num">74</span>, <span class="num">63</span>, <span class="num">100</span>, <span class="num">100</span>])</span>
+<span class="line">average([<span class="num">22</span>, <span class="num">19</span>, <span class="num">74</span>, <span class="num">63</span>, <span class="num">100</span>, <span class="num">44</span>])</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">完成後的預期輸出</span><pre>pass (Average: 89.3)
+fail (Average: 53.7)</pre></div>
+  <p class="dx-note">提示：sum(a_list) / len(a_list) 一行搞定平均（/ 是真除法，不用擔心整數截斷）。if not a_list 是「空串列判斷」的慣用寫法：空容器在布林脈絡下是 False。</p>
+</div>
 </section>
 
 <section id="exceptions">
@@ -779,6 +1069,18 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qExcFeedback"></div>
 </div>
+
+<h3 id="dx-exc">講義補充：沒接住會怎樣？</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 沒有 try/except 的下場</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> math</span>
+<span class="line">a_number = -<span class="num">23</span></span>
+<span class="line"><span class="fn">print</span>(math.sqrt(a_number))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">執行期錯誤訊息</span><pre>          ~~~~~~~~~^^^^^^^^^^
+ValueError: math domain error</pre></div>
+  <p class="dx-note">對照上面接住的版本：同一行程式，有 try/except 就能優雅收場，沒有就整支程式陣亡，traceback 直接甩在你臉上。ValueError 這一行就是該接的訊號。</p>
+</div>
 </section>
 
 <section id="functions">
@@ -829,6 +1131,19 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="lst + [9] 造出全新的串列，lst 改綁過去，區域名字跟 a 從此分道揚鑣。想讓 a 變長，要用 lst.append(9) 或 lst += [9]（就地版本）。" onclick="quizCheck('qFn', this)"><span class="opt-letter">(A)</span> <code>[1]</code>：lst 被改綁到新串列，a 不動</div><div class="quiz-opt" data-correct="false" data-fb="那是 lst.append(9) 的效果。+ 造新物件、append 改舊物件，一字之差兩個世界。" onclick="quizCheck('qFn', this)"><span class="opt-letter">(B)</span> <code>[1, 9]</code></div><div class="quiz-opt" data-correct="false" data-fb="語法完全合法，這是語意問題不是語法問題。" onclick="quizCheck('qFn', this)"><span class="opt-letter">(C)</span> 丟出例外</div>
   </div>
   <div class="quiz-feedback" id="qFnFeedback"></div>
+</div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 函式可以疊著呼叫</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">square</span>(n):</span>
+<span class="line">    <span class="kw">return</span> n ** <span class="num">2</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(square(<span class="num">3</span>))</span>
+<span class="line"><span class="fn">print</span>(square(square(<span class="num">3</span>)))   <span class="com"># 先算內層 9，再平方</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>9
+81</pre></div>
+  <p class="dx-note"><span id="dx-fn"></span>square(square(3)) 由內往外算：內層回傳 9，外層拿 9 再平方。這種「函式結果餵給函式」的組合思維是遞迴章的前菜。</p>
 </div>
 </section>
 
@@ -927,6 +1242,61 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qCls2Feedback"></div>
 </div>
+
+<h3 id="dx-cls">收工驗收：完整 Fraction 的使用畫面</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 五步蓋完之後：__str__ / __add__ / __eq__</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">gcd</span>(m, n):</span>
+<span class="line">    <span class="kw">while</span> m % n != <span class="num">0</span>:</span>
+<span class="line">        m, n = n, m % n</span>
+<span class="line">    <span class="kw">return</span> n</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">class</span> Fraction:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, top, bottom):</span>
+<span class="line">        <span class="fn">self</span>._num = top</span>
+<span class="line">        <span class="fn">self</span>._den = bottom</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> <span class="str">f</span><span class="str">"</span><span class="str">{</span><span class="fn">self</span>._num<span class="str">}</span><span class="str">/</span><span class="str">{</span><span class="fn">self</span>._den<span class="str">}</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__eq__</span>(<span class="fn">self</span>, other):</span>
+<span class="line">        <span class="kw">return</span> <span class="fn">self</span>._num * other._den == other._num * <span class="fn">self</span>._den</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__add__</span>(<span class="fn">self</span>, other):</span>
+<span class="line">        new_num = <span class="fn">self</span>._num * other._den + <span class="fn">self</span>._den * other._num</span>
+<span class="line">        new_den = <span class="fn">self</span>._den * other._den</span>
+<span class="line">        cmmn = gcd(new_num, new_den)</span>
+<span class="line">        <span class="kw">return</span> Fraction(new_num // cmmn, new_den // cmmn)</span>
+<span class="line"> </span>
+<span class="line">x = Fraction(<span class="num">1</span>, <span class="num">2</span>)</span>
+<span class="line">y = Fraction(<span class="num">2</span>, <span class="num">3</span>)</span>
+<span class="line"><span class="fn">print</span>(y)</span>
+<span class="line"><span class="fn">print</span>(x + y)</span>
+<span class="line"><span class="fn">print</span>(x == y)</span>
+<span class="line"> </span>
+<span class="line">z = Fraction(<span class="num">2</span>, <span class="num">4</span>)</span>
+<span class="line"><span class="fn">print</span>(x == z)   <span class="com"># 深相等：1/2 == 2/4</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>2/3
+7/6
+False
+True</pre></div>
+  <p class="dx-note">最後一行是<strong>深相等</strong>的驗收：x 和 z 是兩個不同的物件，但 __eq__ 用交叉相乘比「值」，所以 1/2 == 2/4 是 True。沒寫 __eq__ 時，== 預設比「是不是同一個物件」（跟 is 一樣），那叫淺相等。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 課後練習：負分母與大小比較</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Fraction:</span>
+<span class="line">    <span class="com"># 你的程式碼：</span></span>
+<span class="line">    <span class="com">#  - __init__ 把負分母正規化（9/-10 → -9/10）</span></span>
+<span class="line">    <span class="com">#  - __gt__(self, other)、__lt__(self, other)</span></span>
+<span class="line"> </span>
+<span class="line">a = Fraction(<span class="num">3</span>, <span class="num">5</span>)</span>
+<span class="line">b = Fraction(<span class="num">9</span>, -<span class="num">10</span>)</span>
+<span class="line"><span class="fn">print</span>(a &gt; b)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">完成後的預期輸出</span><pre>True</pre></div>
+  <p class="dx-note">提示：比大小跟 __eq__ 一樣用交叉相乘就好，不用真的除；但要先把「負號都搬到分子」，交叉相乘的不等號方向才不會被負分母翻轉。</p>
+</div>
 </section>
 
 <section id="inherit">
@@ -1021,6 +1391,26 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="造物件那一行是成功的（Python 沒有「抽象類別不能實例化」的內建限制），爆點在 get_output 呼叫不存在的方法。想提早擋，可以用 abc 模組把它宣告成抽象方法。" onclick="quizCheck('qInh2', this)"><span class="opt-letter">(A)</span> AttributeError：LogicGate 沒有 perform_gate_logic</div><div class="quiz-opt" data-correct="false" data-fb="_output 的初始值確實是 None，但流程根本走不到回傳那行。" onclick="quizCheck('qInh2', this)"><span class="opt-letter">(B)</span> 回傳 None</div><div class="quiz-opt" data-correct="false" data-fb="Python 不做這種檢查：錯誤延到真正呼叫的那一刻才爆。" onclick="quizCheck('qInh2', this)"><span class="opt-letter">(C)</span> 程式開始執行前就報錯</div>
   </div>
   <div class="quiz-feedback" id="qInh2Feedback"></div>
+</div>
+
+<h3 id="dx-inh">講義完整範例：整座電路的程式版</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 01 · 用類別把電路接起來</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">g1 = AndGate(<span class="str">"</span><span class="str">gand1</span><span class="str">"</span>)</span>
+<span class="line">g2 = AndGate(<span class="str">"</span><span class="str">gand2</span><span class="str">"</span>)</span>
+<span class="line">g3 = OrGate(<span class="str">"</span><span class="str">gor3</span><span class="str">"</span>)</span>
+<span class="line">g4 = NotGate(<span class="str">"</span><span class="str">gnot4</span><span class="str">"</span>)</span>
+<span class="line">c1 = Connector(g1, g3)   <span class="com"># g1 輸出 → g3 輸入</span></span>
+<span class="line">c2 = Connector(g2, g3)</span>
+<span class="line">c3 = Connector(g3, g4)</span>
+<span class="line"><span class="fn">print</span>(g4.get_output())</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">示範執行（A=B=1、C=D=0）</span><pre>Enter input for gate gand1 --&gt;1
+Enter input for gate gand1 --&gt;1
+Enter input for gate gand2 --&gt;0
+Enter input for gate gand2 --&gt;0
+0</pre></div>
+  <p class="dx-note">呼叫 g4.get_output() 會沿著 Connector 一路「往上游要值」：NOT 問 OR、OR 問兩個 AND、AND 才向使用者要輸入。所以 NOT((1 AND 1) OR (0 AND 0)) = NOT(1) = 0。拿上面的互動電路對照：同樣輸入應該得到同樣的 0。</p>
 </div>
 </section>
 
