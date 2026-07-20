@@ -294,6 +294,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 
@@ -447,6 +458,81 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 
   <h3>二元樹（Binary Tree）</h3>
   <p>本章我們專注於每個節點最多有<strong>兩個子節點</strong>的樹，稱為二元樹。我們特別命名為 <code>left_child</code> 和 <code>right_child</code>，這個順序在解析樹（運算子的左右運算元）和 BST（小的在左、大的在右）中是有語義的。</p>
+
+<h3 id="dx-voc">講義完整範例：BinaryTree 與解析樹的使用畫面</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 09 · BinaryTree 基本操作</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.trees <span class="kw">import</span> BinaryTree</span>
+<span class="line"> </span>
+<span class="line">a_tree = BinaryTree(<span class="str">"</span><span class="str">a</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(a_tree.get_root_val())</span>
+<span class="line"><span class="fn">print</span>(a_tree.get_left_child())        <span class="com"># 還沒有：None</span></span>
+<span class="line">a_tree.insert_left(<span class="str">"</span><span class="str">b</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(a_tree.get_left_child().get_root_val())</span>
+<span class="line">a_tree.insert_right(<span class="str">"</span><span class="str">c</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(a_tree.get_right_child().get_root_val())</span>
+<span class="line">a_tree.get_right_child().set_root_val(<span class="str">"</span><span class="str">hello</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(a_tree.get_right_child().get_root_val())</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>a
+None
+b
+c
+hello</pre></div>
+  <p class="dx-note">get_left_child() 回傳的是<strong>整棵左子樹</strong>（BinaryTree 物件），不只是值：所以能一路點下去操作任何深度的節點。insert_left 若遇到既有左子樹，會把它「往下推」成新節點的左子樹。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 09 · 解析樹：建樹、求值、還原</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> operator</span>
+<span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Stack</span>
+<span class="line"><span class="kw">from</span> pythonds3.trees <span class="kw">import</span> BinaryTree</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">build_parse_tree</span>(fp_expr):</span>
+<span class="line">    fp_list = fp_expr.split()</span>
+<span class="line">    p_stack = Stack()</span>
+<span class="line">    expr_tree = BinaryTree(<span class="str">"</span><span class="str">"</span>)</span>
+<span class="line">    p_stack.push(expr_tree)</span>
+<span class="line">    current_tree = expr_tree</span>
+<span class="line">    <span class="kw">for</span> token in fp_list:</span>
+<span class="line">        <span class="kw">if</span> token == <span class="str">"</span><span class="str">(</span><span class="str">"</span>:</span>
+<span class="line">            current_tree.insert_left(<span class="str">"</span><span class="str">"</span>)</span>
+<span class="line">            p_stack.push(current_tree)</span>
+<span class="line">            current_tree = current_tree.left_child</span>
+<span class="line">        <span class="kw">elif</span> token in [<span class="str">"</span><span class="str">+</span><span class="str">"</span>, <span class="str">"</span><span class="str">-</span><span class="str">"</span>, <span class="str">"</span><span class="str">*</span><span class="str">"</span>, <span class="str">"</span><span class="str">/</span><span class="str">"</span>]:</span>
+<span class="line">            current_tree.root = token</span>
+<span class="line">            current_tree.insert_right(<span class="str">"</span><span class="str">"</span>)</span>
+<span class="line">            p_stack.push(current_tree)</span>
+<span class="line">            current_tree = current_tree.right_child</span>
+<span class="line">        <span class="kw">elif</span> token == <span class="str">"</span><span class="str">)</span><span class="str">"</span>:</span>
+<span class="line">            current_tree = p_stack.pop()</span>
+<span class="line">        <span class="kw">else</span>:</span>
+<span class="line">            current_tree.root = <span class="fn">int</span>(token)</span>
+<span class="line">            parent = p_stack.pop()</span>
+<span class="line">            current_tree = parent</span>
+<span class="line">    <span class="kw">return</span> expr_tree</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">evaluate</span>(parse_tree):</span>
+<span class="line">    operators = {<span class="str">"</span><span class="str">+</span><span class="str">"</span>: operator.add, <span class="str">"</span><span class="str">-</span><span class="str">"</span>: operator.sub,</span>
+<span class="line">                 <span class="str">"</span><span class="str">*</span><span class="str">"</span>: operator.mul, <span class="str">"</span><span class="str">/</span><span class="str">"</span>: operator.truediv}</span>
+<span class="line">    left_child = parse_tree.left_child</span>
+<span class="line">    right_child = parse_tree.right_child</span>
+<span class="line">    <span class="kw">if</span> left_child and right_child:</span>
+<span class="line">        fn = operators[parse_tree.root]</span>
+<span class="line">        <span class="kw">return</span> fn(evaluate(left_child), evaluate(right_child))</span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        <span class="kw">return</span> parse_tree.root</span>
+<span class="line"> </span>
+<span class="line">pt = build_parse_tree(<span class="str">"</span><span class="str">( 3 + ( 4 * 5 ) )</span><span class="str">"</span>)</span>
+<span class="line">pt.inorder()                <span class="com"># 中序走訪：印回運算式的骨架</span></span>
+<span class="line"><span class="fn">print</span>()</span>
+<span class="line"><span class="fn">print</span>(evaluate(pt))         <span class="com"># 後序邏輯：先算子樹再套運算子</span></span>
+<span class="line"><span class="fn">print</span>(pt.print_exp())       <span class="com"># 中序＋括號還原</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>3 + 4 * 5 
+23
+( 3 + ( 4 * 5 ) ) None</pre></div>
+  <p class="dx-note">三個動作就是三種走訪的應用：inorder 印骨架（但括號不見了）、evaluate 是後序（先算 4*5=20 再算 3+20；/ 是真除法所以可能出現小數）、print_exp 是中序加括號。課後練習：改 print_exp，讓葉節點不要包括號。</p>
+</div>
 </section>
 
 <!-- ============================================================ -->
@@ -831,6 +917,29 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 
   <h3>應用：Heap Sort（堆排序）</h3>
   <p>有了 <code>heapify</code>（$O(n)$）和 $n$ 次 <code>delete-min</code>（每次 $O(\log n)$），就能寫出 $O(n \log n)$ 的排序：把所有元素丟進 heap，然後不斷 delete-min 拿出來。這是<strong>不需要額外 $O(n)$ 空間</strong>的就地排序變體（直接在原陣列上做 heap 操作）的核心。</p>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 09 · heapify 的使用畫面＋heap_sort 練習</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.trees <span class="kw">import</span> BinaryHeap</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">heap_sort</span>(unsorted_list):</span>
+<span class="line">    heap = BinaryHeap()</span>
+<span class="line">    sorted_list = []</span>
+<span class="line">    <span class="com"># 你的程式碼：</span></span>
+<span class="line">    <span class="com"># 1. heapify 一次 O(n) 建堆</span></span>
+<span class="line">    <span class="com"># 2. 反覆 delete() 取最小值加進 sorted_list，每次 O(log n)</span></span>
+<span class="line">    <span class="kw">return</span> sorted_list</span>
+<span class="line"> </span>
+<span class="line">a_heap = BinaryHeap()</span>
+<span class="line">a_heap.heapify([<span class="num">10</span>, <span class="num">4</span>, <span class="num">9</span>, <span class="num">8</span>, <span class="num">12</span>, <span class="num">15</span>, <span class="num">3</span>, <span class="num">5</span>, <span class="num">14</span>, <span class="num">18</span>])</span>
+<span class="line"><span class="fn">print</span>(a_heap)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">Sorted list:</span><span class="str">"</span>, heap_sort([<span class="num">10</span>, <span class="num">3</span>, <span class="num">5</span>, <span class="num">1</span>, <span class="num">15</span>, <span class="num">7</span>, <span class="num">9</span>, <span class="num">2</span>, <span class="num">8</span>]))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">heapify 快照＋heap_sort 完成後的輸出</span><pre>[3, 4, 9, 5, 12, 15, 10, 8, 14, 18]
+Sorted list: [1, 2, 3, 5, 7, 8, 9, 10, 15]</pre></div>
+  <p class="dx-note"><span id="dx-hp"></span>第一行是 heapify 後的陣列：不是排序！只保證每個節點 ≤ 兩個小孩（3 在根、4 和 9 是它的小孩…）。把空格填完的 heap_sort 才給出第二行：build 一次 O(n)，delete 最小值 n 次各 O(log n)，總共 O(n log n)。</p>
+</div>
 </section>
 
 <!-- ============================================================ -->
@@ -913,6 +1022,42 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <span class="info-label">build BST 的順序很重要</span>
     把 keys $70, 31, 93, 94, 14, 23, 73$ 依序插入會得到一棵漂亮的「平衡」BST；但若插入順序是 $14, 23, 31, 70, 73, 93, 94$（已排序），<strong>新樹會退化成一條鏈</strong>：高度從 $O(\log n)$ 變成 $O(n)$。試試上面的「隨機」按鈕和輸入排序的 keys 比較看看。這就是下一節要解決的問題。
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 09 · BinarySearchTree 當 Map 用＋tree_sort 練習</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.trees <span class="kw">import</span> BinarySearchTree</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">tree_sort</span>(values):</span>
+<span class="line">    bst = BinarySearchTree()</span>
+<span class="line">    result = []</span>
+<span class="line">    <span class="com"># 你的程式碼：</span></span>
+<span class="line">    <span class="com"># 1. 全部 put 進去（平均每次 O(log n)）</span></span>
+<span class="line">    <span class="com"># 2. 中序走訪，鍵自動由小到大（O(n)）</span></span>
+<span class="line">    <span class="kw">return</span> result</span>
+<span class="line"> </span>
+<span class="line">my_tree = BinarySearchTree()</span>
+<span class="line">my_tree[<span class="str">"</span><span class="str">a</span><span class="str">"</span>], my_tree[<span class="str">"</span><span class="str">q</span><span class="str">"</span>] = <span class="str">"</span><span class="str">a</span><span class="str">"</span>, <span class="str">"</span><span class="str">quick</span><span class="str">"</span></span>
+<span class="line">my_tree[<span class="str">"</span><span class="str">b</span><span class="str">"</span>], my_tree[<span class="str">"</span><span class="str">f</span><span class="str">"</span>] = <span class="str">"</span><span class="str">brown</span><span class="str">"</span>, <span class="str">"</span><span class="str">fox</span><span class="str">"</span></span>
+<span class="line">my_tree[<span class="str">"</span><span class="str">j</span><span class="str">"</span>], my_tree[<span class="str">"</span><span class="str">o</span><span class="str">"</span>] = <span class="str">"</span><span class="str">jumps</span><span class="str">"</span>, <span class="str">"</span><span class="str">over</span><span class="str">"</span></span>
+<span class="line">my_tree[<span class="str">"</span><span class="str">t</span><span class="str">"</span>], my_tree[<span class="str">"</span><span class="str">l</span><span class="str">"</span>] = <span class="str">"</span><span class="str">the</span><span class="str">"</span>, <span class="str">"</span><span class="str">lazy</span><span class="str">"</span></span>
+<span class="line">my_tree[<span class="str">"</span><span class="str">d</span><span class="str">"</span>] = <span class="str">"</span><span class="str">dog</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(my_tree[<span class="str">"</span><span class="str">q</span><span class="str">"</span>], my_tree[<span class="str">"</span><span class="str">l</span><span class="str">"</span>])</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">There are </span><span class="str">{</span><span class="fn">len</span>(my_tree)<span class="str">}</span><span class="str"> items in this tree</span><span class="str">"</span>)</span>
+<span class="line">my_tree.delete(<span class="str">"</span><span class="str">a</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">There are </span><span class="str">{</span><span class="fn">len</span>(my_tree)<span class="str">}</span><span class="str"> items in this tree</span><span class="str">"</span>)</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">for</span> node in my_tree:          <span class="com"># 中序疊代：依鍵序</span></span>
+<span class="line">    <span class="fn">print</span>(my_tree[node], end=<span class="str">"</span><span class="str"> </span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>()</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">輸出（含 tree_sort([20, 1, 15, 22, 10, 3, 7, 5, 8, 12]) 完成後的結果）</span><pre>quick lazy
+There are 9 items in this tree
+There are 8 items in this tree
+brown dog fox jumps lazy over quick the 
+Sorted list: [1, 3, 5, 7, 8, 10, 12, 15, 20, 22]</pre></div>
+  <p class="dx-note"><span id="dx-bst"></span>最後幾行是「tree_sort 現象」：for node in my_tree 走的是中序疊代器，值自然按鍵排序（b、d、f、j、l、o、q、t）。my_tree["a"] 這種語法靠 __setitem__/__getitem__ 轉接到 put/get。這也是為什麼 dict 要「有序走訪」時常改用平衡 BST。</p>
+</div>
 </section>
 
 <!-- ============================================================ -->
