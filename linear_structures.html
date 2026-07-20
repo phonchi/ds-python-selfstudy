@@ -318,6 +318,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 <nav class="float-nav" id="floatNav" aria-label="章節導覽">
@@ -688,6 +699,41 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qBaseFeedback"></div>
 </div>
+
+<h3 id="dx-base">講義完整實作：從虛擬碼到 Python</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 05 · divide_by_2 與萬用 base_converter</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Stack</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">divide_by_2</span>(decimal_num):</span>
+<span class="line">    rem_stack = Stack()</span>
+<span class="line">    <span class="kw">while</span> decimal_num &gt; <span class="num">0</span>:</span>
+<span class="line">        rem = decimal_num % <span class="num">2</span></span>
+<span class="line">        rem_stack.push(rem)</span>
+<span class="line">        decimal_num = decimal_num // <span class="num">2</span></span>
+<span class="line">    bin_string = <span class="str">"</span><span class="str">"</span></span>
+<span class="line">    <span class="kw">while</span> not rem_stack.is_empty():</span>
+<span class="line">        bin_string = bin_string + <span class="fn">str</span>(rem_stack.pop())</span>
+<span class="line">    <span class="kw">return</span> bin_string</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">base_converter</span>(decimal_num, base):</span>
+<span class="line">    digits = <span class="str">"</span><span class="str">0123456789ABCDEF</span><span class="str">"</span></span>
+<span class="line">    rem_stack = Stack()</span>
+<span class="line">    <span class="kw">while</span> decimal_num &gt; <span class="num">0</span>:</span>
+<span class="line">        rem_stack.push(decimal_num % base)</span>
+<span class="line">        decimal_num = decimal_num // base</span>
+<span class="line">    new_string = <span class="str">"</span><span class="str">"</span></span>
+<span class="line">    <span class="kw">while</span> not rem_stack.is_empty():</span>
+<span class="line">        new_string = new_string + digits[rem_stack.pop()]</span>
+<span class="line">    <span class="kw">return</span> new_string</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(divide_by_2(<span class="num">42</span>), divide_by_2(<span class="num">31</span>))</span>
+<span class="line"><span class="fn">print</span>(base_converter(<span class="num">25</span>, <span class="num">2</span>), base_converter(<span class="num">25</span>, <span class="num">16</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>101010 11111
+11001 19</pre></div>
+  <p class="dx-note">兩個函式的骨架一模一樣：餘數進 stack、商繼續 //、最後把 stack 倒出來。base_converter 只多了一張 digits 對照表，base 16 的餘數 10~15 才印得出 A~F。注意除法一定要用 //：/ 會給你 float。</p>
+</div>
 </section>
 
 <section id="infix">
@@ -822,6 +868,101 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="左結合運算子 pop 到「大於等於」，右結合的 ^ 只 pop「嚴格大於」，同級的 ^ 要留在 stack 裡等右邊先算。整串算出來是 45。" onclick="quizCheck('qCaret', this)"><span class="opt-letter">(A)</span> 遇到 ^ 時只 pop「嚴格大於」自己的；答案 5 3 4 2 - ^ *</div><div class="quiz-opt" data-correct="false" data-fb="用「大於等於」會把前一個 ^ 提早倒出來，2^3^2 就會被算成 (2^3)^2 = 64，而正確是 2^(3^2) = 512。" onclick="quizCheck('qCaret', this)"><span class="opt-letter">(B)</span> 照舊 pop「大於等於」；答案 5 3 ^ 4 2 - *</div><div class="quiz-opt" data-correct="false" data-fb="次方的優先權最高（4），比乘除（3）還高。結合方向與優先權是兩件獨立的事。" onclick="quizCheck('qCaret', this)"><span class="opt-letter">(C)</span> 把 ^ 的優先權設成最低</div>
   </div>
   <div class="quiz-feedback" id="qCaretFeedback"></div>
+</div>
+
+<h3 id="dx-infix">講義完整實作：轉換器與求值器的 Python 全文</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 05 · infix_to_postfix 完整程式</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Stack</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">infix_to_postfix</span>(infix_expr):</span>
+<span class="line">    prec = {<span class="str">"</span><span class="str">*</span><span class="str">"</span>: <span class="num">3</span>, <span class="str">"</span><span class="str">/</span><span class="str">"</span>: <span class="num">3</span>, <span class="str">"</span><span class="str">+</span><span class="str">"</span>: <span class="num">2</span>, <span class="str">"</span><span class="str">-</span><span class="str">"</span>: <span class="num">2</span>, <span class="str">"</span><span class="str">(</span><span class="str">"</span>: <span class="num">1</span>}</span>
+<span class="line">    op_stack = Stack()</span>
+<span class="line">    postfix_list = []</span>
+<span class="line">    token_list = infix_expr.split()</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">for</span> token in token_list:</span>
+<span class="line">        <span class="kw">if</span> token.isalnum():</span>
+<span class="line">            postfix_list.append(token)          <span class="com"># 運算元直接輸出</span></span>
+<span class="line">        <span class="kw">elif</span> token == <span class="str">'</span><span class="str">(</span><span class="str">'</span>:</span>
+<span class="line">            op_stack.push(token)</span>
+<span class="line">        <span class="kw">elif</span> token == <span class="str">'</span><span class="str">)</span><span class="str">'</span>:</span>
+<span class="line">            <span class="kw">while</span> (not op_stack.is_empty()) and op_stack.peek() != <span class="str">'</span><span class="str">(</span><span class="str">'</span>:</span>
+<span class="line">                postfix_list.append(op_stack.pop())</span>
+<span class="line">            op_stack.pop()                      <span class="com"># 丟掉那個 '('</span></span>
+<span class="line">        <span class="kw">else</span>:</span>
+<span class="line">            <span class="com"># 優先級 &gt;= 自己的都先請出來</span></span>
+<span class="line">            <span class="kw">while</span> (not op_stack.is_empty()) and (prec[op_stack.peek()] &gt;= prec[token]):</span>
+<span class="line">                postfix_list.append(op_stack.pop())</span>
+<span class="line">            op_stack.push(token)</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">while</span> not op_stack.is_empty():</span>
+<span class="line">        postfix_list.append(op_stack.pop())</span>
+<span class="line">    <span class="kw">return</span> <span class="str">'</span><span class="str"> </span><span class="str">'</span>.join(postfix_list)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(infix_to_postfix(<span class="str">"</span><span class="str">A * B + C * D</span><span class="str">"</span>))</span>
+<span class="line"><span class="fn">print</span>(infix_to_postfix(<span class="str">"</span><span class="str">( A + B ) * C - ( D - E ) * ( F + G )</span><span class="str">"</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>A B * C D * +
+A B + C * D E - F G + * -</pre></div>
+  <p class="dx-note">prec 表把「(」設成最低的 1 是關鍵巧思：左括號躺在 stack 裡時，誰都「贏不過」它，自然不會被提前彈出。token 之間要有空白（程式用 split() 切）。第二條把五組括號全部「編譯」掉了：後序完全不需要括號。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 05 · A * B + C * D 逐 token 追蹤</div>
+  <table style="width:100%;border-collapse:collapse;font-size:.86rem;font-family:'JetBrains Mono',monospace;">
+    <tr style="border-bottom:2px solid var(--card-border);"><th style="text-align:left;padding:.35rem;">token</th><th style="text-align:left;">op_stack（頂在右）</th><th style="text-align:left;">輸出串</th></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.35rem;">A</td><td></td><td>A</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.35rem;">*</td><td>*</td><td>A</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.35rem;">B</td><td>*</td><td>A B</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.35rem;">+</td><td>+&nbsp;&nbsp;<span style="color:var(--muted)">← * 優先級較高，先彈出</span></td><td>A B *</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.35rem;">C</td><td>+</td><td>A B * C</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.35rem;">*</td><td>+ *&nbsp;&nbsp;<span style="color:var(--muted)">← * 比 + 高，疊上去</span></td><td>A B * C</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.35rem;">D</td><td>+ *</td><td>A B * C D</td></tr>
+    <tr><td style="padding:.35rem;">收尾</td><td><span style="color:var(--muted)">全部倒出</span></td><td>A B * C D * +</td></tr>
+  </table>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 05 · postfix_eval 完整程式</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Stack</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">do_math</span>(op, op1, op2):</span>
+<span class="line">    <span class="kw">if</span> op == <span class="str">"</span><span class="str">*</span><span class="str">"</span>:</span>
+<span class="line">        <span class="kw">return</span> op1 * op2</span>
+<span class="line">    <span class="kw">elif</span> op == <span class="str">"</span><span class="str">/</span><span class="str">"</span>:</span>
+<span class="line">        <span class="kw">return</span> op1 / op2</span>
+<span class="line">    <span class="kw">elif</span> op == <span class="str">"</span><span class="str">+</span><span class="str">"</span>:</span>
+<span class="line">        <span class="kw">return</span> op1 + op2</span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        <span class="kw">return</span> op1 - op2</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">postfix_eval</span>(postfix_expr):</span>
+<span class="line">    operand_stack = Stack()</span>
+<span class="line">    <span class="kw">for</span> token in postfix_expr.split():</span>
+<span class="line">        <span class="kw">if</span> token in <span class="str">"</span><span class="str">0123456789</span><span class="str">"</span>:</span>
+<span class="line">            operand_stack.push(<span class="fn">int</span>(token))</span>
+<span class="line">        <span class="kw">else</span>:</span>
+<span class="line">            operand2 = operand_stack.pop()   <span class="com"># 先彈出的是右運算元！</span></span>
+<span class="line">            operand1 = operand_stack.pop()</span>
+<span class="line">            operand_stack.push(do_math(token, operand1, operand2))</span>
+<span class="line">    <span class="kw">return</span> operand_stack.pop()</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(postfix_eval(<span class="str">"</span><span class="str">7 8 + 3 2 + /</span><span class="str">"</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>3.0</pre></div>
+  <p class="dx-note">彈出順序是天大的事：<strong>先彈出的是 operand2（右運算元）</strong>。加法乘法看不出差別，除法減法一交換就錯：7 8 + 3 2 + / 是 15 ÷ 5 = 3.0，弄反就變 0.333…。輸出是 3.0 不是 3：do_math 用的 / 是真除法。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 05 · 課後練習：讓 ^ 右結合</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">infix_to_postfix</span>(infix_expr):</span>
+<span class="line">    <span class="com"># 你的程式碼：加入次方運算子 ^（優先級最高、右結合）</span></span>
+<span class="line">    <span class="com"># 提示：右結合代表「同優先級不彈出」，</span></span>
+<span class="line">    <span class="com">#       prec[op_stack.peek()] &gt;= prec[token] 的 &gt;= 要對 ^ 改成 &gt;</span></span>
+<span class="line">    <span class="kw">return</span> <span class="str">'</span><span class="str"> </span><span class="str">'</span>.join(postfix_list)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(infix_to_postfix(<span class="str">"</span><span class="str">5 * 3 ^ ( 4 - 2 )</span><span class="str">"</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">完成後的預期輸出</span><pre>5 3 4 2 - ^ *</pre></div>
+  <p class="dx-note">右結合是指 2 ^ 3 ^ 2 = 2 ^ (3 ^ 2) = 512，不是 (2 ^ 3) ^ 2 = 64。只改優先級不夠，還得改「同級要不要彈」的判斷。</p>
 </div>
 </section>
 
@@ -1077,6 +1218,29 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 <span class="line" data-l="9">    <span class="kw">return</span> <span class="num">True</span></span></div></div>
     </div>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 05 · pal_checker 的 Python 全文</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Deque</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">pal_checker</span>(a_string):</span>
+<span class="line">    char_deque = Deque()</span>
+<span class="line">    <span class="kw">for</span> ch in a_string:</span>
+<span class="line">        char_deque.add_rear(ch)          <span class="com"># 全部從尾端進</span></span>
+<span class="line">    <span class="kw">while</span> char_deque.size() &gt; <span class="num">1</span>:</span>
+<span class="line">        first = char_deque.remove_front()</span>
+<span class="line">        last = char_deque.remove_rear()</span>
+<span class="line">        <span class="kw">if</span> first != last:</span>
+<span class="line">            <span class="kw">return</span> <span class="kw">False</span></span>
+<span class="line">    <span class="kw">return</span> <span class="kw">True</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(pal_checker(<span class="str">"</span><span class="str">lsdkjfskf</span><span class="str">"</span>))</span>
+<span class="line"><span class="fn">print</span>(pal_checker(<span class="str">"</span><span class="str">radar</span><span class="str">"</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>False
+True</pre></div>
+  <p class="dx-note"><span id="dx-dq"></span>while 條件是 size() &gt; 1 而不是 not is_empty()：剩一個字元（奇數長度的中點）不用比，它自己跟自己一定相等。兩端各取一個、兩邊往中間夾，deque 兩端 O(1) 的能力在這裡剛好用滿。</p>
+</div>
 </section>
 
 <section id="exercises">
