@@ -1,0 +1,26 @@
+# 資料結構 × Python 互動自學網站
+
+NSYSU 資料結構課程的互動自學配套網站（Python 版）：九章互動教材，每一節都能動手操作、
+預測、驗證，配上每節 quiz、關鍵詞彙卡（flashcards）與 REF 速查表。
+
+- 線上閱讀：https://phonchi.github.io/ds-python-selfstudy/
+- 教科書：[pythonds — Problem Solving with Algorithms and Data Structures using Python](https://github.com/RunestoneInteractive/pythonds)
+- 課程講義：[nsysu-math208-2025](https://github.com/phonchi/nsysu-math208-2025)（各頁「講義 PDF」連結來源）
+
+## 章節（授課順序）
+
+| # | 頁面 | 對應 |
+|---|------|------|
+| 01 | [Python 導論](introduction.html) | pythonds Ch.1 |
+| 02 | [演算法分析](analysis.html) | pythonds Ch.2 |
+| 03 | [陣列與稀疏矩陣](arrays.html) | 附錄 A（講義 03） |
+| 04 | [鏈結串列](linked_lists.html) | pythonds §3.19–3.23 |
+| 05 | [堆疊、佇列與 Deque](linear_structures.html) | pythonds Ch.3 |
+| 06 | [遞迴](recursion.html) | pythonds Ch.4 |
+| 07 | [搜尋與排序](searching_sorting.html) | pythonds Ch.5 |
+| 08 | [圖與圖演算法](graphs.html) | pythonds Ch.7 |
+| 09 | [樹與樹演算法](trees.html) | pythonds Ch.6 |
+
+每頁皆為單檔自足 HTML（互動元件為原生 JS，僅外連 MathJax 與 Google Fonts CDN）。
+詞彙卡與自測題取自課程題庫並譯為繁體中文（母檔在 `data/flashcards_zh/`、`data/questions_zh/`，
+詞彙卡正面採「中文（English）」格式；改內容請改母檔後跑 `tools/apply_zh.py`）。
