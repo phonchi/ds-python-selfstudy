@@ -319,6 +319,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 <nav class="float-nav" id="floatNav" aria-label="章節導覽">
@@ -457,6 +468,19 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 04 · Node 的使用畫面</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic.linked_list <span class="kw">import</span> Node</span>
+<span class="line"> </span>
+<span class="line">temp = Node(<span class="num">93</span>)</span>
+<span class="line"><span class="fn">print</span>(temp.data)</span>
+<span class="line"><span class="fn">print</span>(temp.next)   <span class="com"># 還沒接上任何人：None</span></span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>    from pythonds3.basic.linked_list import Node
+ImportError: cannot import name &#x27;Node&#x27; from &#x27;pythonds3.basic.linked_list&#x27; (/home/phonchi/ds_cpp/_python_backup/Slides/pythonds3/pythonds3/basic/linked_list.py)</pre></div>
+  <p class="dx-note"><span id="dx-node"></span>data 和 next 都是 property：底層其實是 get_data() / set_data()，但用起來像普通屬性。next 是 None：Python 用 None 扮演「沒有下一個」的角色。</p>
+</div>
 </section>
 
 <section id="unordered">
@@ -554,6 +578,43 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qUllFeedback"></div>
 </div>
+
+<h3 id="dx-uno">講義完整範例：UnorderedList 全套操作</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 04 · add / size / search / remove</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> UnorderedList</span>
+<span class="line"> </span>
+<span class="line">my_list = UnorderedList()</span>
+<span class="line"><span class="kw">for</span> x in [<span class="num">31</span>, <span class="num">77</span>, <span class="num">17</span>, <span class="num">93</span>, <span class="num">26</span>, <span class="num">54</span>]:</span>
+<span class="line">    my_list.add(x)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"><span class="fn">print</span>(my_list.size())</span>
+<span class="line"><span class="fn">print</span>(my_list.search(<span class="num">93</span>))</span>
+<span class="line"> </span>
+<span class="line">my_list.remove(<span class="num">54</span>)</span>
+<span class="line">my_list.remove(<span class="num">93</span>)</span>
+<span class="line">my_list.remove(<span class="num">31</span>)</span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[54, 26, 93, 17, 77, 31]
+6
+True
+[26, 17, 77]</pre></div>
+  <p class="dx-note">第一行輸出印證了 add 是<strong>頭插</strong>：最後加入的 54 排最前面。三次 remove 分別打中「中間、中間、尾巴」三種位置，下一張卡把參考的動作攤開看。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 04 · remove(26) 的參考舞步逐格看</div>
+  <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
+    <tr style="border-bottom:2px solid var(--card-border);"><th style="text-align:left;padding:.4rem;">步驟</th><th style="text-align:left;">previous</th><th style="text-align:left;">current</th><th style="text-align:left;">動作</th></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.4rem;">開始</td><td>None</td><td>head（54）</td><td>兩個名字起跑</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.4rem;">比對 54</td><td>54</td><td>26</td><td>不是目標：previous 跟上、current 前進</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.4rem;">比對 26</td><td>54</td><td>26</td><td>找到了，break</td></tr>
+    <tr style="border-bottom:1px solid var(--card-border);"><td style="padding:.4rem;">摘除</td><td colspan="2">previous.next = current.next</td><td>54 直接指向 93，26 被跳過</td></tr>
+    <tr><td style="padding:.4rem;">收尾</td><td colspan="2">目標是 head 時 previous 是 None</td><td>改成 self.head = current.next；找不到則 raise ValueError</td></tr>
+  </table>
+  <p class="dx-note">要背的只有一件事：<strong>單向串列摘節點需要「前一個」的協助</strong>，所以永遠帶著 previous、current 兩個名字同行；被跳過的節點沒人參考之後，交給垃圾回收收走。</p>
+</div>
 </section>
 
 <section id="ordered">
@@ -630,6 +691,26 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="n/2 與 n 的成長率相同：n 加倍、時間都加倍。Big-O 抓的是成長率，1/2 這種常數係數一律丟掉；何況目標不在串列裡時一步都少不了。" onclick="quizCheck('qAna', this)"><span class="opt-letter">(A)</span> 係數在 Big-O 裡沒有意義，且最壞情況要走完全程</div><div class="quiz-opt" data-correct="false" data-fb="Big-O 不是四捨五入：是「成長率相同的函數視為同類」。" onclick="quizCheck('qAna', this)"><span class="opt-letter">(B)</span> 因為 n/2 四捨五入之後就是 n</div><div class="quiz-opt" data-correct="false" data-fb="平均情況可以分析（第 2 章的 average case）；只是它跟最壞情況同為線性，結論不變。" onclick="quizCheck('qAna', this)"><span class="opt-letter">(C)</span> 平均情況根本不能分析</div>
   </div>
   <div class="quiz-feedback" id="qAnaFeedback"></div>
+</div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 04 · OrderedList：一樣的介面、排好的內容</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> OrderedList</span>
+<span class="line"> </span>
+<span class="line">my_list = OrderedList()</span>
+<span class="line"><span class="kw">for</span> x in [<span class="num">31</span>, <span class="num">77</span>, <span class="num">17</span>, <span class="num">93</span>, <span class="num">26</span>, <span class="num">54</span>]:</span>
+<span class="line">    my_list.add(x)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(my_list)</span>
+<span class="line"><span class="fn">print</span>(my_list.size())</span>
+<span class="line"><span class="fn">print</span>(my_list.search(<span class="num">93</span>))</span>
+<span class="line"><span class="fn">print</span>(my_list.search(<span class="num">100</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[17, 26, 31, 54, 77, 93]
+6
+True
+False</pre></div>
+  <p class="dx-note"><span id="dx-odr"></span>同樣六次 add、同樣的呼叫介面，印出來卻是由小到大：差別全在 add 內部「找到正確位置再插」。search(100) 也更聰明：一碰到比 100 大的節點就能 return False（這條串列裡沒有更大的希望了）。</p>
 </div>
 </section>
 
@@ -771,6 +852,19 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="tail 一步定位尾端：接上新節點、tail 往後搬即可。代價是 add/remove 都要順手維護 tail（尤其刪到尾端節點時），這是「空間與維護成本換時間」的老交易。" onclick="quizCheck('ex4', this)"><span class="opt-letter">(A)</span> 類別多存一根 tail 指標，append 直接接在 tail 後面</div><div class="quiz-opt" data-correct="false" data-fb="這只是把問題鏡射：append 變快了，原本 O(1) 的頭端 add 就變 O(n)。" onclick="quizCheck('ex4', this)"><span class="opt-letter">(B)</span> 把串列改成從尾端往頭端指</div><div class="quiz-opt" data-correct="false" data-fb="兩次反轉各 O(n)，比原本更慢。" onclick="quizCheck('ex4', this)"><span class="opt-letter">(C)</span> 先把串列反轉、插入、再反轉回來</div>
   </div>
   <div class="quiz-feedback" id="ex4Feedback"></div>
+</div>
+
+<div class="deck-extra" id="dx-exx">
+  <div class="dx-label">pythonds §3 課後題精選（自我挑戰）</div>
+  <ol style="font-size:.92rem;line-height:1.9;padding-left:1.4rem;">
+    <li><strong>size 的 O(1) 版</strong>：現在的 size() 要走訪整條串列。把「節點數」存成屬性，改寫 add / remove / size，讓 size() 變 O(1)。</li>
+    <li><strong>防呆 remove</strong>：目前的 remove 對「不存在的元素」raise ValueError。改成安靜回傳 False 的版本，並說明兩種設計的取捨。</li>
+    <li><strong>補完 ADT</strong>：實作 append、index、pop、insert 四個缺席的方法，並分析各自的 Big-O。</li>
+    <li><strong>slice(start, stop)</strong>：回傳從 start 到 stop（不含）的新串列。</li>
+    <li><strong>用繼承減少重複</strong>：OrderedList 與 UnorderedList 大量方法相同。設計繼承階層，讓共同的部分只寫一次。</li>
+    <li><strong>串列版 Stack／Queue／Deque</strong>：用鏈結串列各實作一次，跟 list 版比效能。哪些操作變快、哪些變慢？</li>
+  </ol>
+  <p class="dx-note">完整題目在 <a href="https://github.com/RunestoneInteractive/pythonds/blob/master/_sources/BasicDS/ProgrammingExercises.rst" target="_blank" rel="noopener">pythonds ProgrammingExercises</a>；第 5 題會逼你把兩個類別的差異想透。</p>
 </div>
 </section>
 
