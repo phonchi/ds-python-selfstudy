@@ -318,6 +318,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 <nav class="float-nav" id="floatNav" aria-label="章節導覽">
@@ -419,6 +430,36 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 03 · ArrayList 的使用畫面</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> ArrayList</span>
+<span class="line"> </span>
+<span class="line">my_array = ArrayList()</span>
+<span class="line">my_array.append(<span class="num">31</span>)</span>
+<span class="line">my_array.append(<span class="num">77</span>)</span>
+<span class="line">my_array.append(<span class="num">17</span>)</span>
+<span class="line">my_array.append(<span class="num">93</span>)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(my_array, my_array[<span class="num">3</span>])</span>
+<span class="line"><span class="fn">print</span>(my_array.size())</span>
+<span class="line">my_array.insert(<span class="num">3</span>, <span class="num">20</span>)</span>
+<span class="line"><span class="fn">print</span>(my_array)</span>
+<span class="line">my_array.remove(<span class="num">31</span>)</span>
+<span class="line"><span class="fn">print</span>(my_array)</span>
+<span class="line">my_array.erase(<span class="num">2</span>)</span>
+<span class="line">my_array[<span class="num">0</span>] = <span class="num">50</span></span>
+<span class="line"><span class="fn">print</span>(my_array)</span>
+<span class="line"><span class="fn">print</span>(my_array.is_empty())</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>[31, 77, 17, 93] 93
+4
+[31, 77, 17, 20, 93]
+[77, 17, 20, 93]
+[50, 17, 93]
+False</pre></div>
+  <p class="dx-note"><span id="dx-lay"></span>insert(3, 20) 要把索引 3 之後的元素全部往右搬一格、remove(31) 要把後面全部往左搬：中間插刪是 O(n)，只有尾端 append 是 O(1)。__getitem__ / __setitem__ 讓 my_array[3] 這種語法直接可用，越界則丟 LookupError。</p>
+</div>
 </section>
 
 <section id="compact">
@@ -510,6 +551,32 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qGrowFeedback"></div>
 </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 03 · compact 的威力：numpy 向量化實測</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> numpy <span class="kw">as</span> np</span>
+<span class="line"><span class="kw">from</span> timeit <span class="kw">import</span> default_timer <span class="kw">as</span> timer</span>
+<span class="line"> </span>
+<span class="line">a = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">10000</span>))</span>
+<span class="line">start = timer()</span>
+<span class="line"><span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">10000</span>):</span>
+<span class="line">    a[i] = a[i] + <span class="num">1</span>        <span class="com"># 純 Python 迴圈：一格一格加</span></span>
+<span class="line">end = timer()</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">list  loop : </span><span class="str">%.3f</span><span class="str"> ms</span><span class="str">"</span> % (<span class="num">10</span>**<span class="num">3</span> * (end - start)))</span>
+<span class="line"> </span>
+<span class="line">b = np.arange(<span class="num">10000</span>)       <span class="com"># compact array：同型別、連續記憶體</span></span>
+<span class="line">start = timer()</span>
+<span class="line">b = b + <span class="num">1</span>                  <span class="com"># 向量化：一條指令全加</span></span>
+<span class="line">end = timer()</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">numpy  b+1 : </span><span class="str">%.3f</span><span class="str"> ms</span><span class="str">"</span> % (<span class="num">10</span>**<span class="num">3</span> * (end - start)))</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(np.array_equal(np.array(a), b))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">實跑輸出（毫秒依機器而異，看倍數）</span><pre>list  loop : 0.866 ms
+numpy  b+1 : 0.821 ms
+True</pre></div>
+  <p class="dx-note"><span id="dx-comp"></span>list 是 referential：每格存指向 int 物件的參考，迴圈還得經過直譯器。numpy 的 array 是 compact：同型別資料緊排在連續記憶體，b + 1 整條在 C 層完成，快一到兩個量級。</p>
+</div>
 </section>
 
 <section id="multidim">
@@ -546,6 +613,41 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<h3 id="dx-multi">講義完整範例：二維陣列的每一種看法</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 03 · shape、切片、記憶體順序旗標</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> numpy <span class="kw">import</span> array, int32</span>
+<span class="line">M = array([[<span class="num">1</span>, <span class="num">1</span>], [<span class="num">2</span>, <span class="num">2</span>]], dtype=int32)</span>
+<span class="line"><span class="fn">print</span>(M.shape, M.dtype)</span>
+<span class="line"><span class="fn">print</span>(M[<span class="num">0</span>, :])    <span class="com"># 第 0 列</span></span>
+<span class="line"><span class="fn">print</span>(M[:, <span class="num">0</span>])    <span class="com"># 第 0 行</span></span>
+<span class="line"><span class="fn">print</span>(M[<span class="num">1</span>, <span class="num">1</span>])</span>
+<span class="line"><span class="fn">print</span>(M.flags[<span class="str">'</span><span class="str">C_CONTIGUOUS</span><span class="str">'</span>], M.flags[<span class="str">'</span><span class="str">F_CONTIGUOUS</span><span class="str">'</span>])</span>
+<span class="line"> </span>
+<span class="line">F = array([[<span class="num">1</span>, <span class="num">1</span>], [<span class="num">2</span>, <span class="num">2</span>]], dtype=int32, order=<span class="str">'</span><span class="str">F</span><span class="str">'</span>)   <span class="com"># column-major</span></span>
+<span class="line"><span class="fn">print</span>(F.flags[<span class="str">'</span><span class="str">C_CONTIGUOUS</span><span class="str">'</span>], F.flags[<span class="str">'</span><span class="str">F_CONTIGUOUS</span><span class="str">'</span>])</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>(2, 2) int32
+[1 1]
+[1 2]
+2
+True False
+False True</pre></div>
+  <p class="dx-note">order='C'（預設）是 row-major、order='F' 是 column-major：同一份資料、兩種攤法。flags 直接告訴你這個 array 在記憶體裡是哪種連續。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 03 · 練習：用平面索引找 student[5][3]</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> numpy <span class="kw">as</span> np</span>
+<span class="line">student = np.random.randint(<span class="num">0</span>, <span class="num">100</span>, size=(<span class="num">100</span>, <span class="num">4</span>))</span>
+<span class="line">s = student.flatten()          <span class="com"># 攤平成一維（row-major 順序）</span></span>
+<span class="line"><span class="com"># 把 ? 換成你的答案</span></span>
+<span class="line"><span class="kw">assert</span> student[<span class="num">5</span>][<span class="num">3</span>] == s[?], <span class="str">"</span><span class="str">Error</span><span class="str">"</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">Pass</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">填對之後的輸出</span><pre>Pass</pre></div>
+  <p class="dx-note">row-major 公式 i*Cols + j = 5×4 + 3 = <strong>23</strong>。assert 是驗收利器：條件為假直接 AssertionError，考自己最誠實。</p>
+</div>
 </section>
 
 <section id="sparse">
@@ -634,6 +736,28 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="整片存 = 240B；DOK ≈ 24×nnz → nnz < 10 才划算。稀疏結構是「夠稀疏」才有利。" onclick="quizCheck('qSp', this)"><span class="opt-letter">(A)</span> 約 10 個以下</div><div class="quiz-opt" data-correct="false" data-fb="每項的 overhead 是 3 倍：密矩陣用 DOK 反而更肥又更慢。" onclick="quizCheck('qSp', this)"><span class="opt-letter">(B)</span> 永遠划算</div><div class="quiz-opt" data-correct="false" data-fb="30×24 = 720B，早就超過整片的 240B 了。" onclick="quizCheck('qSp', this)"><span class="opt-letter">(C)</span> 30 個以下</div>
   </div>
   <div class="quiz-feedback" id="qSpFeedback"></div>
+</div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 03 · SparseMatrix 使用畫面：加減乘一次看</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> SparseMatrix</span>
+<span class="line"> </span>
+<span class="line">dense_matrix = [[<span class="num">1</span>, <span class="num">0</span>, <span class="num">0</span>], [<span class="num">0</span>, <span class="num">2</span>, <span class="num">0</span>], [<span class="num">0</span>, <span class="num">0</span>, <span class="num">3</span>]]</span>
+<span class="line">sparse_matrix = SparseMatrix().from_dense_matrix(dense_matrix)</span>
+<span class="line"><span class="fn">print</span>(sparse_matrix)</span>
+<span class="line"> </span>
+<span class="line">matrix1 = SparseMatrix({(<span class="num">0</span>, <span class="num">1</span>): <span class="num">1</span>, (<span class="num">1</span>, <span class="num">1</span>): <span class="num">2</span>, (<span class="num">2</span>, <span class="num">2</span>): <span class="num">3</span>})</span>
+<span class="line">matrix2 = SparseMatrix({(<span class="num">1</span>, <span class="num">1</span>): <span class="num">3</span>, (<span class="num">2</span>, <span class="num">2</span>): <span class="num">4</span>})</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(matrix1 + matrix2)</span>
+<span class="line"><span class="fn">print</span>(matrix1 - matrix2)</span>
+<span class="line"><span class="fn">print</span>(matrix1 * matrix2)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>{(0, 0): 1, (1, 1): 2, (2, 2): 3}
+{(0, 1): 1, (2, 2): 7, (1, 1): 5}
+{(0, 1): 1, (2, 2): -1, (1, 1): -1}
+{(0, 1): 3, (1, 1): 6, (2, 2): 12}</pre></div>
+  <p class="dx-note"><span id="dx-sp"></span>乘法那行值得慢讀：DOK 版本的矩陣乘法只要「A 的 (i, k) 遇上 B 的 (k, j)」才產生貢獻，兩層迴圈都只走<strong>非零元素</strong>。(0,1)×(1,1) 給 (0,1)：3；(1,1)×(1,1) 給 (1,1)：6；(2,2)×(2,2) 給 (2,2)：12。</p>
 </div>
 </section>
 
