@@ -318,6 +318,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 <nav class="float-nav" id="floatNav" aria-label="章節導覽">
@@ -431,6 +442,65 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<h3 id="dx-pro">講義完整範例：同一題的兩張臉，加上碼錶</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · sum_of_n：好讀的版本</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">sum_of_n</span>(n):</span>
+<span class="line">    the_sum = <span class="num">0</span></span>
+<span class="line">    <span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">1</span>, n + <span class="num">1</span>):</span>
+<span class="line">        the_sum = the_sum + i</span>
+<span class="line">    <span class="kw">return</span> the_sum</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(sum_of_n(<span class="num">10</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>55</pre></div>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · foo：一樣的演算法、糟糕的可讀性</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">foo</span>(tom):</span>
+<span class="line">    fred = <span class="num">0</span></span>
+<span class="line">    <span class="kw">for</span> bill in <span class="fn">range</span>(<span class="num">1</span>, tom + <span class="num">1</span>):</span>
+<span class="line">        barney = bill</span>
+<span class="line">        fred = fred + barney</span>
+<span class="line">    <span class="kw">return</span> fred</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(foo(<span class="num">10</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>55</pre></div>
+  <p class="dx-note">foo 和 sum_of_n 做的事一模一樣、效率也一樣：<strong>可讀性</strong>跟<strong>效率</strong>是兩回事。演算法分析比的是後者：同一個問題，不同「解法」消耗的資源。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · 用 time.time() 量時間：迴圈版 vs 公式版</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> time</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">sum_of_n_2</span>(n):</span>
+<span class="line">    start = time.time()</span>
+<span class="line">    the_sum = <span class="num">0</span></span>
+<span class="line">    <span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">1</span>, n + <span class="num">1</span>):</span>
+<span class="line">        the_sum = the_sum + i</span>
+<span class="line">    end = time.time()</span>
+<span class="line">    <span class="kw">return</span> the_sum, end - start</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">3</span>):</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"</span><span class="str">Sum is </span><span class="str">%d</span><span class="str"> required </span><span class="str">%10.7f</span><span class="str"> seconds</span><span class="str">"</span> % sum_of_n_2(<span class="num">1_000_000</span>))</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">sum_of_n_3</span>(n):          <span class="com"># 等差級數公式：迴圈整個消失</span></span>
+<span class="line">    start = time.time()</span>
+<span class="line">    the_sum = (n * (n + <span class="num">1</span>)) // <span class="num">2</span></span>
+<span class="line">    end = time.time()</span>
+<span class="line">    <span class="kw">return</span> the_sum, end - start</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">Sum is </span><span class="str">%d</span><span class="str"> required </span><span class="str">%10.7f</span><span class="str"> seconds</span><span class="str">"</span> % sum_of_n_3(<span class="num">1_000_000</span>))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">Sum is </span><span class="str">%d</span><span class="str"> required </span><span class="str">%10.7f</span><span class="str"> seconds</span><span class="str">"</span> % sum_of_n_3(<span class="num">100_000_000</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">實跑輸出（秒數依機器而異）</span><pre>Sum is 500000500000 required  0.0171947 seconds
+Sum is 500000500000 required  0.0174472 seconds
+Sum is 500000500000 required  0.0165753 seconds
+Sum is 500000500000 required  0.0000014 seconds
+Sum is 5000000050000000 required  0.0000005 seconds</pre></div>
+  <p class="dx-note">迴圈版加到一百萬要花得出感覺的時間；公式版 n(n+1)/2 不管 n 多大都幾乎是 0 秒：這就是 O(n) 與 O(1) 的差。函式回傳 (總和, 秒數) 這個 tuple，一次帶回兩個值。</p>
+</div>
 </section>
 
 <section id="bigo">
@@ -472,6 +542,26 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="quiz-opt" data-correct="true" data-fb="T(n) = n² + n，主導項是 n²。低次項 n 直接丟掉。" onclick="quizCheck('qBigo', this)"><span class="opt-letter">(A)</span> O(n²)</div><div class="quiz-opt" data-correct="false" data-fb="Big-O 只留主導項：n² + n 就寫 O(n²)。" onclick="quizCheck('qBigo', this)"><span class="opt-letter">(B)</span> O(n² + n)</div><div class="quiz-opt" data-correct="false" data-fb="兩段是「接續」不是「巢狀」：相加不相乘。" onclick="quizCheck('qBigo', this)"><span class="opt-letter">(C)</span> O(n³)</div>
   </div>
   <div class="quiz-feedback" id="qBigoFeedback"></div>
+</div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · 練習題原始碼：T(n) 逐項數</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">n = <span class="num">100</span></span>
+<span class="line"><span class="com"># 從這裡開始數</span></span>
+<span class="line">a = <span class="num">5</span></span>
+<span class="line">b = <span class="num">6</span></span>
+<span class="line">c = <span class="num">10</span></span>
+<span class="line"><span class="kw">for</span> i in <span class="fn">range</span>(n):</span>
+<span class="line">    <span class="kw">for</span> j in <span class="fn">range</span>(n):</span>
+<span class="line">        x = i * i</span>
+<span class="line">        y = j * j</span>
+<span class="line">        z = i * j</span>
+<span class="line"><span class="kw">for</span> k in <span class="fn">range</span>(n):</span>
+<span class="line">    w = a * k + <span class="num">45</span></span>
+<span class="line">    v = b * b</span>
+<span class="line">d = <span class="num">33</span></span>
+<span class="line"> </span></div>
+  <p class="dx-note"><span id="dx-bigo"></span>逐項數：開頭 3 個指定；雙層迴圈本體 3 個指定，各跑 n² 次；單層迴圈 2 個指定，跑 n 次；收尾 1 個。T(n) = 3 + 3n² + 2n + 1，只留主導項就是 <strong>O(n²)</strong>。這題是講義的自我檢測題，先自己數完再看這段解說。</p>
 </div>
 </section>
 
@@ -588,6 +678,39 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
   <div class="quiz-feedback" id="qAnaFeedback"></div>
 </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · 解法 1 Checking Off 的完整程式</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">anagram_solution_1</span>(s1, s2):</span>
+<span class="line">    still_ok = <span class="kw">True</span></span>
+<span class="line">    <span class="kw">if</span> <span class="fn">len</span>(s1) != <span class="fn">len</span>(s2):</span>
+<span class="line">        still_ok = <span class="kw">False</span></span>
+<span class="line">    a_list = <span class="fn">list</span>(s2)</span>
+<span class="line">    pos_1 = <span class="num">0</span></span>
+<span class="line">    <span class="kw">while</span> pos_1 &lt; <span class="fn">len</span>(s1) and still_ok:</span>
+<span class="line">        pos_2 = <span class="num">0</span></span>
+<span class="line">        found = <span class="kw">False</span></span>
+<span class="line">        <span class="kw">while</span> pos_2 &lt; <span class="fn">len</span>(a_list) and not found:</span>
+<span class="line">            <span class="kw">if</span> s1[pos_1] == a_list[pos_2]:</span>
+<span class="line">                found = <span class="kw">True</span></span>
+<span class="line">            <span class="kw">else</span>:</span>
+<span class="line">                pos_2 = pos_2 + <span class="num">1</span></span>
+<span class="line">        <span class="kw">if</span> found:</span>
+<span class="line">            <span class="kw">del</span> a_list[pos_2]     <span class="com"># 劃掉配對到的字元</span></span>
+<span class="line">        <span class="kw">else</span>:</span>
+<span class="line">            still_ok = <span class="kw">False</span></span>
+<span class="line">        pos_1 = pos_1 + <span class="num">1</span></span>
+<span class="line">    <span class="kw">return</span> still_ok</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(anagram_solution_1(<span class="str">"</span><span class="str">apple</span><span class="str">"</span>, <span class="str">"</span><span class="str">pleap</span><span class="str">"</span>))</span>
+<span class="line"><span class="fn">print</span>(anagram_solution_1(<span class="str">"</span><span class="str">abcd</span><span class="str">"</span>, <span class="str">"</span><span class="str">dcba</span><span class="str">"</span>))</span>
+<span class="line"><span class="fn">print</span>(anagram_solution_1(<span class="str">"</span><span class="str">abcd</span><span class="str">"</span>, <span class="str">"</span><span class="str">dcda</span><span class="str">"</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>True
+True
+False</pre></div>
+  <p class="dx-note"><span id="dx-ana"></span>對 s1 的每個字元，去 s2 的副本裡線性找、找到就 del 劃掉：外層 n 次、內層平均 n/2 次，O(n²)。注意一定要 list(s2) 複製一份：字串本身不可變，劃不了。</p>
+</div>
 </section>
 
 <section id="lists">
@@ -638,6 +761,60 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<h3 id="dx-lst">講義完整範例：把四種寫法真的量一次</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · 四種填滿 list 的方式（timeit）</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> timeit <span class="kw">import</span> Timer</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">test1</span>():</span>
+<span class="line">    l = []</span>
+<span class="line">    <span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">1000</span>):</span>
+<span class="line">        l = l + [i]      <span class="com"># 串接：每次都造新串列</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">test2</span>():</span>
+<span class="line">    l = []</span>
+<span class="line">    <span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">1000</span>):</span>
+<span class="line">        l.append(i)</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">test3</span>():</span>
+<span class="line">    l = [i <span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">1000</span>)]</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">test4</span>():</span>
+<span class="line">    l = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">1000</span>))</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">for</span> name, label in [(<span class="str">"</span><span class="str">test1</span><span class="str">"</span>, <span class="str">"</span><span class="str">concatenation</span><span class="str">"</span>), (<span class="str">"</span><span class="str">test2</span><span class="str">"</span>, <span class="str">"</span><span class="str">appending</span><span class="str">"</span>),</span>
+<span class="line">                    (<span class="str">"</span><span class="str">test3</span><span class="str">"</span>, <span class="str">"</span><span class="str">list comprehension</span><span class="str">"</span>), (<span class="str">"</span><span class="str">test4</span><span class="str">"</span>, <span class="str">"</span><span class="str">list range</span><span class="str">"</span>)]:</span>
+<span class="line">    t = Timer(<span class="str">f</span><span class="str">"</span><span class="str">{</span>name<span class="str">}</span><span class="str">()</span><span class="str">"</span>, <span class="str">f</span><span class="str">"</span><span class="str">from __main__ import </span><span class="str">{</span>name<span class="str">}</span><span class="str">"</span>)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>label<span class="str">:</span><span class="str">&lt;20</span><span class="str">}</span><span class="str">{</span>t.timeit(number=<span class="num">1000</span>)<span class="str">:</span><span class="str">8.2f</span><span class="str">}</span><span class="str"> seconds</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">實跑輸出（秒數依機器而異，看量級）</span><pre>concatenation           0.44 seconds
+appending               0.01 seconds
+list comprehension      0.01 seconds
+list range              0.00 seconds</pre></div>
+  <p class="dx-note">串接版每一圈都複製整條串列，慢一個量級以上。timeit 的套路：Timer(要量的敘述, 準備工作)，timeit(number=N) 跑 N 次回傳總秒數。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · pop(0) vs pop()：n 變大會怎樣</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> timeit <span class="kw">import</span> Timer</span>
+<span class="line"> </span>
+<span class="line">pop_zero = Timer(<span class="str">"</span><span class="str">x.pop(0)</span><span class="str">"</span>, <span class="str">"</span><span class="str">from __main__ import x</span><span class="str">"</span>)</span>
+<span class="line">pop_end = Timer(<span class="str">"</span><span class="str">x.pop()</span><span class="str">"</span>, <span class="str">"</span><span class="str">from __main__ import x</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span><span class="str">'</span><span class="str">n</span><span class="str">'</span><span class="str">:</span><span class="str">10s</span><span class="str">}</span><span class="str">{</span><span class="str">'</span><span class="str">pop(0)</span><span class="str">'</span><span class="str">:</span><span class="str">&gt;15s</span><span class="str">}</span><span class="str">{</span><span class="str">'</span><span class="str">pop()</span><span class="str">'</span><span class="str">:</span><span class="str">&gt;15s</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"><span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">1_000_000</span>, <span class="num">4_000_001</span>, <span class="num">1_000_000</span>):</span>
+<span class="line">    x = <span class="fn">list</span>(<span class="fn">range</span>(i))</span>
+<span class="line">    pop_zero_t = pop_zero.timeit(number=<span class="num">1000</span>)</span>
+<span class="line">    x = <span class="fn">list</span>(<span class="fn">range</span>(i))</span>
+<span class="line">    pop_end_t = pop_end.timeit(number=<span class="num">1000</span>)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>i<span class="str">:</span><span class="str">&lt;10d</span><span class="str">}</span><span class="str">{</span>pop_zero_t<span class="str">:</span><span class="str">&gt;15.5f</span><span class="str">}</span><span class="str">{</span>pop_end_t<span class="str">:</span><span class="str">&gt;15.5f</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">實跑輸出（秒數依機器而異，看走勢）</span><pre>n                  pop(0)          pop()
+1000000           0.16887        0.00002
+2000000           0.36016        0.00001
+3000000           0.68670        0.00001
+4000000           1.23720        0.00001</pre></div>
+  <p class="dx-note">重點在<strong>走勢</strong>：n 翻倍，pop(0) 的時間跟著翻倍（O(n)：整條往前搬）；pop() 文風不動（O(1)：從尾端拿）。這就是「量測驗證 Big-O」的標準做法。</p>
+</div>
 </section>
 
 <section id="hash">
@@ -674,6 +851,31 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<h3 id="dx-hash">講義完整範例：in 的兩個世界</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 02 · list 線性掃描 vs dict 雜湊</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> timeit</span>
+<span class="line"><span class="kw">import</span> random</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span><span class="str">'</span><span class="str">n</span><span class="str">'</span><span class="str">:</span><span class="str">10s</span><span class="str">}</span><span class="str">{</span><span class="str">'</span><span class="str">list</span><span class="str">'</span><span class="str">:</span><span class="str">&gt;10s</span><span class="str">}</span><span class="str">{</span><span class="str">'</span><span class="str">dict</span><span class="str">'</span><span class="str">:</span><span class="str">&gt;10s</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"><span class="kw">for</span> i in <span class="fn">range</span>(<span class="num">200_000</span>, <span class="num">1_000_001</span>, <span class="num">200_000</span>):</span>
+<span class="line">    t = timeit.Timer(<span class="str">f</span><span class="str">"</span><span class="str">random.randrange(</span><span class="str">{</span>i<span class="str">}</span><span class="str">) in x</span><span class="str">"</span>,</span>
+<span class="line">                     <span class="str">"</span><span class="str">from __main__ import random, x</span><span class="str">"</span>)</span>
+<span class="line">    x = <span class="fn">list</span>(<span class="fn">range</span>(i))</span>
+<span class="line">    lst_time = t.timeit(number=<span class="num">1000</span>)</span>
+<span class="line">    x = {j: <span class="kw">None</span> <span class="kw">for</span> j in <span class="fn">range</span>(i)}</span>
+<span class="line">    dict_time = t.timeit(number=<span class="num">1000</span>)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>i<span class="str">:</span><span class="str">&lt;10,</span><span class="str">}</span><span class="str">{</span>lst_time<span class="str">:</span><span class="str">&gt;10.3f</span><span class="str">}</span><span class="str">{</span>dict_time<span class="str">:</span><span class="str">&gt;10.3f</span><span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">實跑輸出（秒數依機器而異，看走勢）</span><pre>n               list      dict
+200,000        0.296     0.000
+400,000        0.557     0.000
+600,000        0.901     0.000
+800,000        1.257     0.000
+1,000,000      1.578     0.001</pre></div>
+  <p class="dx-note">同一個 in 運算子，底層是兩個世界：list 逐格比對，n 翻倍時間翻倍；dict 雜湊直達，n 翻五倍也不動。代價在搜尋與排序一章的雜湊節會算清楚：空間、雜湊函數品質、碰撞。</p>
+</div>
 </section>
 
 <section id="exercises">
