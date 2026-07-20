@@ -318,6 +318,17 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
 @media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
 </style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
 </head>
 <body>
 <nav class="float-nav" id="floatNav" aria-label="章節導覽">
@@ -539,6 +550,47 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<h3 id="dx-fr">講義完整範例：用 stack 模擬遞迴、用 inspect 看見遞迴</h3>
+<div class="deck-extra">
+  <div class="dx-label">講義 06 · 遞迴拿掉、換成自己管理的 stack</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Stack</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">to_str</span>(n, base):</span>
+<span class="line">    r_stack = Stack()</span>
+<span class="line">    convert_string = <span class="str">"</span><span class="str">0123456789ABCDEF</span><span class="str">"</span></span>
+<span class="line">    <span class="kw">while</span> n &gt; <span class="num">0</span>:</span>
+<span class="line">        r_stack.push(convert_string[n % base])</span>
+<span class="line">        n = n // base</span>
+<span class="line">    res = <span class="str">"</span><span class="str">"</span></span>
+<span class="line">    <span class="kw">while</span> not r_stack.is_empty():</span>
+<span class="line">        res = res + <span class="fn">str</span>(r_stack.pop())</span>
+<span class="line">    <span class="kw">return</span> res</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(to_str(<span class="num">1453</span>, <span class="num">16</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>5AD</pre></div>
+  <p class="dx-note">這版沒有遞迴：自己開一個 Stack 存餘數字元、最後倒出來。它證明了一件事：<strong>遞迴版其實是把同一個 stack 藏進了「呼叫堆疊」</strong>，每一層呼叫的區域變數就是一格 stack frame。</p>
+</div>
+<div class="deck-extra">
+  <div class="dx-label">講義 06 · 用 inspect.stack() 印出深度</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> inspect</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">to_str</span>(n, base):</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">  depth=</span><span class="str">{</span><span class="fn">len</span>(inspect.stack())<span class="str">}</span><span class="str">, n=</span><span class="str">{</span>n<span class="str">}</span><span class="str">"</span>)</span>
+<span class="line">    <span class="kw">if</span> n &lt; base:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">"</span><span class="str">0123456789ABCDEF</span><span class="str">"</span>[n]</span>
+<span class="line">    <span class="kw">return</span> to_str(n // base, base) + <span class="str">"</span><span class="str">0123456789ABCDEF</span><span class="str">"</span>[n % base]</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(to_str(<span class="num">10</span>, <span class="num">2</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>  depth=2, n=10
+  depth=3, n=5
+  depth=4, n=2
+  depth=5, n=1
+1010</pre></div>
+  <p class="dx-note">inspect.stack() 回傳目前的呼叫堆疊：n 每 // 一次 2 就多一層 frame，深度一路加一。最深那層（n=1）先回傳「1」，然後一路「回程」把餘數黏在後面，1010 是回程時由左往右組出來的。</p>
+</div>
 </section>
 
 <section id="viz">
@@ -681,6 +733,29 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 06 · move_tower 完整程式與 3 層塔的輸出</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">move_tower</span>(height, from_pole, to_pole, with_pole):</span>
+<span class="line">    <span class="kw">if</span> height &gt;= <span class="num">1</span>:</span>
+<span class="line">        move_tower(height - <span class="num">1</span>, from_pole, with_pole, to_pole)</span>
+<span class="line">        move_disk(from_pole, to_pole)</span>
+<span class="line">        move_tower(height - <span class="num">1</span>, with_pole, to_pole, from_pole)</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">def</span> <span class="fn">move_disk</span>(from_p, to_p):</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"</span><span class="str">moving disk from</span><span class="str">"</span>, from_p, <span class="str">"</span><span class="str">to</span><span class="str">"</span>, to_p)</span>
+<span class="line"> </span>
+<span class="line">move_tower(<span class="num">3</span>, <span class="str">"</span><span class="str">A</span><span class="str">"</span>, <span class="str">"</span><span class="str">B</span><span class="str">"</span>, <span class="str">"</span><span class="str">C</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>moving disk from A to B
+moving disk from A to C
+moving disk from B to C
+moving disk from A to B
+moving disk from C to A
+moving disk from C to B
+moving disk from A to B</pre></div>
+  <p class="dx-note"><span id="dx-hn"></span>7 行輸出 = 2³ − 1 步，跟理論下限一模一樣。注意基底情況是「height &lt; 1 什麼都不做」：它藏在 if 的反面，這種「隱形 base case」是遞迴的常見寫法。拿上面的互動動畫對照，每一行輸出對應一次圓盤移動。</p>
+</div>
 </section>
 
 <section id="maze">
@@ -747,6 +822,35 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       </div>
     </div>
   </div>
+
+<div class="deck-extra">
+  <div class="dx-label">講義 06 · search_from 的完整回溯邏輯</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">search_from</span>(maze, row, column):</span>
+<span class="line">    <span class="com"># 基底情況們：</span></span>
+<span class="line">    <span class="kw">if</span> maze[row][column] == OBSTACLE:          <span class="com"># 1. 撞牆</span></span>
+<span class="line">        <span class="kw">return</span> <span class="kw">False</span></span>
+<span class="line">    <span class="kw">if</span> maze[row][column] in [TRIED, DEAD_END]: <span class="com"># 2. 走過的格子</span></span>
+<span class="line">        <span class="kw">return</span> <span class="kw">False</span></span>
+<span class="line">    <span class="kw">if</span> maze.is_exit(row, column):              <span class="com"># 3. 找到出口！</span></span>
+<span class="line">        maze.update_position(row, column, PART_OF_PATH)</span>
+<span class="line">        <span class="kw">return</span> <span class="kw">True</span></span>
+<span class="line">    maze.update_position(row, column, TRIED)</span>
+<span class="line"> </span>
+<span class="line">    <span class="com"># 短路串接：北、南、西、東，找到一條就收工</span></span>
+<span class="line">    found = (</span>
+<span class="line">        search_from(maze, row - <span class="num">1</span>, column)</span>
+<span class="line">        or search_from(maze, row + <span class="num">1</span>, column)</span>
+<span class="line">        or search_from(maze, row, column - <span class="num">1</span>)</span>
+<span class="line">        or search_from(maze, row, column + <span class="num">1</span>)</span>
+<span class="line">    )</span>
+<span class="line">    <span class="kw">if</span> found:</span>
+<span class="line">        maze.update_position(row, column, PART_OF_PATH)</span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        maze.update_position(row, column, DEAD_END)</span>
+<span class="line">    <span class="kw">return</span> found</span>
+<span class="line"> </span></div>
+  <p class="dx-note"><span id="dx-mz"></span>or 的<strong>短路特性</strong>就是回溯引擎：往北找到出路，南西東連試都不試；四個方向全 False 才標成死路。三個基底情況缺一不可：少了「走過的格子」那條，遞迴會在兩格之間永遠彈跳。講義的完整版把迷宮畫在 turtle 視窗上，跑起來能看到 TRIED 與 DEAD_END 一格格擴散。</p>
+</div>
 </section>
 
 <section id="dp">
