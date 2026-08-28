@@ -342,7 +342,7 @@ footer a{color:var(--accent2);}
   <a href="#slicing" data-target="slicing"><span class="fn-num">P03</span><span class="fn-name">切片子串列</span></a>
   <a href="#mutate" data-target="mutate"><span class="fn-num">P04</span><span class="fn-name">修改與刪除</span></a>
   <a href="#concat" data-target="concat"><span class="fn-num">P05</span><span class="fn-name">串接與重複</span></a>
-  <a href="#iterate" data-target="iterate"><span class="fn-num">P06</span><span class="fn-name">遍歷與 in</span></a>
+  <a href="#iterate" data-target="iterate"><span class="fn-num">P06</span><span class="fn-name">走訪與 in</span></a>
   <a href="#methods" data-target="methods"><span class="fn-num">P07</span><span class="fn-name">常見方法動畫</span></a>
   <a href="#comprehension" data-target="comprehension"><span class="fn-num">P08</span><span class="fn-name">串列生成式</span></a>
   <a href="#seqtypes" data-target="seqtypes"><span class="fn-num">P09</span><span class="fn-name">序列型別家族</span></a>
@@ -385,7 +385,7 @@ footer a{color:var(--accent2);}
     <a href="#slicing"><span class="toc-num">P03</span>切片子串列（互動試算器）</a>
     <a href="#mutate"><span class="toc-num">P04</span>修改與刪除</a>
     <a href="#concat"><span class="toc-num">P05</span>串接與重複</a>
-    <a href="#iterate"><span class="toc-num">P06</span>遍歷與 in / not in</a>
+    <a href="#iterate"><span class="toc-num">P06</span>走訪與 in / not in</a>
     <a href="#methods"><span class="toc-num">P07</span>常見方法逐步動畫</a>
     <a href="#comprehension"><span class="toc-num">P08</span>串列生成式</a>
     <a href="#seqtypes"><span class="toc-num">P09</span>序列型別家族</a>
@@ -500,7 +500,7 @@ footer a{color:var(--accent2);}
 <section id="concat">
   <div class="section-number">PART 05 · 串接與重複</div>
   <h2>串接 List 與複製 List</h2>
-  <p>串列可以像字串一樣進行串接（concatenation）和重複（repetition）。<code>+</code> 運算符把兩個串列合併成一個<strong>新串列</strong>；<code>*</code> 運算符搭配整數值可以重複整個串列。</p>
+  <p>串列可以像字串一樣串接（concatenation）和重複（repetition）。<code>+</code> 運算子把兩個串列合併成一個<strong>新串列</strong>；<code>*</code> 運算子搭配整數值可以重複整個串列。</p>
   <table class="cmp-table">
     <tr><th>運算式</th><th>結果</th></tr>
     <tr><td>[1, 2, 3] + ['A', 'B', 'C']</td><td>[1, 2, 3, 'A', 'B', 'C']</td></tr>
@@ -514,10 +514,10 @@ footer a{color:var(--accent2);}
 
 <!-- ============================================================ -->
 <section id="iterate">
-  <div class="section-number">PART 06 · 遍歷</div>
-  <h2>List 遍歷：for、range()、enumerate()</h2>
+  <div class="section-number">PART 06 · 走訪</div>
+  <h2>List 走訪：for、range()、enumerate()</h2>
   <p><code>for</code> 迴圈的本質，就是沿著置物櫃排成的走廊，從第一格走到最後一格，每經過一格就把裡面的東西拿出來做點事——這種「一項一項處理」的動作稱為<strong>逐項迭代</strong>。<code>range(4)</code> 回傳的其實也是一個序列，Python 會把它當成類似 <code>[0, 1, 2, 3]</code> 的東西：</p>
-  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line"><span class="kw">for</span> subject <span class="kw">in</span> subjects:  <span class="com"># 只需要讀取元素時，直接遍歷串列最簡潔</span></span>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line"><span class="kw">for</span> subject <span class="kw">in</span> subjects:  <span class="com"># 只需要讀取元素時，直接走訪串列最簡潔</span></span>
 <span class="line">    <span class="fn">print</span>(subject)</span></div>
 
   <p>如果需要索引來<strong>寫入或更新</strong>元素，常見做法是搭配 <code>range(len(...))</code>：</p>
@@ -630,10 +630,10 @@ footer a{color:var(--accent2);}
 <span class="line">    <span class="com"># 請注意，guess 和 secret 都是串列！</span></span>
 <span class="line">    a = <span class="num">0</span>  <span class="com"># 正確且在正確位置的數字數量</span></span>
 <span class="line">    b = <span class="num">0</span>  <span class="com"># 正確但在錯誤位置的數字數量</span></span>
-<span class="line">    <span class="kw">for</span> _________________:  <span class="com"># 遍歷 guess 和 secret 的長度並取出索引</span></span>
-<span class="line">        <span class="kw">if</span> _________________:  <span class="com"># 使用運算符來確定該數字是否在正確的位置</span></span>
+<span class="line">    <span class="kw">for</span> _________________:  <span class="com"># 走訪 guess 和 secret 的長度並取出索引</span></span>
+<span class="line">        <span class="kw">if</span> _________________:  <span class="com"># 使用運算子來確定該數字是否在正確的位置</span></span>
 <span class="line">            a += <span class="num">1</span></span>
-<span class="line">        <span class="kw">elif</span> _______:  <span class="com"># 使用運算符來確定該數字是否在秘密數字中</span></span>
+<span class="line">        <span class="kw">elif</span> _______:  <span class="com"># 使用運算子來確定該數字是否在秘密數字中</span></span>
 <span class="line">            b += <span class="num">1</span></span>
 <span class="line">    <span class="kw">return</span> a, b</span>
 <span class="line"></span>
@@ -652,7 +652,7 @@ footer a{color:var(--accent2);}
 <span class="line">        <span class="fn">print</span>(<span class="str">"無效的猜測，請輸入四位數字。"</span>)</span>
 <span class="line">        <span class="kw">continue</span></span>
 <span class="line"></span>
-<span class="line">    <span class="com"># 使用串列生成式將猜測轉換為四位數字的列表</span></span>
+<span class="line">    <span class="com"># 使用串列生成式將猜測轉換為四位數字的串列</span></span>
 <span class="line">    guess = ________________________</span>
 <span class="line"></span>
 <span class="line">    guesses += <span class="num">1</span></span>
@@ -830,7 +830,7 @@ footer a{color:var(--accent2);}
   <h2>自我檢測：串列與元組 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
   <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q1.</span>以下語句會印出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">alist = [3, 67, &quot;cat&quot;, [56, 57, &quot;dog&quot;], [ ], 3.14, False]
 print&#40;alist[5])</pre>
     <div class="sq-opts">
@@ -852,7 +852,7 @@ print&#40;alist[5])</pre>
     <div class="sq-fb"></div>
   </div>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q3.</span>以下語句會印出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q3.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">alist = [3, 67, &quot;cat&quot;, [56, 57, &quot;dog&quot;], 2.5, 3.14, False]
 print&#40;alist[4:])</pre>
     <div class="sq-opts">
@@ -864,7 +864,7 @@ print&#40;alist[4:])</pre>
     <div class="sq-fb"></div>
   </div>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q4.</span>以下語句會輸出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q4.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">alist = [1,3,5]
 blist = [2,4,6]
 print&#40;alist + blist)</pre>
@@ -877,7 +877,7 @@ print&#40;alist + blist)</pre>
     <div class="sq-fb"></div>
   </div>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q5.</span>以下語句會印出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q5.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">my_list = [1, 2, 3]
 my_list.append([4, 5])
 my_list.extend([6, 7])
@@ -1299,7 +1299,7 @@ StepRunner('ref', [
 })();
 </script>
 <script>
-const FLASHCARDS = [{"front": "容器（Container）", "back": "儲存或組織多個值的結構，例如串列、元組和字典。"}, {"front": "方法（Method）", "back": "與物件相關聯的函數，並且可以在該物件上被呼叫。"}, {"front": "序列（Sequence）", "back": "有序的項目集合，每個項目可以通過其位置來存取。"}, {"front": "串列（List）", "back": "Python 中的一個可變序列型別，可以儲存一組項目。"}, {"front": "元組（Tuple）", "back": "Python 中的一個不可變序列型別，可以儲存一組項目。"}, {"front": "元素（Element）", "back": "包含在像串列或元組等容器中的個別項目或值。"}, {"front": "索引（Index）", "back": "序列中元素的數值位置，從 0 開始。"}, {"front": "下標運算子（Subscript Operator）", "back": "用於通過索引存取容器中元素的方括號（[]）。"}, {"front": "切片（Slice）", "back": "通過指定起始位置、結束位置及選擇性步驟來檢索序列子集的一種方法。"}, {"front": "可變（Mutable）", "back": "描述可以在建立後改變的物件，例如串列。"}, {"front": "項目指派（Item Assignment）", "back": "通過使用索引來更改可變容器中元素的值的過程。"}, {"front": "逐項走訪（Iteration）", "back": "逐個處理容器中每個元素的過程。"}, {"front": "串列生成式（List Comprehension）", "back": "通過對序列中每個項目應用表達式來建立串列的簡潔方法。"}, {"front": "不可變（Immutable）", "back": "描述建立後無法更改的物件，例如元組。"}, {"front": "參照（Reference）", "back": "Python 中的變數儲存一個參照，這是物件的記憶體位址。它指向物件儲存的位置，而不是包含物件本身。"}, {"front": "就地修改（In-place Modification）", "back": "在不建立新物件的情況下更改可變物件的內容。"}];
+const FLASHCARDS = [{"front": "容器（Container）", "back": "儲存或組織多個值的結構，例如串列、元組和字典。"}, {"front": "方法（Method）", "back": "與物件相關聯的函數，並且可以在該物件上被呼叫。"}, {"front": "序列（Sequence）", "back": "有序的項目集合，每個項目都可以依它的位置存取。"}, {"front": "串列（List）", "back": "Python 中的一個可變序列型別，可以儲存一組項目。"}, {"front": "元組（Tuple）", "back": "Python 中的一個不可變序列型別，可以儲存一組項目。"}, {"front": "元素（Element）", "back": "包含在像串列或元組等容器中的個別項目或值。"}, {"front": "索引（Index）", "back": "序列中元素的數值位置，從 0 開始。"}, {"front": "下標運算子（Subscript Operator）", "back": "用索引存取容器元素的方括號（[]）。"}, {"front": "切片（Slice）", "back": "指定起始位置、結束位置與選擇性的間隔，取出序列一段子集的做法。"}, {"front": "可變（Mutable）", "back": "描述可以在建立後改變的物件，例如串列。"}, {"front": "項目指派（Item Assignment）", "back": "用索引改變可變容器中某個元素的值。"}, {"front": "逐項走訪（Iteration）", "back": "逐個處理容器中每個元素的過程。"}, {"front": "串列生成式（List Comprehension）", "back": "對序列中每個項目套用一個運算式來建立串列的簡潔寫法。"}, {"front": "不可變（Immutable）", "back": "描述建立後無法更改的物件，例如元組。"}, {"front": "參照（Reference）", "back": "Python 中的變數儲存一個參照，這是物件的記憶體位址。它指向物件儲存的位置，而不是包含物件本身。"}, {"front": "就地修改（In-place Modification）", "back": "在不建立新物件的情況下更改可變物件的內容。"}];
 
 /* ===== Flashcards engine ===== */
 (function(){

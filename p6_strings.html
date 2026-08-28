@@ -732,7 +732,7 @@ footer a{color:var(--accent2);}
   <h2>自我檢測：字串操作 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
   <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q1.</span>以下語句會輸出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">print&#40;&quot;Hello\nWorld!\tWelcome to \&quot;Python\&quot; programming.\\&quot;)</pre>
     <div class="sq-opts">
       <button class="sq-opt" data-c="1" data-fb="正確！跳脫字元 \n 會產生換行，\t 會產生 Tab 鍵，\&quot; 會顯示雙引號，而 \\ 會顯示反斜線。">Hello
@@ -752,7 +752,7 @@ print&#40;s[2] + s[-4])</pre>
       <button class="sq-opt" data-c="0" data-fb="很接近了，t 在位置 2，從左到右從 0 開始計算；但 r 在 -5，從右到左從 -1 開始計算。">tr</button>
       <button class="sq-opt" data-c="1" data-fb="對於 -4，從右到左計算，從 -1 開始。">to</button>
       <button class="sq-opt" data-c="0" data-fb="p 在位置 0，而不是 2。">ps</button>
-      <button class="sq-opt" data-c="0" data-fb="[ ] 運算子回傳一個字串，可以與另一個字串進行串聯。">錯誤，不能將 [ ] 運算子與 + 運算子一起使用。</button>
+      <button class="sq-opt" data-c="0" data-fb="[ ] 運算子回傳一個字串，可以與另一個字串串接。">錯誤，不能將 [ ] 運算子與 + 運算子一起使用。</button>
     </div>
     <div class="sq-fb"></div>
   </div>
@@ -765,7 +765,7 @@ print&#40;f&quot;{name} 是 {age} 歲，餘額為 {balance:.2f}&quot;)</pre>
     <div class="sq-opts">
       <button class="sq-opt" data-c="1" data-fb="正確！f-string 會將變數值代入並將餘額格式化為兩位小數。">Alice 是 30 歲，餘額為 1234.57</button>
       <button class="sq-opt" data-c="0" data-fb="錯誤。餘額已格式化為兩位小數，因此會四捨五入為 1234.57。">Alice 是 30 歲，餘額為 1234.5678</button>
-      <button class="sq-opt" data-c="0" data-fb="錯誤。大括號內的表達式會被計算，而不是字面印出。">Alice 是 {age} 歲，餘額為 {balance:.2f}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。大括號裡的運算式會先算出來，而不是字面印出。">Alice 是 {age} 歲，餘額為 {balance:.2f}</button>
       <button class="sq-opt" data-c="0" data-fb="錯誤。變數 'name' 應該被其值 'Alice' 取代。">name 是 30 歲，餘額為 1234.57</button>
     </div>
     <div class="sq-fb"></div>
@@ -1125,7 +1125,7 @@ StepRunner('methods', [
 })();
 </script>
 <script>
-const FLASHCARDS = [{"front": "字串（String）", "back": "一系列用來表示文字資料的字元。"}, {"front": "跳脫字元（Escape Character）", "back": "用來在字串中引入特殊字符序列的反斜線。"}, {"front": "原始字串（Raw String）", "back": "以'r'為前綴的字串，將反斜線視為字面上的字符，而不是轉義序列。"}, {"front": "字串插值（String Interpolation）", "back": "將變數值或表達式插入到字串佔位符中的過程。"}, {"front": "格式化字串（Formatted String）", "back": "包含佔位符的字串，這些佔位符可以使用變數值來替換，通常使用 % 符號。"}, {"front": "格式說明子（Format Specifier）", "back": "格式字串中的特殊語法，用來定義如何格式化一個值（例如，.2f表示保留兩位小數）。"}, {"front": "f 字串（f-string）", "back": "以'f'為前綴的字串文字，允許在字串內直接進行表達式計算和格式化。"}, {"front": "不可變性（Immutability）", "back": "字串一旦建立就不能修改，所有「修改」方法其實都回傳一份新字串。因此在迴圈裡反覆用 + 串接字串是 O(n²)，正確做法是先收集到串列再用 join。"}, {"front": "字串連接（join）", "back": "把一串字串用指定的分隔符接起來的方法，寫成 '分隔符'.join(串列)。它只配置一次記憶體，比在迴圈裡反覆用 + 快得多。"}, {"front": "切片（Slice）", "back": "用 s[start:stop:step] 取出子字串，會產生一份新的字串。s[::-1] 是反轉字串的慣用寫法，第 05 章的回文判斷會用到。"}, {"front": "字串分割（split）", "back": "依分隔符把字串切成串列的方法。讀檔做資料前處理時幾乎一定會用到，通常搭配 strip() 去掉頭尾空白與換行。"}, {"front": "字元編碼（Encoding）", "back": "字元與位元組之間的轉換規則。Python 3 的字串是 Unicode，寫入檔案時要指定 encoding='utf-8'，否則處理中文容易變成亂碼。"}, {"front": "字母重排詞（Anagram）", "back": "字母組成相同、順序不同的兩個字串。第 02 章用它比較四種解法的成本差異，從 O(n²) 一路到 O(n)，是演算法分析最好的入門例子。"}];
+const FLASHCARDS = [{"front": "字串（String）", "back": "一系列用來表示文字資料的字元。"}, {"front": "跳脫字元（Escape Character）", "back": "用來在字串中引入特殊字符序列的反斜線。"}, {"front": "原始字串（Raw String）", "back": "以'r'為前綴的字串，將反斜線視為字面上的字符，而不是轉義序列。"}, {"front": "字串插值（String Interpolation）", "back": "把變數值或運算式填進字串佔位符的做法。"}, {"front": "格式化字串（Formatted String）", "back": "包含佔位符的字串，這些佔位符可以使用變數值來替換，通常使用 % 符號。"}, {"front": "格式說明子（Format Specifier）", "back": "格式字串中的特殊語法，用來定義如何格式化一個值（例如，.2f表示保留兩位小數）。"}, {"front": "f 字串（f-string）", "back": "以'f'為前綴的字串文字，可以直接在字串裡算運算式並格式化。"}, {"front": "不可變性（Immutability）", "back": "字串一旦建立就不能修改，所有「修改」方法其實都回傳一份新字串。因此在迴圈裡反覆用 + 串接字串是 O(n²)，正確做法是先收集到串列再用 join。"}, {"front": "字串連接（join）", "back": "把一串字串用指定的分隔符接起來的方法，寫成 '分隔符'.join(串列)。它只配置一次記憶體，比在迴圈裡反覆用 + 快得多。"}, {"front": "切片（Slice）", "back": "用 s[start:stop:step] 取出子字串，會產生一份新的字串。s[::-1] 是反轉字串的慣用寫法，第 05 章的回文判斷會用到。"}, {"front": "字串分割（split）", "back": "依分隔符把字串切成串列的方法。讀檔做資料前處理時幾乎一定會用到，通常搭配 strip() 去掉頭尾空白與換行。"}, {"front": "字元編碼（Encoding）", "back": "字元與位元組之間的轉換規則。Python 3 的字串是 Unicode，寫入檔案時要指定 encoding='utf-8'，否則處理中文容易變成亂碼。"}, {"front": "字母重排詞（Anagram）", "back": "字母組成相同、順序不同的兩個字串。第 02 章用它比較四種解法的成本差異，從 O(n²) 一路到 O(n)，是演算法分析最好的入門例子。"}];
 
 /* ===== Flashcards engine ===== */
 (function(){

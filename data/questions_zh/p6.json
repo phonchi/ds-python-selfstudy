@@ -1,6 +1,6 @@
 [
  {
-  "question": "以下語句會輸出什麼？",
+  "question": "以下程式會印出什麼？",
   "code": "print(\"Hello\\nWorld!\\tWelcome to \\\"Python\\\" programming.\\\\\")",
   "answers": [
    {
@@ -47,7 +47,7 @@
    {
     "answer": "錯誤，不能將 [ ] 運算子與 + 運算子一起使用。",
     "correct": false,
-    "feedback": "[ ] 運算子回傳一個字串，可以與另一個字串進行串聯。"
+    "feedback": "[ ] 運算子回傳一個字串，可以與另一個字串串接。"
    }
   ]
  },
@@ -68,7 +68,7 @@
    {
     "answer": "Alice 是 {age} 歲，餘額為 {balance:.2f}",
     "correct": false,
-    "feedback": "錯誤。大括號內的表達式會被計算，而不是字面印出。"
+    "feedback": "錯誤。大括號裡的運算式會先算出來，而不是字面印出。"
    },
    {
     "answer": "name 是 30 歲，餘額為 1234.57",

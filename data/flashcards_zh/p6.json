@@ -13,7 +13,7 @@
 },
 {
 "front": "字串插值（String Interpolation）",
-"back": "將變數值或表達式插入到字串佔位符中的過程。"
+"back": "把變數值或運算式填進字串佔位符的做法。"
 },
 {
 "front": "格式化字串（Formatted String）",
@@ -25,7 +25,7 @@
 },
 {
 "front": "f 字串（f-string）",
-"back": "以'f'為前綴的字串文字，允許在字串內直接進行表達式計算和格式化。"
+"back": "以'f'為前綴的字串文字，可以直接在字串裡算運算式並格式化。"
 },
 {
 "front": "不可變性（Immutability）",

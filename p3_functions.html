@@ -414,7 +414,7 @@ footer a{color:var(--accent2);}
 
   <div class="info-box warm">
     <div class="info-label">⚠ 函數執行結束後，參數就被遺忘了</div>
-    <p style="margin-bottom:0;">如果在 <code>hello('Bob')</code> 之後加一行 <code>print(name)</code>，會產生 <code>NameError</code>！因為 <code>name</code> 只存在於呼叫 <code>hello()</code> 時建立的區域範圍中，函數一返回，這個區域範圍就被銷毀，<code>name</code> 也跟著消失。（這正是下面 P05「區域 vs 全域範圍」要探討的主題。）</p>
+    <p style="margin-bottom:0;">如果在 <code>hello('Bob')</code> 之後加一行 <code>print(name)</code>，會產生 <code>NameError</code>！因為 <code>name</code> 只存在於呼叫 <code>hello()</code> 時建立的區域範圍中，函式一回傳，這個區域範圍就被銷毀，<code>name</code> 也跟著消失。（這正是下面 P05「區域 vs 全域範圍」要探討的主題。）</p>
   </div>
 
   <h3>位置引數：依照順序配對</h3>
@@ -459,7 +459,7 @@ footer a{color:var(--accent2);}
       <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="stackOut"></div></div>
       <div class="info-card">
         <div class="ic-title">呼叫堆疊是什麼？</div>
-        <p style="font-size:.82rem;margin:0;">全域範圍只有一個，程式一開始就建立；每呼叫一次函數，就在堆疊上疊一個新的區域 frame。frame 之間互不干擾，函數返回時最上面的 frame 會被銷毀。</p>
+        <p style="font-size:.82rem;margin:0;">全域範圍只有一個，程式一開始就建立；每呼叫一次函數，就在堆疊上疊一個新的區域 frame。frame 之間互不干擾，函式回傳時最上面的 frame 會被銷毀。</p>
       </div>
     </div>
   </div>
@@ -641,8 +641,8 @@ footer a{color:var(--accent2);}
   <div class="section-number">PART 05 · 區域變數與全域變數</div>
   <h2>範圍（Scope）：變數活多久、誰看得到</h2>
   <p>函式被呼叫時建立的<strong>參數</strong>，以及在函式內被賦值的變數，都住在這個函式自己的<strong>區域範圍（local scope）</strong>。在所有函式之外被賦值的變數，則住在<strong>全域範圍（global scope）</strong>。一個變數只能屬於其中一種範圍，不能又是區域變數、又是全域變數。</p>
-  <p>換個白話的說法：函式就像一間房間，裡面的變數是寫在房間自己的白板上；房間門一關（函式執行結束、返回），白板就被擦掉——房間外的人看不到、也拿不到裡面白板上的內容。</p>
-  <p>把「範圍」想像成變數的容器：範圍被銷毀時，裡面所有的變數也會被遺忘。一個模組<strong>只有一個全域範圍</strong>，程式開始執行時就建立；而<strong>每呼叫一次函式，就會產生一個新的區域範圍</strong>，函式執行完畢返回後，該區域範圍就被銷毀。也就是說，下次再呼叫同一個函式，區域變數並不會記得上一次呼叫時的值。</p>
+  <p>換個白話的說法：函式就像一間房間，裡面的變數是寫在房間自己的白板上；房間門一關（函式執行結束、回傳），白板就被擦掉——房間外的人看不到、也拿不到裡面白板上的內容。</p>
+  <p>把「範圍」想像成變數的容器：範圍被銷毀時，裡面所有的變數也會被遺忘。一個模組<strong>只有一個全域範圍</strong>，程式開始執行時就建立；而<strong>每呼叫一次函式，就會產生一個新的區域範圍</strong>，函式執行完畢回傳後，該區域範圍就被銷毀。也就是說，下次再呼叫同一個函式，區域變數並不會記得上一次呼叫時的值。</p>
 
   <h3>情境一：區域變數無法在全域範圍中使用</h3>
   <div class="pseudo-code">
@@ -653,7 +653,7 @@ footer a{color:var(--accent2);}
 <span class="line"><span class="fn">print</span>(eggs)</span></div>
   <div class="console"><div class="err-line out-line">Traceback (most recent call last):
 NameError: name 'eggs' is not defined</div></div>
-  <p style="margin-top:.6rem;">變數 <code>eggs</code> 只存在於呼叫 <code>spam()</code> 時建立的區域範圍中；函式返回後，該區域範圍就被銷毀，<code>eggs</code> 也不再存在。</p>
+  <p style="margin-top:.6rem;">變數 <code>eggs</code> 只存在於呼叫 <code>spam()</code> 時建立的區域範圍中；函式回傳後，該區域範圍就被銷毀，<code>eggs</code> 也不再存在。</p>
 
   <h3>情境二：不同的區域範圍互不相通</h3>
   <div class="pseudo-code">
@@ -667,7 +667,7 @@ NameError: name 'eggs' is not defined</div></div>
 <span class="line">    eggs = <span class="num">0</span></span>
 <span class="line"></span>
 <span class="line"><span class="fn">spam</span>()</span></div>
-  <p><code>bacon()</code> 裡的 <code>eggs</code>，跟 <code>spam()</code> 裡的 <code>eggs</code> 是完全不同的兩個變數——它們分別存在於各自呼叫所建立的區域範圍中。<code>bacon()</code> 執行完畢返回後，它的區域範圍（含 <code>ham</code> 與那個 <code>eggs</code>）就被銷毀；回到 <code>spam()</code> 後印出的 <code>eggs</code>，仍然是 <code>spam()</code> 自己的 99。</p>
+  <p><code>bacon()</code> 裡的 <code>eggs</code>，跟 <code>spam()</code> 裡的 <code>eggs</code> 是完全不同的兩個變數——它們分別存在於各自呼叫所建立的區域範圍中。<code>bacon()</code> 執行完畢回傳後，它的區域範圍（含 <code>ham</code> 與那個 <code>eggs</code>）就被銷毀；回到 <code>spam()</code> 後印出的 <code>eggs</code>，仍然是 <code>spam()</code> 自己的 99。</p>
 
   <h3>情境三：全域變數可以在區域範圍中被讀取</h3>
   <div class="pseudo-code">
@@ -819,9 +819,9 @@ NameError: name 'eggs' is not defined</div></div>
 <span class="line"><span class="kw">while</span> playAgain == <span class="str">'yes'</span>:</span>
 <span class="line">    <span class="com"># 使用遊戲模組中的 displayIntro() 顯示遊戲資訊</span></span>
 <span class="line">    game.displayIntro()</span>
-<span class="line">    <span class="com"># 讀取使用者輸入並通過調用遊戲模組中的 chooseCave() 函數返回洞穴號碼</span></span>
+<span class="line">    <span class="com"># 讀取使用者輸入並呼叫遊戲模組中的 chooseCave() 函式回傳洞穴號碼</span></span>
 <span class="line">    caveNumber = game.chooseCave()</span>
-<span class="line">    <span class="com"># 通過調用遊戲模組中的 checkCave() 函數並提供適當的引數檢查洞穴是否安全</span></span>
+<span class="line">    <span class="com"># 呼叫遊戲模組中的 checkCave() 函數並提供適當的引數檢查洞穴是否安全</span></span>
 <span class="line">    game.checkCave(caveNumber)</span>
 <span class="line"></span>
 <span class="line">    <span class="fn">print</span>(<span class="str">'你想再玩一次嗎？（是或否）'</span>)</span>
@@ -901,7 +901,7 @@ NameError: name 'eggs' is not defined</div></div>
     <div class="sq-opts">
       <button class="sq-opt" data-c="1" data-fb="正確！函數是一個具名稱的程式區塊。">一個具名稱的程式區塊。</button>
       <button class="sq-opt" data-c="0" data-fb="雖然函數包含一連串的指令，但不是所有的一連串的指令都被視為函數。">任何一連串的指令。</button>
-      <button class="sq-opt" data-c="0" data-fb="雖然有些函數會計算出數值，但 Python 中的函數概念與數學中的函數略有不同，並非所有函數都用來計算數值。例如，print&#40;) 函數就沒有計算數值。">一個計算數值的數學表達式。</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然有些函數會計算出數值，但 Python 中的函數概念與數學中的函數略有不同，並非所有函數都用來計算數值。例如，print&#40;) 函數就沒有計算數值。">一個算得出數值的數學運算式。</button>
       <button class="sq-opt" data-c="0" data-fb="這樣的敘述被稱為指派（賦值）敘述，而不是函數。">像 x = 5 + 4 這樣的敘述。</button>
     </div>
     <div class="sq-fb"></div>
@@ -1358,7 +1358,7 @@ StepRunner('scope', [
 })();
 </script>
 <script>
-const FLASHCARDS = [{"front": "分而治之（Divide and Conquer）", "back": "一種將問題分解為較小且易於處理的子問題，分別解決每個子問題，再將結果合併的策略。"}, {"front": "抽象化（Abstraction）", "back": "隱藏複雜細節並只顯示對象或過程中關鍵特徵的概念。"}, {"front": "函數（Function）", "back": "一個可重用的程式碼塊，當被調用時，執行特定的任務。"}, {"front": "函數呼叫（Function Call）", "back": "執行函數的行為，指定函數名稱並提供必要的參數。"}, {"front": "引數（Argument）", "back": "調用函數時傳遞給函數的實際值或變數。"}, {"front": "參數（Parameter）", "back": "函數定義中的變數，在函數調用時接收參數的值。"}, {"front": "位置參數（Positional Parameter）", "back": "必須按照定義順序傳遞給函數的參數。"}, {"front": "說明字串（Docstring）", "back": "放置於函數或模組開始處的字串，用於描述其目的和使用方式。"}, {"front": "回傳敘述（return Statement）", "back": "結束函數執行並可選擇性地回傳一個值給調用者的語句。"}, {"front": "有回傳值的函數（Fruitful Function）", "back": "執行後回傳值的函數。"}, {"front": "無回傳值的函數（Void Function）", "back": "不回傳任何值的函數。"}, {"front": "關鍵字引數（Keyword Argument）", "back": "通過顯式命名參數傳遞給函數的參數，允許按照任意順序指定參數。"}, {"front": "預設參數（Default Parameter）", "back": "具有預設值的參數，如果在函數調用時未提供參數，則使用此預設值。"}, {"front": "區域範圍（Local Scope）", "back": "程式中（通常在函數內）定義變數的區域，該變數只能在該區塊內訪問。"}, {"front": "全域範圍（Global Scope）", "back": "變數可以在程式的任何部分訪問的區域，通常在函數外部定義。"}, {"front": "區域變數（Local Variable）", "back": "在函數內部定義的變數，僅能在該函數內部使用。"}, {"front": "全域變數（Global Variable）", "back": "在模組的頂層定義的變數，該變數可以在該模組的任何地方訪問。"}, {"front": "模組（Module）", "back": "包含 Python 程式碼的文件，包含函數、類別或變數，能夠被導入並在其他 Python 程式中重複使用。"}];
+const FLASHCARDS = [{"front": "分而治之（Divide and Conquer）", "back": "一種將問題分解為較小且易於處理的子問題，分別解決每個子問題，再將結果合併的策略。"}, {"front": "抽象化（Abstraction）", "back": "隱藏複雜細節並只顯示對象或過程中關鍵特徵的概念。"}, {"front": "函數（Function）", "back": "一段可以重複使用的程式碼，當被呼叫時，執行特定的任務。"}, {"front": "函數呼叫（Function Call）", "back": "執行函數的行為，指定函數名稱並提供必要的參數。"}, {"front": "引數（Argument）", "back": "呼叫函數時傳遞給函數的實際值或變數。"}, {"front": "參數（Parameter）", "back": "函數定義中的變數，在函數呼叫時接收參數的值。"}, {"front": "位置參數（Positional Parameter）", "back": "必須按照定義順序傳遞給函數的參數。"}, {"front": "說明字串（Docstring）", "back": "放置於函數或模組開始處的字串，用於描述其目的和使用方式。"}, {"front": "回傳敘述（return Statement）", "back": "結束函式執行、並可選擇回傳一個值給呼叫端的敘述。"}, {"front": "有回傳值的函數（Fruitful Function）", "back": "執行後回傳值的函數。"}, {"front": "無回傳值的函數（Void Function）", "back": "不回傳任何值的函數。"}, {"front": "關鍵字引數（Keyword Argument）", "back": "呼叫時明確寫出參數名稱來傳遞的引數，允許按照任意順序指定參數。"}, {"front": "預設參數（Default Parameter）", "back": "具有預設值的參數，如果在函數呼叫時未提供參數，則使用此預設值。"}, {"front": "區域範圍（Local Scope）", "back": "程式中（通常在函數內）定義變數的區域，該變數只能在該區塊內訪問。"}, {"front": "全域範圍（Global Scope）", "back": "變數可以在程式的任何部分訪問的區域，通常在函數外部定義。"}, {"front": "區域變數（Local Variable）", "back": "在函數內部定義的變數，僅能在該函數內部使用。"}, {"front": "全域變數（Global Variable）", "back": "在模組的頂層定義的變數，該變數可以在該模組的任何地方訪問。"}, {"front": "模組（Module）", "back": "包含 Python 程式碼的文件，包含函數、類別或變數，能夠被導入並在其他 Python 程式中重複使用。"}];
 
 /* ===== Flashcards engine ===== */
 (function(){

@@ -388,7 +388,7 @@ footer a{color:var(--accent2);}
 <section id="prologue">
   <div class="section-number">PROLOGUE · 開場</div>
   <h2>引言：從「循序執行」到「流程控制」</h2>
-  <p>日常生活中，我們無時無刻都在面對許多的選擇：要不要吃飯、要吃什麼、要不要睡覺、要不要出去玩……這些選擇，其實都是由一個又一個的<strong>邏輯判斷</strong>組成的。程式語言也是一樣——這一章，我們就來看看在 Python 裡如何進行邏輯判斷，以及如何用布林值來做流程控制。</p>
+  <p>日常生活中，我們無時無刻都在面對許多的選擇：要不要吃飯、要吃什麼、要不要睡覺、要不要出去玩……這些選擇，其實都是由一個又一個的<strong>邏輯判斷</strong>組成的。程式語言也是一樣——這一章，我們就來看看在 Python 裡怎麼做邏輯判斷，以及如何用布林值來做流程控制。</p>
   <p>上一章我們學會了單一指令的基本知識，也知道程式就是一系列指令。但程式設計真正強大之處，不僅僅在於<strong>逐條執行指令</strong>！一個程式可以決定<strong>跳過</strong>某些指令、<strong>重複</strong>執行它們，或是<strong>選擇</strong>其中一組指令來執行——這些能力統稱為<strong>流程控制敘述（flow control statements）</strong>，它們直接對應到流程圖中的符號。</p>
   <p>流程圖用<strong>菱形</strong>畫出分支點（要做決定的地方），<strong>矩形</strong>畫出每一個步驟，<strong>圓角矩形</strong>則代表開始與結束。神奇的是，數學上可以證明：不管程式多複雜，通通都能只靠三種控制形式組合出來——<span class="pill pill-blue">循序執行</span><span class="pill pill-green">選擇敘述</span><span class="pill pill-orange">重複敘述</span>。這個看似簡單的組合技，就是<strong>結構化程式設計（structured programming）</strong>的核心理念。</p>
 
@@ -643,7 +643,7 @@ footer a{color:var(--accent2);}
   <p>當餘數為 0（偶數）時，<code>continue</code> 讓 Python 忽略本輪剩下的程式碼，直接回到迴圈開頭；否則才會執行 <code>print()</code>。<code>print()</code> 的 <code>end</code> 參數可以改變預設的「印完自動換行」行為，這裡改成印出一個空格。</p>
 
   <h3>Truthy 與 Falsy 值</h3>
-  <p>Python 中 <code>0</code>、<code>None</code>、空字串 <code>''</code>、以及空的容器（如空列表）都被視為 <strong>falsy（等同 False）</strong>，其餘所有值都被視為 <strong>truthy（等同 True）</strong>。這讓程式可以寫得更精簡：</p>
+  <p>Python 中 <code>0</code>、<code>None</code>、空字串 <code>''</code>、以及空的容器（如空串列）都被視為 <strong>falsy（等同 False）</strong>，其餘所有值都被視為 <strong>truthy（等同 True）</strong>。這讓程式可以寫得更精簡：</p>
   <div class="pseudo-code" style="margin:1rem 0;">
 <span class="line">name = <span class="str">''</span></span>
 <span class="line"><span class="kw">while</span> <span class="kw">not</span> name:      <span class="com"># 等同於 while name == ''</span></span>
@@ -744,7 +744,7 @@ footer a{color:var(--accent2);}
   </div>
 
   <h3>🧪 QUIZ · for 迴圈（下方測驗第 6 題）</h3>
-  <p>本節對應下方測驗第 6 題：<code>for ch in "python rocks": print("HELLO")</code> 會印出幾次 HELLO？（提示：for 迴圈也可以逐項遍歷字串這種<strong>序列型別</strong>，不是只能搭配 range()！）</p>
+  <p>本節對應下方測驗第 6 題：<code>for ch in "python rocks": print("HELLO")</code> 會印出幾次 HELLO？（提示：for 迴圈也可以逐項走訪字串這種<strong>序列型別</strong>，不是只能搭配 range()！）</p>
 </section>
 
 <!-- ============================================================ -->
@@ -848,9 +848,9 @@ footer a{color:var(--accent2);}
   <div class="sq-item">
     <div class="sq-q"><span class="sq-num">Q2.</span>要檢查變數 x 是否介於 0 與 5 之間，下列哪一項是 Python 特有的「連鎖比較」寫法？</div>
     <div class="sq-opts">
-      <button class="sq-opt" data-c="0" data-fb="每個比較運算子必須兩邊都有值。在這裡右側的表達式 &lt; 5 缺少左邊的值。">x &gt; 0 and &lt; 5</button>
+      <button class="sq-opt" data-c="0" data-fb="每個比較運算子必須兩邊都有值。在這裡右邊的運算式 &lt; 5 缺少左邊的值。">x &gt; 0 and &lt; 5</button>
       <button class="sq-opt" data-c="1" data-fb="這個運算式等同於寫成 x &gt; 0 and x &lt; 5，但這種寫法比較簡潔！">0 &lt; x &lt; 5</button>
-      <button class="sq-opt" data-c="0" data-fb="這個表達式對所有大於 0 或小於 5 的數都會回傳 True，而所有數字都滿足這個條件，所以結果總是 True！">x &gt; 0 or x &lt; 5</button>
+      <button class="sq-opt" data-c="0" data-fb="這個運算式對所有大於 0 或小於 5 的數都會回傳 True，而所有數字都滿足這個條件，所以結果總是 True！">x &gt; 0 or x &lt; 5</button>
       <button class="sq-opt" data-c="0" data-fb="這個寫法也正確，但它是所有語言都通用的寫法。Python 額外支援連鎖比較，可以直接寫成 0 &lt; x &lt; 5。">x &gt; 0 and x &lt; 5</button>
     </div>
     <div class="sq-fb"></div>
@@ -891,7 +891,7 @@ print&#40;answer)</pre>
     <div class="sq-opts">
       <button class="sq-opt" data-c="1" data-fb="只要 n 為正數，迴圈就會一直運行。在這個例子中，可以看到 n 永遠不會變成非正數。">n 從 10 開始，每次迴圈都遞增 1，因此它永遠是正數。</button>
       <button class="sq-opt" data-c="0" data-fb="雖然 answer 永遠是正數，但迴圈條件並未考慮 answer 的值。">answer 從 1 開始，每次迴圈都加上 n，因此它永遠是正數。</button>
-      <button class="sq-opt" data-c="0" data-fb="雖然這是間接導致無限迴圈的原因，但比較 n 與 0 是合法的。">在 while 迴圈中，你不能將 n 與 0 進行比較。你必須將它與另一個變數比較。</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然這是間接導致無限迴圈的原因，但比較 n 與 0 是合法的。">在 while 迴圈中，你不能將 n 與 0 比較。你必須將它與另一個變數比較。</button>
       <button class="sq-opt" data-c="0" data-fb="迴圈條件必須變為 False 以使迴圈終止，但在這個例子中，n 本身並不是條件。">在 while 迴圈的主體中，我們必須將 n 設定為 False，而這段程式碼沒有這麼做。</button>
     </div>
     <div class="sq-fb"></div>
@@ -1231,7 +1231,7 @@ StepRunner('cond', [
 })();
 </script>
 <script>
-const FLASHCARDS = [{"front": "流程控制敘述（Control Flow Statement）", "back": "決定程式碼執行順序的指令。"}, {"front": "布林運算式（Boolean Expression）", "back": "運算結果為 True 或 False 的運算式。"}, {"front": "布林值（Boolean Value）", "back": "Python 中的兩個真值：True 與 False。"}, {"front": "比較運算子（Comparison Operator）", "back": "用來比較值的運算子，如 ==、!=、<、>、<= 和 >=。"}, {"front": "布林運算子（Boolean Operator）", "back": "用來組合或反轉布林運算式的運算子，例如 and、or 和 not。"}, {"front": "循序執行（Sequential Execution）", "back": "程式碼依序逐條執行的過程。"}, {"front": "選擇敘述（Selection Statement）", "back": "根據條件讓程式選擇不同執行路徑的敘述（例如 if 敘述）。"}, {"front": "重複敘述（Iteration Statement）", "back": "反覆執行程式碼區塊的迴圈，直到滿足某個條件（例如 for 或 while 迴圈）。"}, {"front": "結構化程式設計（Structured Programming）", "back": "利用區塊、迴圈和函數撰寫清晰、邏輯性強程式碼的程式設計風格。"}, {"front": "條件（Condition）", "back": "用於決定執行哪個程式碼路徑的布林運算式。"}, {"front": "子句（Clause）", "back": "控制結構中的一部分，例如 if 敘述中的條件部分。"}, {"front": "程式碼區塊（Code Block）", "back": "一組會一起執行的敘述，通常由縮排定義。"}, {"front": "縮排（Indentation）", "back": "行首的空格，用以定義 Python 中的程式碼區塊。"}, {"front": "控制結構（Control Structure）", "back": "控制程式執行流程的結構，如迴圈與條件敘述。"}, {"front": "條件敘述（if Statement）", "back": "僅在指定條件為 True 時執行程式碼的條件敘述。"}, {"front": "條件迴圈（while Statement）", "back": "只要條件保持為 True 就重複執行程式碼區塊的迴圈。"}, {"front": "增強指派運算子（Augmented Assignment Operator）", "back": "用於原地更新變數值的簡寫運算子（例如 +=、-=、*=）。"}, {"front": "跳出迴圈（break Statement）", "back": "一個立即退出迴圈的指令。"}, {"front": "無窮迴圈（Infinite Loop）", "back": "除非被中斷，否則永不停止運行的迴圈。"}, {"front": "跳過本輪（continue Statement）", "back": "一個跳過當前迴圈剩餘部分並進入下一次迭代的指令。"}, {"front": "計數迴圈（for Statement）", "back": "對序列中的每個項目進行迭代，並對每個項目執行一個程式碼區塊的迴圈。"}, {"front": "成員運算子（in Operator）", "back": "用於檢查某值是否存在於序列中或對序列項目進行迭代的關鍵字。"}, {"front": "序列型別（Sequence Type）", "back": "儲存有序項目集合的資料型別，如串列、元組與字串。"}, {"front": "標準函式庫（Standard Library）", "back": "Python 內建的一系列模組與函數，用於執行許多常見任務。"}];
+const FLASHCARDS = [{"front": "流程控制敘述（Control Flow Statement）", "back": "決定程式碼執行順序的指令。"}, {"front": "布林運算式（Boolean Expression）", "back": "運算結果為 True 或 False 的運算式。"}, {"front": "布林值（Boolean Value）", "back": "Python 中的兩個真值：True 與 False。"}, {"front": "比較運算子（Comparison Operator）", "back": "用來比較值的運算子，如 ==、!=、<、>、<= 和 >=。"}, {"front": "布林運算子（Boolean Operator）", "back": "用來組合或反轉布林運算式的運算子，例如 and、or 和 not。"}, {"front": "循序執行（Sequential Execution）", "back": "程式碼依序逐條執行的過程。"}, {"front": "選擇敘述（Selection Statement）", "back": "根據條件讓程式選擇不同執行路徑的敘述（例如 if 敘述）。"}, {"front": "重複敘述（Iteration Statement）", "back": "反覆執行程式碼區塊的迴圈，直到滿足某個條件（例如 for 或 while 迴圈）。"}, {"front": "結構化程式設計（Structured Programming）", "back": "利用區塊、迴圈和函數撰寫清晰、邏輯性強程式碼的程式設計風格。"}, {"front": "條件（Condition）", "back": "用於決定執行哪個程式碼路徑的布林運算式。"}, {"front": "子句（Clause）", "back": "控制結構中的一部分，例如 if 敘述中的條件部分。"}, {"front": "程式碼區塊（Code Block）", "back": "一組會一起執行的敘述，通常由縮排定義。"}, {"front": "縮排（Indentation）", "back": "行首的空格，用以定義 Python 中的程式碼區塊。"}, {"front": "控制結構（Control Structure）", "back": "控制程式執行流程的結構，如迴圈與條件敘述。"}, {"front": "條件敘述（if Statement）", "back": "僅在指定條件為 True 時執行程式碼的條件敘述。"}, {"front": "條件迴圈（while Statement）", "back": "只要條件保持為 True 就重複執行程式碼區塊的迴圈。"}, {"front": "增強指派運算子（Augmented Assignment Operator）", "back": "用於原地更新變數值的簡寫運算子（例如 +=、-=、*=）。"}, {"front": "跳出迴圈（break Statement）", "back": "一個立即退出迴圈的指令。"}, {"front": "無窮迴圈（Infinite Loop）", "back": "除非被中斷，否則永不停止運行的迴圈。"}, {"front": "跳過本輪（continue Statement）", "back": "一個跳過當前迴圈剩餘部分並進入下一次迭代的指令。"}, {"front": "計數迴圈（for Statement）", "back": "逐一走訪序列中的每個項目，並對每個項目執行一個程式碼區塊的迴圈。"}, {"front": "成員運算子（in Operator）", "back": "用於檢查某值是否存在於序列中或逐一走訪序列項目的關鍵字。"}, {"front": "序列型別（Sequence Type）", "back": "儲存有序項目集合的資料型別，如串列、元組與字串。"}, {"front": "標準函式庫（Standard Library）", "back": "Python 內建的一系列模組與函數，用於執行許多常見任務。"}];
 
 /* ===== Flashcards engine ===== */
 (function(){

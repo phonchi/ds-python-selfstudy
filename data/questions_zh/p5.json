@@ -1,6 +1,6 @@
 [
  {
-  "question": "以下語句會印出什麼？",
+  "question": "以下程式會印出什麼？",
   "code": "d1 = {\"a\": 1, \"b\": 2}\nd2 = d1\nd2[\"a\"] = 99\nprint(d1)",
   "answers": [
    {
@@ -26,7 +26,7 @@
   ]
  },
  {
-  "question": "以下語句會輸出什麼？",
+  "question": "以下程式會印出什麼？",
   "code": "d = {\"水果\": \"蘋果\", \"數量\": 10, \"價錢\": 2.5}\nprint(list(d.keys()))\nprint(list(d.values()))\nprint(list(d.items()))",
   "answers": [
    {
@@ -52,7 +52,7 @@
   ]
  },
  {
-  "question": "以下語句會印出什麼？",
+  "question": "以下程式會印出什麼？",
   "code": "d = {\"name\": \"Alice\", \"年齡\": 25}\nprint(d.get(\"name\"))\nprint(d.get(\"性別\", \"未提供\"))",
   "answers": [
    {
@@ -78,7 +78,7 @@
   ]
  },
  {
-  "question": "執行以下語句後，字典 'd' 的最終狀態為何？",
+  "question": "執行以下程式後，字典 'd' 的最終狀態為何？",
   "code": "d = {\"a\": \"alpha\"}\nd.setdefault(\"a\", \"ALPHA\")\nd.setdefault(\"b\", \"beta\")\nd.setdefault(\"c\", \"gamma\")\nprint(d)",
   "answers": [
    {

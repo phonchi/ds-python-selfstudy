@@ -496,7 +496,7 @@ footer a{color:var(--accent2);}
 
 <!-- ============================================================ -->
 <section id="iterate">
-  <div class="section-number">PART 02 · 遍歷字典</div>
+  <div class="section-number">PART 02 · 走訪字典</div>
   <h2>keys()、values()、items() 與 for 迴圈</h2>
   <p>字典其實會借給你三副眼鏡，讓你用不同角度看同一份資料：戴上 <span class="pill pill-blue">keys()</span> 這副眼鏡，只看得到所有的<strong>鍵</strong>；換上 <span class="pill pill-green">values()</span>，只看得到所有的<strong>值</strong>；戴上 <span class="pill pill-orange">items()</span>，鍵和值就一起入鏡，變成一組組 <code>(鍵, 值)</code> 元組。這三副「眼鏡」實際回傳的是 <code>dict_keys</code>／<code>dict_values</code>／<code>dict_items</code> 檢視物件，不是真正的 <code>list</code>，但一樣能直接放進 <code>for</code> 迴圈裡用；想要真正的串列，再包一層 <code>list()</code> 就好。</p>
 
@@ -505,7 +505,7 @@ footer a{color:var(--accent2);}
     <p style="margin-bottom:0;">如果字典有上百萬筆資料，<code>keys()</code> 若直接回傳一個 list，光是配置那個 list 就要耗掉一大塊記憶體。用 <code>sys.getsizeof()</code> 實測一百萬筆資料的字典：<code>big_dict.keys()</code> 只佔 <strong>40 bytes</strong>，但轉成 <code>list(big_dict.keys())</code> 卻要 <strong>8,000,056 bytes</strong>！這就是為什麼 Python 選擇回傳「隨用隨產生」的檢視物件，而不是一次展開的 list。</p>
   </div>
 
-  <p>預設情況下，直接對字典做 <code>for k in grade:</code> 遍歷的是<strong>鍵</strong>而不是值。搭配 <code>items()</code> 與多重指派，可以在同一個迴圈同時取得鍵和值：</p>
+  <p>預設情況下，直接對字典做 <code>for k in grade:</code> 走訪的是<strong>鍵</strong>而不是值。搭配 <code>items()</code> 與多重指派，可以在同一個迴圈同時取得鍵和值：</p>
 
   <h3>🎬 互動：用 items() 同時走訪鍵與值</h3>
   <div class="viz-layout">
@@ -893,7 +893,7 @@ set  的 in（20 萬筆，200 次）: 0.000015 秒
   <h2>自我檢測：字典與集合 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
   <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q1.</span>以下語句會印出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">d1 = {&quot;a&quot;: 1, &quot;b&quot;: 2}
 d2 = d1
 d2[&quot;a&quot;] = 99
@@ -907,7 +907,7 @@ print&#40;d1)</pre>
     <div class="sq-fb"></div>
   </div>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q2.</span>以下語句會輸出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q2.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">d = {&quot;水果&quot;: &quot;蘋果&quot;, &quot;數量&quot;: 10, &quot;價錢&quot;: 2.5}
 print&#40;list(d.keys()))
 print&#40;list(d.values()))
@@ -921,7 +921,7 @@ print&#40;list(d.items()))</pre>
     <div class="sq-fb"></div>
   </div>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q3.</span>以下語句會印出什麼？</div>
+    <div class="sq-q"><span class="sq-num">Q3.</span>以下程式會印出什麼？</div>
     <pre class="sq-code">d = {&quot;name&quot;: &quot;Alice&quot;, &quot;年齡&quot;: 25}
 print&#40;d.get(&quot;name&quot;))
 print&#40;d.get(&quot;性別&quot;, &quot;未提供&quot;))</pre>
@@ -934,7 +934,7 @@ print&#40;d.get(&quot;性別&quot;, &quot;未提供&quot;))</pre>
     <div class="sq-fb"></div>
   </div>
   <div class="sq-item">
-    <div class="sq-q"><span class="sq-num">Q4.</span>執行以下語句後，字典 'd' 的最終狀態為何？</div>
+    <div class="sq-q"><span class="sq-num">Q4.</span>執行以下程式後，字典 'd' 的最終狀態為何？</div>
     <pre class="sq-code">d = {&quot;a&quot;: &quot;alpha&quot;}
 d.setdefault(&quot;a&quot;, &quot;ALPHA&quot;)
 d.setdefault(&quot;b&quot;, &quot;beta&quot;)
@@ -1107,7 +1107,7 @@ StepRunner('create', [
 });
 
 /* ============================================================
-   P02 keys/values/items 遍歷 runner
+   P02 keys/values/items 走訪 runner
    ============================================================ */
 const iterateCanvas = document.getElementById('iterateCanvas');
 const GRADE_PAIRS = [

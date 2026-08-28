@@ -407,7 +407,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   <h2>「AI 三秒就寫得出 BST，那我在這裡幹嘛？」</h2>
   <p>這是一個好問題，值得認真回答，而不是用「基本功很重要」四個字打發掉。</p>
   <p>先承認事實：現在把「幫我用 Python 實作一棵二元搜尋樹，含插入、搜尋、刪除」貼給任何一個主流模型，你會在幾秒內拿到一份看起來很專業、而且<strong>大部分情況真的會動</strong>的程式碼。這門課教的每一個資料結構，AI 都寫得出來。</p>
-  <p>所以問題不是「AI 會不會寫」，而是<strong>換你來當那個要為結果負責的人時，你憑什麼判斷它寫得對不對</strong>。</p>
+  <p>所以真正的問題只有一個：<strong>換你來當那個要為結果負責的人時，你憑什麼判斷它寫得對不對。</strong></p>
   <div class="info-box">
     <div class="info-label">💡 這一頁想說服你的一件事</div>
     <p style="margin-bottom:0;">AI 讓「產出程式碼」變得幾乎免費，於是價值整個移到了另一端：<strong>選擇、驗證與取捨</strong>。而這三件事，剛好就是資料結構與演算法這門課在教的東西。</p>
@@ -418,7 +418,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   <div class="section-number">PART 01 · 能跑 ≠ 跑得動</div>
   <h2>AI 給你的是「能跑」，不是「n 變成一百萬還能跑」</h2>
   <p>你要 AI 排序，它給你一段程式。它能跑。你用 20 筆資料測試，0.001 秒，完美。三個月後資料變成一百萬筆，同一段程式跑了四十分鐘還沒結束。</p>
-  <p>問題不在 AI 寫錯，而在<strong>你沒說要多快，它也不知道你的 n 會長多大</strong>。而「n 長大時會怎樣」正是這門課第 02 章要教的東西：<em>漸近複雜度</em>。</p>
+  <p>AI 沒有寫錯。<strong>你沒說要多快，它也不知道你的 n 會長多大。</strong>而「n 長大時會怎樣」正是這門課第 02 章要教的東西：<em>漸近複雜度</em>。</p>
 
   <div class="viz-layout">
     <div>
@@ -438,8 +438,8 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="side-panel">
       <div class="info-card">
         <div class="ic-title">重點 <span class="ic-badge">WHY</span></div>
-        <p style="font-size:.88rem;">n 小的時候，所有演算法看起來都一樣快 —— 這正是「用小資料測試」會騙人的原因。</p>
-        <p style="font-size:.88rem;margin-bottom:0;">差距不是「快一點」，是<strong>好幾個數量級</strong>：n = 100 萬時，$O(n^2)$ 要花的時間是 $O(n \log n)$ 的<strong>五萬倍</strong>。這不是效能調校的問題，是<strong>能不能做</strong>的問題。</p>
+        <p style="font-size:.88rem;">n 小的時候，所有演算法看起來都一樣快。這正是「用小資料測試」會騙人的原因。</p>
+        <p style="font-size:.88rem;margin-bottom:0;">這個差距要用<strong>數量級</strong>來算：n = 100 萬時，$O(n^2)$ 要花的時間是 $O(n \log n)$ 的<strong>五萬倍</strong>。到這個地步就不是效能調校的問題了，是<strong>能不能做</strong>的問題。</p>
       </div>
       <div class="info-card">
         <div class="ic-title">課程對照 <span class="ic-badge">CH02</span></div>
@@ -487,7 +487,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <p style="margin-bottom:0;">程式崩潰你至少知道要修。但「跑得出正確答案、只是慢一萬倍」不會噴任何錯誤訊息 —— 它只會在你上線之後、資料長大之後、或是在你交出去給別人用之後，才開始傷人。<strong>要抓到這種問題，你必須看得懂那段程式在做什麼，而不只是看它有沒有跑完。</strong></p>
   </div>
 
-  <p>還有一件事值得記住：AI 是<strong>非決定性</strong>的。同一個問題問三次，可能拿到三份不同的實作，其中一份用了 <code>set</code>、一份用了 <code>list</code>。你要有能力挑出哪一份可以用 —— 這個能力沒有捷徑，只能靠自己寫過、量過、踩過。</p>
+  <p>還有一件事：AI 是<strong>非決定性</strong>的。同一個問題問三次，可能拿到三份不同的實作，其中一份用了 <code>set</code>、一份用了 <code>list</code>。你要有能力挑出哪一份可以用 —— 這個能力沒有捷徑，只能靠自己寫過、量過、踩過。</p>
 </section>
 
 <section id="loop">
@@ -501,11 +501,11 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <p style="margin-bottom:0;">照著食譜做菜，你會做出那道菜；但你不會變成廚師。廚師的能力在於：食材換了、火力不同、客人臨時說不吃辣，他還能重新設計一道菜。<strong>你想成為哪一種？</strong></p>
   </div>
 
-  <p>更具體地說：這門課裡真正難的從來不是「寫出 quicksort」，而是「為什麼 quicksort 平均是 $O(n \log n)$、最壞卻是 $O(n^2)$」、「為什麼要選這個 pivot」、「什麼時候該改用 merge sort」。這些是<strong>推理</strong>，不是<strong>抄寫</strong>。抄一百遍程式碼也長不出推理能力。</p>
+  <p>這門課裡真正難的從來不是「寫出 quicksort」。難的是「為什麼 quicksort 平均是 $O(n \log n)$、最壞卻是 $O(n^2)$」、「為什麼要選這個 pivot」、「什麼時候該改用 merge sort」。這些都是<strong>推理</strong>，抄一百遍程式碼也長不出來。</p>
 
   <div class="info-box">
     <div class="info-label">✅ 那 AI 到底能不能用？</div>
-    <p style="margin-bottom:0;">能，而且應該用 —— 但用法要對。把 AI 當<strong>助教</strong>而不是<strong>代工</strong>：先自己寫、卡住了問「我這裡為什麼錯」、拿到解釋之後自己改。Colab 內建的 Gemini 有一個 <strong>Learn Mode</strong>，設計上就是只給引導不給完整答案，下一章（<a href="00b_setup.html">00B</a>）會教你怎麼打開它。</p>
+    <p style="margin-bottom:0;">能，而且應該用，但用法要對。把 AI 當<strong>助教</strong>用，不要當<strong>代工</strong>：先自己寫、卡住了問「我這裡為什麼錯」、拿到解釋之後自己改。Colab 內建的 Gemini 有一個 <strong>Learn Mode</strong>，設計上就是只給引導不給完整答案，下一章（<a href="00b_setup.html">00B</a>）會教你怎麼打開它。</p>
   </div>
 </section>
 
@@ -514,7 +514,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   <h2>說真的，這門課跟你的未來有什麼關係？</h2>
 
   <h3 style="font-family:'Noto Serif TC',serif;font-size:1.15rem;margin:1.4rem 0 .5rem;color:var(--accent2);">① 這是所有量化領域的共同語言</h3>
-  <p>不管你之後做的是資料科學、機器學習、生物資訊、金融工程還是純數學計算，你都會遇到「資料太多、跑太慢」的那一天。到那天，你需要的詞彙是雜湊表、是堆積、是圖的最短路徑 —— 而不是「再租一台更大的機器」。</p>
+  <p>不管你之後做的是資料科學、機器學習、生物資訊、金融工程還是純數學計算，你都會遇到「資料太多、跑太慢」的那一天。到那天，你會需要雜湊表、堆積、圖的最短路徑這些詞。「再租一台更大的機器」買不了多少時間。</p>
 
   <h3 style="font-family:'Noto Serif TC',serif;font-size:1.15rem;margin:1.4rem 0 .5rem;color:var(--accent2);">② 你早晚要讀別人的原始碼</h3>
   <p>這門課用的 <code>pythonds3</code>、你未來會用的 NumPy、PyTorch、NetworkX，全部都是別人寫的資料結構。當文件講不清楚、當行為跟你預期不同，唯一的辦法就是打開原始碼看。<strong>而原始碼裡面就是 class、就是遞迴、就是樹和圖。</strong></p>
@@ -523,7 +523,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   <p>當產出程式碼變得免費，會產出的人就不值錢了。真正變貴的是能<strong>審查</strong>的人：能看一眼就說「這裡會 $O(n^2)$」「這個遞迴沒有 base case」「這個 dict 的 key 用了 mutable 物件會炸」。技術面試考白板題、研究團隊要人 code review，考的都是這一層。</p>
 
   <div class="info-box purple">
-    <div class="info-label">🎯 一句話總結</div>
+    <div class="info-label">🎯 講白一點</div>
     <p style="margin-bottom:0;">AI 會<strong>放大</strong>你的能力，也會<strong>放大</strong>你的無知。懂的人用它跑得更快；不懂的人用它把錯誤生產得更快。</p>
   </div>
 </section>

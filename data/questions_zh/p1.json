@@ -46,7 +46,7 @@
    {
     "answer": "哈囉!",
     "correct": false,
-    "feedback": "它不會進行翻譯。"
+    "feedback": "它不會翻譯。"
    }
   ]
  },
@@ -62,7 +62,7 @@
    {
     "answer": "5",
     "correct": false,
-    "feedback": "不論使用 / 或 // 都不會進行四捨五入。"
+    "feedback": "不論使用 / 或 // 都不會四捨五入。"
    },
    {
     "answer": "4",
@@ -72,7 +72,7 @@
    {
     "answer": "4.0",
     "correct": true,
-    "feedback": "在處理不同數值型態時，會隱式轉換成較寬或較精確的型態再進行運算。"
+    "feedback": "在處理不同數值型態時，會隱式轉換成較寬或較精確的型態再運算。"
    }
   ]
  },
@@ -145,7 +145,7 @@
    {
     "answer": "54",
     "correct": false,
-    "feedback": "轉換為整數時，int 函式不會進行四捨五入。"
+    "feedback": "轉換為整數時，int 函式不會四捨五入。"
    },
    {
     "answer": "53.785",

@@ -611,7 +611,7 @@ footer a{color:var(--accent2);}
 
   <h3>兩種型別轉換</h3>
   <p><span class="pill pill-blue">隱式轉換</span> Python 自動把「較小」的型別轉成「較大」的以避免資料遺失：<code>5 + 4.2</code> → <code>9.2</code>（int 自動升級成 float）。順序是 <code>complex &gt; float &gt; int &gt; bool</code>。</p>
-  <p><span class="pill pill-red">顯式轉換</span> 你手動呼叫轉換（cast）函數：<code>int()</code>、<code>float()</code>、<code>str()</code>。注意 <code>int(3.9)</code> 得到 <code>3</code>——是<strong>直接捨去小數</strong>，不是四捨五入！</p>
+  <p><span class="pill pill-red">明確轉換</span> 你手動呼叫轉換（cast）函數：<code>int()</code>、<code>float()</code>、<code>str()</code>。注意 <code>int(3.9)</code> 得到 <code>3</code>——是<strong>直接捨去小數</strong>，不是四捨五入！</p>
 </section>
 
 <!-- ============================================================ -->
@@ -734,7 +734,7 @@ footer a{color:var(--accent2);}
     <tr><td>input()</td><td>讀取使用者輸入</td><td class="worst">永遠回傳字串！</td></tr>
     <tr><td>type()</td><td>查詢值的型別</td><td>學習期的好朋友</td></tr>
     <tr><td>len()</td><td>字串長度</td><td>回傳整數</td></tr>
-    <tr><td>int() / float() / str()</td><td>顯式型別轉換</td><td>int(3.9) = 3，直接捨去不四捨五入</td></tr>
+    <tr><td>int() / float() / str()</td><td>明確指定的型別轉換</td><td>int(3.9) = 3，直接捨去不四捨五入</td></tr>
     <tr><td>help('keywords')</td><td>列出所有關鍵字</td><td>關鍵字不能當變數名稱</td></tr>
   </table>
 
@@ -773,7 +773,7 @@ footer a{color:var(--accent2);}
       <button class="sq-opt" data-c="0" data-fb="語法是正確的！">什麼都不會印出，而且會產生執行時錯誤。</button>
       <button class="sq-opt" data-c="0" data-fb="程式中的字面值包含引號，但印出來的結果不包含引號。">&quot;Hello!&quot;</button>
       <button class="sq-opt" data-c="1" data-fb="正確。">Hello!</button>
-      <button class="sq-opt" data-c="0" data-fb="它不會進行翻譯。">哈囉!</button>
+      <button class="sq-opt" data-c="0" data-fb="它不會翻譯。">哈囉!</button>
     </div>
     <div class="sq-fb"></div>
   </div>
@@ -782,9 +782,9 @@ footer a{color:var(--accent2);}
     <pre class="sq-code">print&#40;18.0 // 4)</pre>
     <div class="sq-opts">
       <button class="sq-opt" data-c="0" data-fb="// 運算子會無條件捨去小數部分。">4.5</button>
-      <button class="sq-opt" data-c="0" data-fb="不論使用 / 或 // 都不會進行四捨五入。">5</button>
+      <button class="sq-opt" data-c="0" data-fb="不論使用 / 或 // 都不會四捨五入。">5</button>
       <button class="sq-opt" data-c="0" data-fb="儘管運算子會無條件捨去，但結果仍會以浮點數表示。">4</button>
-      <button class="sq-opt" data-c="1" data-fb="在處理不同數值型態時，會隱式轉換成較寬或較精確的型態再進行運算。">4.0</button>
+      <button class="sq-opt" data-c="1" data-fb="在處理不同數值型態時，會隱式轉換成較寬或較精確的型態再運算。">4.0</button>
     </div>
     <div class="sq-fb"></div>
   </div>
@@ -819,7 +819,7 @@ print&#40;day)</pre>
     <div class="sq-opts">
       <button class="sq-opt" data-c="0" data-fb="這是有效的 Python 程式碼。它呼叫 int 函式將 53.785 轉換為整數，然後印出回傳的值。">什麼都不會印出，而且會產生執行時錯誤。</button>
       <button class="sq-opt" data-c="1" data-fb="int 函式會捨棄小數部分，僅保留整數部分，因此印出 53。">53</button>
-      <button class="sq-opt" data-c="0" data-fb="轉換為整數時，int 函式不會進行四捨五入。">54</button>
+      <button class="sq-opt" data-c="0" data-fb="轉換為整數時，int 函式不會四捨五入。">54</button>
       <button class="sq-opt" data-c="0" data-fb="int 函式會移除 53.785 的小數部分，傳回整數 53。">53.785</button>
     </div>
     <div class="sq-fb"></div>
@@ -1200,7 +1200,7 @@ StepRunner('hello', [
 })();
 </script>
 <script>
-const FLASHCARDS = [{"front": "演算法（Algorithm）", "back": "它包含明確、無歧義的步驟，並且必須在有限時間內產生結果。"}, {"front": "虛擬碼（Pseudocode）", "back": "用簡單的語言描述演算法步驟的方法，看起來像程式碼。"}, {"front": "程式設計（Programming）", "back": "撰寫電腦指令（程式碼）的過程，讓電腦執行任務。"}, {"front": "程式語言（Programming Language）", "back": "一套用於撰寫電腦能理解的程式碼的規則和語法。"}, {"front": "直譯式語言（Interpreted Language）", "back": "一種程式語言，其程式碼會被逐行直接執行，而不需先進行編譯。"}, {"front": "直譯器（Interpreter）", "back": "一個逐行讀取並執行程式碼的工具。"}, {"front": "敘述（Statement）", "back": "一行告知電腦執行某個動作的程式碼。"}, {"front": "函數（Function）", "back": "一個可重複使用的程式碼區塊，當你呼叫它時會執行特定任務。"}, {"front": "參數（Parameter）", "back": "傳入函數以幫助其運作的數值或資訊。"}, {"front": "常數（Constant）", "back": "在程式運行期間一旦設定後就不應改變的值。"}, {"front": "方法（Method）", "back": "屬於物件的函數，用來對該物件執行操作。"}, {"front": "註解（Comment）", "back": "供人類閱讀的程式碼備註，電腦執行時會忽略。"}, {"front": "運算式（Expression）", "back": "由數值、變數和運算子組成，用來計算新值的表達式。"}, {"front": "向下取整除法（Floor Division）", "back": "使用 '//' 運算子進行的除法，回傳不超過結果的最大整數。"}, {"front": "變數（Variable）", "back": "用來儲存在程式運行過程中可以改變的值的名稱。"}, {"front": "指派敘述（Assignment Statement）", "back": "使用 '=' 符號將值賦給變數的一行程式碼。"}, {"front": "關鍵字（Keyword）", "back": "Python 中具有特殊意義的保留字，不能用作變數或函數的名稱。"}, {"front": "型別（Type）", "back": "儲存在變數中的資料種類，例如數字（int、float）或文字（str）。"}, {"front": "除錯（Debugging）", "back": "找出並修正程式碼中錯誤的過程。"}, {"front": "語法錯誤（Syntax Error）", "back": "因程式碼不符合 Python 正確的規則或語法而產生的錯誤。"}, {"front": "語意錯誤（Semantic Error）", "back": "程式能運行卻未達到預期效果的錯誤，通常由邏輯錯誤引起。"}, {"front": "執行期錯誤（Runtime Error）", "back": "程式運行時發生的錯誤，常常導致程式意外中止。"}];
+const FLASHCARDS = [{"front": "演算法（Algorithm）", "back": "它包含明確、無歧義的步驟，並且必須在有限時間內產生結果。"}, {"front": "虛擬碼（Pseudocode）", "back": "用簡單的語言描述演算法步驟的方法，看起來像程式碼。"}, {"front": "程式設計（Programming）", "back": "撰寫電腦指令（程式碼）的過程，讓電腦執行任務。"}, {"front": "程式語言（Programming Language）", "back": "一套用於撰寫電腦能理解的程式碼的規則和語法。"}, {"front": "直譯式語言（Interpreted Language）", "back": "一種程式語言，其程式碼會被逐行直接執行，不必先編譯。"}, {"front": "直譯器（Interpreter）", "back": "一個逐行讀取並執行程式碼的工具。"}, {"front": "敘述（Statement）", "back": "一行告知電腦執行某個動作的程式碼。"}, {"front": "函數（Function）", "back": "一個可重複使用的程式碼區塊，當你呼叫它時會執行特定任務。"}, {"front": "參數（Parameter）", "back": "傳入函數以幫助其運作的數值或資訊。"}, {"front": "常數（Constant）", "back": "在程式運行期間一旦設定後就不應改變的值。"}, {"front": "方法（Method）", "back": "屬於物件的函數，用來對該物件執行操作。"}, {"front": "註解（Comment）", "back": "供人類閱讀的程式碼備註，電腦執行時會忽略。"}, {"front": "運算式（Expression）", "back": "由數值、變數和運算子組成，用來算出新值的式子。"}, {"front": "向下取整除法（Floor Division）", "back": "使用 '//' 運算子做的除法，回傳不超過結果的最大整數。"}, {"front": "變數（Variable）", "back": "用來儲存在程式運行過程中可以改變的值的名稱。"}, {"front": "指派敘述（Assignment Statement）", "back": "使用 '=' 符號將值賦給變數的一行程式碼。"}, {"front": "關鍵字（Keyword）", "back": "Python 中具有特殊意義的保留字，不能用作變數或函數的名稱。"}, {"front": "型別（Type）", "back": "儲存在變數中的資料種類，例如數字（int、float）或文字（str）。"}, {"front": "除錯（Debugging）", "back": "找出並修正程式碼中錯誤的過程。"}, {"front": "語法錯誤（Syntax Error）", "back": "因程式碼不符合 Python 正確的規則或語法而產生的錯誤。"}, {"front": "語意錯誤（Semantic Error）", "back": "程式能運行卻未達到預期效果的錯誤，通常由邏輯錯誤引起。"}, {"front": "執行期錯誤（Runtime Error）", "back": "程式運行時發生的錯誤，常常導致程式意外中止。"}];
 
 /* ===== Flashcards engine ===== */
 (function(){
