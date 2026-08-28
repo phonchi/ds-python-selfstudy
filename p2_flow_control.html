@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>流程控制 — 先備 P2（Python）</title>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f39c12;letter-spacing:.3em;margin-bottom:.8rem;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{font-family:'JetBrains Mono',monospace;color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.0rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:40px;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box p:last-child{margin-bottom:0;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.65;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid #f39c12;padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .str{color:#f1fa8c;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+
+/* Preset buttons */
+.preset-row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 1rem;}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:.4rem .85rem;border-radius:6px;border:2px solid var(--card-border);background:var(--card);cursor:pointer;transition:all .2s;color:var(--ink);}
+.preset-btn:hover{border-color:var(--accent2);}
+.preset-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+
+/* Variable state table */
+.var-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+.var-table td{padding:.25rem .4rem;border-bottom:1px dashed var(--card-border);}
+.var-table td.vname{color:var(--accent2);font-weight:600;}
+.var-table td.vval{color:var(--ink);}
+.var-table td.vtype{color:var(--muted);font-size:.72rem;text-align:right;}
+.var-table tr.changed td{background:var(--highlight);}
+.var-empty{color:var(--muted);font-size:.8rem;font-style:italic;}
+
+/* Console */
+.console{background:#111;border-radius:8px;padding:.6rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#d4d4d4;min-height:70px;max-height:220px;overflow-y:auto;line-height:1.6;}
+.console .out-line{white-space:pre-wrap;}
+.console .out-line.new{color:#2ecc71;}
+.console .in-line{color:#f39c12;}
+.console .err-line{color:#e74c3c;}
+
+/* Expression stepper */
+.expr-view{background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.6rem 1rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.5rem;letter-spacing:.05em;min-height:90px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.2rem;}
+.expr-view .hl{background:var(--highlight);border:2px solid #f39c12;border-radius:6px;padding:0 .35rem;color:#b9770e;}
+.expr-view .result{color:var(--accent3);font-weight:700;}
+
+/* Object/tag visualization (variables) */
+.obj-canvas{position:relative;background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.2rem;min-height:150px;display:flex;align-items:center;justify-content:center;gap:2.2rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.obj-box{border:2px solid var(--accent2);border-radius:10px;padding:.6rem 1.1rem;background:#fff;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600;color:var(--ink);position:relative;transition:all .3s;box-shadow:0 3px 10px rgba(0,0,0,.06);}
+.obj-box .obj-type{position:absolute;top:-10px;right:-8px;font-size:.62rem;background:var(--accent2);color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;}
+.obj-box.faded{opacity:.3;border-style:dashed;}
+.obj-box.faded::after{content:'（被遺忘 → 資源回收）';position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:.62rem;color:var(--muted);white-space:nowrap;}
+.obj-box .tag{position:absolute;top:-34px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:12px;white-space:nowrap;transition:all .3s;}
+.obj-box .tag::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--accent);}
+
+/* Sandbox */
+.sandbox{background:var(--card);border:2px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.sandbox .sandbox-label{position:absolute;top:-11px;left:14px;background:var(--accent3);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.input-row{display:flex;gap:.5rem;align-items:center;margin:.5rem 0;flex-wrap:wrap;}
+.input-row label{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent2);font-weight:600;}
+.input-row input[type="text"]{font-family:'JetBrains Mono',monospace;font-size:.9rem;padding:.45rem .7rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;flex:1;min-width:160px;}
+.sandbox-result{margin-top:.6rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.9rem;min-height:46px;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.sandbox-result .ok{color:#2ecc71;font-weight:700;}
+.sandbox-result .bad{color:#e67e22;font-weight:700;}
+.sandbox-result .type-badge{background:#50fa7b;color:#1a1a2e;font-weight:700;padding:1px 10px;border-radius:4px;font-size:.82rem;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+.quiz-box .quiz-label .multi-badge{background:#8e44ad;color:#fff;font-size:.68rem;padding:1px 8px;border-radius:3px;}
+.quiz-box .quiz-q{font-weight:600;margin-bottom:.6rem;}
+.quiz-box .quiz-code{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:.6rem .9rem;font-family:'JetBrains Mono',monospace;font-size:.84rem;margin-bottom:.8rem;white-space:pre-wrap;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0 0;}
+.quiz-opt{display:flex;flex-direction:column;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:.9rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-head{display:flex;align-items:baseline;gap:.6rem;}
+.quiz-opt .opt-letter{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt .opt-fb{display:none;font-size:.82rem;margin-top:.4rem;padding-top:.4rem;border-top:1px dashed var(--card-border);color:#555;}
+.quiz-opt.revealed .opt-fb{display:block;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.correct .opt-fb{color:#14532d;}
+.quiz-opt.wrong{background:#fef5e7;border-color:#d68910;}
+.quiz-opt.wrong .opt-letter{color:#d68910;}
+.quiz-progress{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;margin:.8rem 0;}
+
+/* Flashcards */
+.card-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.flashcard{perspective:900px;height:150px;cursor:pointer;}
+.flashcard .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .fc-inner{transform:rotateY(180deg);}
+.flashcard .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.flashcard .fc-front{background:linear-gradient(150deg,#2c3e7a,#1a1a2e);color:#fff;font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;letter-spacing:.05em;flex-direction:column;gap:.4rem;}
+.flashcard .fc-front .fc-hint{font-size:.66rem;color:rgba(255,255,255,.45);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.flashcard .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.8rem;line-height:1.6;transform:rotateY(180deg);overflow-y:auto;}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:34px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+/* Chapter nav */
+.chapter-nav{display:flex;justify-content:space-between;gap:1rem;margin:2rem 0 0;flex-wrap:wrap;}
+.chapter-nav a{flex:1;min-width:220px;background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1rem 1.3rem;text-decoration:none;color:var(--ink);transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.chapter-nav a:hover{border-color:var(--accent2);transform:translateY(-2px);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.1em;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+footer a{color:var(--accent2);}
+
+/* ===== CH02 additions (new rules only, no existing rule modified) ===== */
+.cmp-table tr.hl-row td{background:var(--highlight)!important;}
+.num-line{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:1rem;}
+.num-cell{min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:2px solid var(--card-border);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.78rem;background:#fff;color:var(--muted);transition:all .2s;}
+.num-cell.sel{background:var(--accent3);color:#fff;border-color:var(--accent3);font-weight:700;transform:scale(1.06);}
+.num-cell.start-marker{box-shadow:0 0 0 2px var(--accent) inset;}
+.range-inputs{display:flex;gap:1rem;flex-wrap:wrap;margin:.6rem 0 1rem;}
+.range-inputs .ri-group{display:flex;flex-direction:column;gap:.3rem;}
+.range-inputs label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent2);font-weight:600;}
+.range-inputs input[type="number"]{font-family:'JetBrains Mono',monospace;font-size:.95rem;padding:.4rem .6rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;width:100px;}
+.truth-btn-row{display:flex;gap:.4rem;}
+
+/* --- New rules for this page only --- */
+/* 🎮 Game box */
+.game-box{background:linear-gradient(150deg,#1a1a2e 0%,#232345 100%);border-radius:14px;padding:1.5rem 1.7rem;margin:1.5rem 0;color:#fff;position:relative;overflow:hidden;}
+.game-box::before{content:'🎮';position:absolute;top:-14px;right:6px;font-size:5.2rem;opacity:.08;}
+.game-box .gb-tag{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#f39c12;letter-spacing:.2em;margin-bottom:.4rem;}
+.game-box h3{color:#fff;margin-top:0;}
+.game-box p{color:rgba(255,255,255,.82);}
+.game-console{background:#111;border-radius:8px;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#d4d4d4;min-height:120px;max-height:260px;overflow-y:auto;line-height:1.7;margin:.8rem 0;}
+.game-console .g-sys{color:#5dade2;}
+.game-console .g-win{color:#2ecc71;font-weight:700;}
+.game-console .g-lose{color:#e74c3c;font-weight:700;}
+.game-console .g-me{color:#f39c12;}
+.game-input-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.game-input-row input{font-family:'JetBrains Mono',monospace;font-size:.95rem;padding:.5rem .8rem;border:none;border-radius:8px;width:130px;}
+.game-note{font-size:.8rem;color:rgba(255,255,255,.72);margin-top:.7rem;}
+.game-note a{color:#2ecc71;}
+
+/* 🤖 Ask-AI exercise box */
+.ai-box{background:var(--card);border:2px dashed #8e44ad;border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.ai-box .ai-label{position:absolute;top:-11px;left:14px;background:#8e44ad;color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.ai-box p:last-child{margin-bottom:0;}
+.ai-box .ai-prompt{font-family:'JetBrains Mono',monospace;font-size:.85rem;background:rgba(142,68,173,.08);border-radius:6px;padding:.4rem .8rem;display:block;margin:.4rem 0;color:#6c3485;}
+
+/* 🎓 Chapter-end bridge */
+.bridge-box{background:#eafaf1;border:2px solid var(--accent3);border-radius:12px;padding:1.3rem 1.5rem;margin:2rem 0 0;}
+.bridge-box .bb-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent3);font-weight:700;letter-spacing:.12em;margin-bottom:.5rem;}
+.bridge-box ul{margin:.3rem 0 .8rem 1.3rem;font-size:.92rem;}
+.bridge-box .bb-next{font-size:.9rem;color:var(--accent2);border-top:1px dashed var(--accent3);padding-top:.6rem;margin-bottom:0;}
+
+/* 深色容器內的可讀性修正（code/summary/pill 在深色背景上原樣式太深） */
+.game-box code,.cta-box code{background:rgba(255,255,255,.14);color:#8be9fd;}
+.game-box details summary{cursor:pointer;color:#5dade2;font-size:.85rem;}
+.game-box .pill{background:rgba(255,255,255,.14);color:#f1fa8c;border-color:rgba(255,255,255,.28);}
+.game-box a{color:#2ecc71;}
+.cta-box a{color:#2ecc71;}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+
+/* ===== 題庫自測區 ===== */
+.sq-item{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.sq-item .sq-q{font-weight:700;margin-bottom:.7rem;}
+.sq-item .sq-q .sq-num{font-family:'JetBrains Mono',monospace;color:var(--accent);margin-right:.4rem;}
+.sq-opts{display:flex;flex-direction:column;gap:.45rem;}
+.sq-opt{text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;line-height:1.6;padding:.55rem .9rem;border-radius:8px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;}
+.sq-opt:hover{border-color:var(--accent2);}
+.sq-opt.correct{border-color:var(--accent3);background:rgba(26,107,74,.10);}
+.sq-opt.wrong{border-color:var(--accent);background:rgba(192,57,43,.08);}
+.sq-fb{display:none;margin-top:.7rem;font-size:.86rem;line-height:1.7;border-left:4px solid var(--accent2);padding:.5rem .9rem;background:var(--paper);border-radius:0 8px 8px 0;}
+.sq-fb.show{display:block;}
+.sq-fb.good{border-left-color:var(--accent3);}
+.sq-fb.bad{border-left-color:var(--accent);}
+
+.sq-code{background:var(--code-bg);color:var(--code-fg);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;padding:.7rem .9rem;border-radius:8px;margin:.2rem 0 .8rem;overflow-x:auto;white-space:pre;}
+</style>
+</head>
+<body>
+
+<!-- Floating navigation sidebar -->
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#prologue" data-target="prologue"><span class="fn-num">P00</span><span class="fn-name">流程控制是什麼</span></a>
+  <a href="#boolexpr" data-target="boolexpr"><span class="fn-num">P01</span><span class="fn-name">布林運算式與比較運算子</span></a>
+  <a href="#logical" data-target="logical"><span class="fn-num">P02</span><span class="fn-name">布林（邏輯）運算子</span></a>
+  <a href="#block" data-target="block"><span class="fn-num">P03</span><span class="fn-name">縮排與程式碼區塊</span></a>
+  <a href="#conditions" data-target="conditions"><span class="fn-num">P04</span><span class="fn-name">if / elif / else</span></a>
+  <a href="#while-loop" data-target="while-loop"><span class="fn-num">P05</span><span class="fn-name">while 迴圈</span></a>
+  <a href="#for-loop" data-target="for-loop"><span class="fn-num">P06</span><span class="fn-name">for 迴圈與 range()</span></a>
+  <a href="#modules" data-target="modules"><span class="fn-num">P07</span><span class="fn-name">匯入模組</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">速查表</span></a>
+  <a href="#bankquiz" data-target="bankquiz"><span class="fn-num">QUIZ</span><span class="fn-name">自我檢測</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="chapter-tag">PREREQ P2</div>
+    <h1><span class="blue">流程控制</span>：條件、迴圈與縮排</h1>
+    <div class="subtitle">先備知識複習 · 選讀，不列入作業與考試範圍</div>
+    <div class="big-formula">if ▸ elif ▸ else ｜ while ｜ for i in range() ｜ break / continue</div>
+    <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（先備複習 · 選讀，不列入評分）</div>
+  <p>① 這頁複習資料結構課程<strong>預設你已經會</strong>的 Python。已經熟的可以直接跳過。
+  ② 每節都附一個<strong>「這在資料結構課哪裡會用到」</strong>的小方框——那才是你該記住的部分。
+  ③ 讀完做 <a href="#bankquiz">自我檢測</a>，再翻 <a href="#cards">關鍵詞彙卡</a>。
+  <br><strong>本頁屬補充先備知識，不列入作業與考試範圍。</strong></p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#prologue"><span class="toc-num">P00</span>引言：流程控制是什麼</a>
+    <a href="#boolexpr"><span class="toc-num">P01</span>布林運算式與比較運算子</a>
+    <a href="#logical"><span class="toc-num">P02</span>布林（邏輯）運算子</a>
+    <a href="#block"><span class="toc-num">P03</span>縮排與程式碼區塊</a>
+    <a href="#conditions"><span class="toc-num">P04</span>if / elif / else 條件執行</a>
+    <a href="#while-loop"><span class="toc-num">P05</span>while 迴圈與 break / continue</a>
+    <a href="#for-loop"><span class="toc-num">P06</span>for 迴圈與 range()</a>
+    <a href="#modules"><span class="toc-num">P07</span>匯入模組</a>
+    <a href="#reference"><span class="toc-num">REF</span>流程控制速查表</a>
+    <a href="#bankquiz"><span class="toc-num">QUIZ</span>自我檢測</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<section id="prologue">
+  <div class="section-number">PROLOGUE · 開場</div>
+  <h2>引言：從「循序執行」到「流程控制」</h2>
+  <p>日常生活中，我們無時無刻都在面對許多的選擇：要不要吃飯、要吃什麼、要不要睡覺、要不要出去玩……這些選擇，其實都是由一個又一個的<strong>邏輯判斷</strong>組成的。程式語言也是一樣——這一章，我們就來看看在 Python 裡如何進行邏輯判斷，以及如何用布林值來做流程控制。</p>
+  <p>上一章我們學會了單一指令的基本知識，也知道程式就是一系列指令。但程式設計真正強大之處，不僅僅在於<strong>逐條執行指令</strong>！一個程式可以決定<strong>跳過</strong>某些指令、<strong>重複</strong>執行它們，或是<strong>選擇</strong>其中一組指令來執行——這些能力統稱為<strong>流程控制敘述（flow control statements）</strong>，它們直接對應到流程圖中的符號。</p>
+  <p>流程圖用<strong>菱形</strong>畫出分支點（要做決定的地方），<strong>矩形</strong>畫出每一個步驟，<strong>圓角矩形</strong>則代表開始與結束。神奇的是，數學上可以證明：不管程式多複雜，通通都能只靠三種控制形式組合出來——<span class="pill pill-blue">循序執行</span><span class="pill pill-green">選擇敘述</span><span class="pill pill-orange">重複敘述</span>。這個看似簡單的組合技，就是<strong>結構化程式設計（structured programming）</strong>的核心理念。</p>
+
+  <div class="info-box">
+    <div class="info-label">結構</div>
+    <p style="margin-bottom:0;">幾乎每一種流程控制敘述都長得像同一個套路：先寫一個稱為<strong>條件（condition）</strong>的判斷式，後面再接一段稱為<strong>子句（clause）</strong>的程式碼區塊——條件成立（True）才會執行子句。其實條件就是布林運算式，只是換了個名字登場！本章就從「怎麼用 Python 表達真與假」開始說起。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="boolexpr">
+  <div class="section-number">PART 01 · 布林運算式</div>
+  <h2>布林運算式與比較運算子</h2>
+  <p>根據不可考的統計，好像不少台中人都有「真的假的」的口頭禪——巧的是，程式語言裡也有「真的」跟「假的」，而且沒有其他的灰色地帶，這種真假值就叫做<strong>布林值（Boolean）</strong>。</p>
+  <p>正式一點來說，一個<strong>布林運算式（boolean expression）</strong>是一個運算式，其值僅為 <code>True</code> 或 <code>False</code>。<code>True</code> 與 <code>False</code> 是屬於 <code>bool</code> 類別的特殊值，並不是字串（注意大小寫，字首必須大寫）。</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line"><span class="fn">print</span>(<span class="num">5</span> == <span class="num">5</span>)   <span class="com"># True</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">5</span> == <span class="num">6</span>)   <span class="com"># False</span></span></div>
+
+  <p><code>==</code> 屬於<strong>比較運算子（comparison operators，或稱關係運算子）</strong>，其他比較運算子如下：</p>
+  <table class="cmp-table">
+    <tr><th>運算子</th><th>意義</th></tr>
+    <tr><td>x == y</td><td>x 等於 y</td></tr>
+    <tr><td>x != y</td><td>x 不等於 y</td></tr>
+    <tr><td>x &gt; y</td><td>x 大於 y</td></tr>
+    <tr><td>x &lt; y</td><td>x 小於 y</td></tr>
+    <tr><td>x &gt;= y</td><td>x 大於或等於 y</td></tr>
+    <tr><td>x &lt;= y</td><td>x 小於或等於 y</td></tr>
+    <tr><td>x is y</td><td>x 與 y 是同一個物件</td></tr>
+    <tr><td>x is not y</td><td>x 與 y 不是同一個物件</td></tr>
+  </table>
+
+  <p>這些運算子會根據給定的值評估結果為 <code>True</code> 或 <code>False</code>，因此可以在條件敘述中作為判斷依據：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line"><span class="fn">print</span>(<span class="num">42</span> == <span class="num">42</span>)            <span class="com"># True，42 等於 42</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">42</span> == <span class="num">42.0</span>)          <span class="com"># True，數值相同</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">42</span> == <span class="str">'42'</span>)          <span class="com"># False，數字與字串永遠不同</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">2</span> != <span class="num">3</span>)               <span class="com"># True</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">'hello'</span> == <span class="str">'Hello'</span>)  <span class="com"># False，區分大小寫</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">42</span> &lt; <span class="num">100</span>)             <span class="com"># True</span></span>
+<span class="line"><span class="fn">print</span>(<span class="num">42</span> &gt;= <span class="num">100</span>)            <span class="com"># False</span></span></div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 最經典的陷阱：= 與 ==</div>
+    <p><code>=</code> 是<strong>指派敘述</strong>（把值存進變數），<code>==</code> 才是<strong>比較運算子</strong>（問「這兩個值相等嗎？」）。把 <code>if x == 5:</code> 誤打成 <code>if x = 5:</code> 是初學者最常犯的錯誤之一。</p>
+    <p style="margin-bottom:0;">另外也沒有 <code>=&lt;</code> 或 <code>=&gt;</code> 這種寫法——一定要寫成 <code>&lt;=</code>、<code>&gt;=</code>。而 <code>is</code>（身份運算子）檢查的是「兩個變數是否指向記憶體中同一個物件」，跟比較「值是否相等」的 <code>==</code> 是不同概念！</p>
+  </div>
+
+  <h3>🧪 QUIZ · 布林運算式（下方測驗第 1 題）</h3>
+  <p>本節對應下方隨堂測驗的第 1 題（<span class="pill pill-purple">複選</span>）：判斷哪些選項是布林運算式。作答前可以先想想——結果是不是 <code>True</code> 或 <code>False</code>？</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="logical">
+  <div class="section-number">PART 02 · 布林（邏輯）運算子</div>
+  <h2>布林（邏輯）運算子：and / or / not</h2>
+  <p>三個<strong>布林運算子（boolean operators）</strong>：<code>and</code>、<code>or</code>、<code>not</code> 用來組合或反轉布林值，運算結果同樣是布林值。電腦會先計算左側運算式，再計算右側運算式。</p>
+
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line"><span class="fn">print</span>((<span class="num">4</span> &lt; <span class="num">5</span>) <span class="kw">and</span> (<span class="num">5</span> &lt; <span class="num">6</span>))    <span class="com"># True</span></span>
+<span class="line"><span class="fn">print</span>((<span class="num">6</span> &lt; <span class="num">5</span>) <span class="kw">or</span> (<span class="num">9</span> &lt; <span class="num">6</span>))     <span class="com"># False</span></span>
+<span class="line"><span class="fn">print</span>((<span class="num">1</span> == <span class="num">2</span>) <span class="kw">or</span> (<span class="num">2</span> == <span class="num">2</span>))   <span class="com"># True</span></span>
+<span class="line"><span class="fn">print</span>(<span class="kw">not</span> (<span class="num">1</span>==<span class="num">3</span>) <span class="kw">and</span> (<span class="num">3</span>==<span class="num">4</span>))  <span class="com"># False</span></span></div>
+
+  <h3>🧪 互動：and / or / not 真值表</h3>
+  <p>點選 A、B 的 True / False 組合，右側即時顯示 <code>A and B</code>、<code>A or B</code>、<code>not A</code> 三個運算結果，並在真值表中反白目前選到的那一列：</p>
+  <div class="sandbox">
+    <div class="sandbox-label">🧪 SANDBOX</div>
+    <div class="input-row">
+      <label>A =</label>
+      <div class="truth-btn-row" id="truthAButtons">
+        <button class="preset-btn active" data-val="true">True</button>
+        <button class="preset-btn" data-val="false">False</button>
+      </div>
+    </div>
+    <div class="input-row">
+      <label>B =</label>
+      <div class="truth-btn-row" id="truthBButtons">
+        <button class="preset-btn active" data-val="true">True</button>
+        <button class="preset-btn" data-val="false">False</button>
+      </div>
+    </div>
+    <div class="sandbox-result" id="truthResult"></div>
+    <table class="cmp-table" id="truthTable" style="margin-top:1rem;">
+      <tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not A</th></tr>
+    </table>
+  </div>
+
+  <p>布林運算子也有<strong>優先順序</strong>：所有數學與比較運算子執行完後，Python 會先算 <code>not</code>，再算 <code>and</code>，最後才算 <code>or</code>。完整的優先順序（由高到低）：</p>
+  <table class="cmp-table">
+    <tr><th>層級</th><th>類別</th><th>運算子</th></tr>
+    <tr><td>7（高）</td><td>指數</td><td>**</td></tr>
+    <tr><td>6</td><td>乘法</td><td>*, /, //, %</td></tr>
+    <tr><td>5</td><td>加法</td><td>+, -</td></tr>
+    <tr><td>4</td><td>關係</td><td>==, !=, &lt;=, &gt;=, &gt;, &lt;</td></tr>
+    <tr><td>3</td><td>邏輯</td><td>not</td></tr>
+    <tr><td>2</td><td>邏輯</td><td>and</td></tr>
+    <tr><td>1（低）</td><td>邏輯</td><td>or</td></tr>
+  </table>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 好用寫法</div>
+    <p style="margin-bottom:0;">要檢查 x 是否介於 0 與 5 之間，除了 <code>x &gt; 0 and x &lt; 5</code>，Python 也支援更簡潔的鏈式寫法 <code>0 &lt; x &lt; 5</code>——兩者完全等價！</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="block">
+  <div class="section-number">PART 03 · 程式碼區塊</div>
+  <h2>縮排：Python 如何分組程式碼區塊</h2>
+  <p>Python 依照<strong>縮排（indentation）</strong>將程式碼分組成<strong>區塊（block）</strong>：從一行程式碼的縮排就能判斷區塊何時開始、何時結束。區塊有三個規則：</p>
+  <p>① 縮排<strong>增加</strong>時，區塊開始。<br>② 區塊中可以包含<strong>其他區塊</strong>（巢狀）。<br>③ 縮排<strong>減少</strong>到 0 或降至外層區塊的縮排時，該區塊結束。</p>
+
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line">name = <span class="str">'Mary'</span></span>
+<span class="line">password = <span class="str">'swordfish'</span></span>
+<span class="line"><span class="kw">if</span> name == <span class="str">'Mary'</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'你好, Mary'</span>)</span>
+<span class="line">    <span class="kw">if</span> password == <span class="str">'swordfish'</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">'允許存取。'</span>)</span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">'密碼錯誤。'</span>)</span></div>
+  <p>第一個區塊從 <code>print('你好, Mary')</code> 開始，包含它之後所有更深縮排的行；在它裡面又巢狀了一個只有一行的區塊 <code>print('允許存取。')</code>；第三個區塊同樣只有一行 <code>print('密碼錯誤。')</code>。</p>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ IndentationError</div>
+    <p style="margin-bottom:0;">當同一個區塊中多行程式碼的縮排<strong>不一致</strong>時，會觸發 <code>IndentationError</code>。務必確保同一區塊中所有程式碼行使用<strong>相同的縮排</strong>——建議統一使用 <strong>4 個空白字元</strong>作為縮排單位。</p>
+  </div>
+
+  <h3>🧪 QUIZ · 程式碼區塊（下方測驗第 3 題）</h3>
+  <p>本節對應下方隨堂測驗第 3 題：if 與 else 下方的縮排區塊，最少 / 最多可以有幾行程式碼？</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="conditions">
+  <div class="section-number">PART 04 · 條件執行</div>
+  <h2>if / elif / else：條件執行</h2>
+  <p>流程控制敘述讓我們能從程式的某部分「跳」到另一部分，這稱為<strong>控制結構（control structures）</strong>。最基本的例子是 <strong>if 敘述</strong>：條件為 <code>True</code> 時執行主體（緊跟在 if 之後的縮排區塊）；條件為 <code>False</code> 時則跳過整個區塊。</p>
+  <p>Python 的 <code>if</code> 敘述其實是照著固定公式寫出來的<strong>複合敘述</strong>：<code>if</code> 關鍵字開頭，接一個會算出 True/False 的<strong>條件</strong>，再接一個冒號 <code>:</code>，最後從下一行開始寫一段縮排的程式碼——這幾塊拼在一起才是完整的 if 敘述：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line">name = <span class="str">'Mary'</span></span>
+<span class="line"><span class="kw">if</span> name == <span class="str">'Alice'</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'Hi, Alice.'</span>)</span>
+<span class="line"><span class="com"># 條件 False，整個區塊被跳過，什麼都不印</span></span></div>
+
+  <p>如果想在條件為 False 時執行「另一組」程式碼，可以加上 <strong><code>else</code> 子句</strong>（分支執行）：由於條件必為 True 或 False，兩個分支中<strong>必定會執行其中一個</strong>。跟人生一樣，我們不會只有兩條路！若可能性超過兩種，可以用 <strong><code>elif</code>（鏈式條件）</strong>串接多個分支：「如果第一個條件為真就做這個；否則如果第二個條件為真就做那個；否則……」。</p>
+
+  <h3>🎬 互動：逐步執行 if / elif / else</h3>
+  <p>假設 <code>name = 'Carol'</code>、<code>age = 3000</code>，逐步執行下面的鏈式條件判斷，觀察 Python 如何依序檢查每個條件，直到找到第一個為 True 的分支（或全部落空後執行 else）：</p>
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="pseudo-code" id="condCode">
+<span class="line">name = <span class="str">'Carol'</span></span>
+<span class="line">age = <span class="num">3000</span></span>
+<span class="line"><span class="kw">if</span> name == <span class="str">'Alice'</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'Hi, Alice.'</span>)</span>
+<span class="line"><span class="kw">elif</span> age &lt; <span class="num">12</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'You are not Alice, kidd.'</span>)</span>
+<span class="line"><span class="kw">else</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'You are neither Alice nor a little kid.'</span>)</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="condStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="condPlay">▶ 播放</button>
+        <button class="btn btn-step" id="condStep">單步 ▸</button>
+        <button class="btn btn-reset" id="condReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">變數狀態</div><div id="condVars"><div class="var-empty">尚未執行</div></div></div>
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="condOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">分支邏輯</div>
+        <p style="font-size:.82rem;margin:0;">Python 由上而下依序檢查 if → elif → elif...，一旦找到第一個 True 的條件就執行對應區塊，<strong>其餘分支全部跳過</strong>（就算它們也為 True）。全部都是 False 才會執行 else。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>📝 練習題（棋盤格顏色）</h3>
+  <p>課本練習題：讓使用者輸入 <code>row</code> 與 <code>column</code>（0～7），判斷 8×8 棋盤上該格是「黑色」或「白色」；超出範圍則印出「超出棋盤」。關鍵提示：同一格的顏色由 <code>row</code>、<code>column</code> 的<strong>奇偶性是否相同</strong>決定（<code>column % 2 == row % 2</code> 時同色）。</p>
+
+  <h3>🧪 QUIZ · 條件執行（下方測驗第 4 題）</h3>
+  <p>本節對應下方測驗第 4 題：<code>x=3, y=5, z=2</code> 時，一段 if / elif / else 鏈式判斷會印出什麼？</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="while-loop">
+  <div class="section-number">PART 05 · 迴圈與迭代</div>
+  <h2>while 迴圈：只要條件為真就重複</h2>
+  <p>小時候上學有沒有做錯事被罰寫的經驗？可能會被罰寫 100 遍「我以後不會亂丟垃圾」，一般人只能一遍一遍寫，厲害一點的可以單手拿五隻筆一次寫五遍——但如果你會使用<strong>迴圈（loop）</strong>，你只需要寫一次程式，就可以叫電腦幫你寫，而且想寫幾次都行！</p>
+  <p><strong><code>while</code> 敘述</strong>讓一段程式碼反覆執行：只要條件為 <code>True</code>，主體就會一直被執行。<code>while</code> 敘述包含：<code>while</code> 關鍵字 → 條件 → 冒號 → 下一行開始的縮排區塊。</p>
+
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line">spam = <span class="num">0</span></span>
+<span class="line"><span class="kw">while</span> spam &lt; <span class="num">5</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'Hello, world.'</span>)</span>
+<span class="line">    spam += <span class="num">1</span>  <span class="com"># 等同於 spam = spam + 1</span></span></div>
+  <p><code>+=</code> 是<strong>增強指派運算子</strong>：同一個變數名稱同時出現在 <code>=</code> 的左右兩側的簡寫形式。while 迴圈的執行流程是：① 評估條件 → ② 若為 False，跳出迴圈，繼續下一敘述 → ③ 若為 True，執行主體後回到 ① 重新評估條件。</p>
+
+  <h3>🎬 互動：逐步展開 while 迴圈的每一輪</h3>
+  <p>完整展開 <code>spam = 0; while spam &lt; 5: ...</code> 的每一輪：條件檢查 → 執行主體 → 遞增，直到條件終於變成 False 為止：</p>
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="pseudo-code" id="wlCode">
+<span class="line">spam = <span class="num">0</span></span>
+<span class="line"><span class="kw">while</span> spam &lt; <span class="num">5</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'Hello, world.'</span>)</span>
+<span class="line">    spam += <span class="num">1</span></span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="wlStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="wlPlay">▶ 播放</button>
+        <button class="btn btn-step" id="wlStep">單步 ▸</button>
+        <button class="btn btn-reset" id="wlReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">變數狀態</div><div id="wlVars"><div class="var-empty">尚未執行</div></div></div>
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="wlOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">迴圈何時停止？</div>
+        <p style="font-size:.82rem;margin:0;">每一輪開始都會<strong>重新檢查</strong>條件。當 <code>spam</code> 遞增到 5 時，<code>5 &lt; 5</code> 為 False，迴圈立刻結束——主體總共執行了 5 次。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 無窮迴圈（infinite loop）</div>
+    <p style="margin-bottom:0;">如果忘記在迴圈主體中<strong>更新條件裡用到的變數</strong>（例如忘了寫 <code>spam += 1</code>），條件會永遠為 True，程式就會卡在無窮迴圈裡出不來！這是初學者最常犯的錯誤之一。若真的不小心寫出無窮迴圈，可以按 <code>CTRL-C</code> 送出 <code>KeyboardInterrupt</code> 強制中止程式。</p>
+  </div>
+
+  <h3>break：立即離開迴圈</h3>
+  <p>有時候需要在迴圈跑到一半時提前離開，這時可以用 <strong><code>break</code> 敘述</strong>：執行流程一遇到它，就會立即跳出（離開）迴圈。搭配 <code>while True:</code> 建立的<strong>無限迴圈</strong>（條件永遠是 True），是很常見的寫法：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line">message = <span class="str">""</span></span>
+<span class="line"><span class="kw">while</span> <span class="kw">True</span>:</span>
+<span class="line">    message = <span class="fn">input</span>(prompt)</span>
+<span class="line">    <span class="kw">if</span> message == <span class="str">'quit'</span>:</span>
+<span class="line">        <span class="kw">break</span>       <span class="com"># 立即跳出迴圈</span></span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        <span class="fn">print</span>(message)</span></div>
+  <p>當使用者輸入 <code>'quit'</code> 時，<code>if</code> 條件為 True，執行 <code>break</code>，流程立刻跳出迴圈；否則印出訊息，並回到 while 開頭重新檢查條件（永遠是 True）。</p>
+
+  <h3>continue：跳過本輪剩下的部分</h3>
+  <p><strong><code>continue</code> 敘述</strong>不會直接離開迴圈，而是跳過本輪迴圈剩餘的程式碼，直接回到迴圈起始位置重新檢查條件。下面的程式會從 1 數到 10，但只印出<strong>奇數</strong>：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line">current_number = <span class="num">0</span></span>
+<span class="line"><span class="kw">while</span> current_number &lt; <span class="num">10</span>:</span>
+<span class="line">    current_number += <span class="num">1</span></span>
+<span class="line">    <span class="kw">if</span> current_number % <span class="num">2</span> == <span class="num">0</span>:</span>
+<span class="line">        <span class="kw">continue</span>       <span class="com"># 偶數：跳過本輪剩下的程式碼</span></span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        <span class="fn">print</span>(current_number, end=<span class="str">' '</span>)</span></div>
+  <p>當餘數為 0（偶數）時，<code>continue</code> 讓 Python 忽略本輪剩下的程式碼，直接回到迴圈開頭；否則才會執行 <code>print()</code>。<code>print()</code> 的 <code>end</code> 參數可以改變預設的「印完自動換行」行為，這裡改成印出一個空格。</p>
+
+  <h3>Truthy 與 Falsy 值</h3>
+  <p>Python 中 <code>0</code>、<code>None</code>、空字串 <code>''</code>、以及空的容器（如空列表）都被視為 <strong>falsy（等同 False）</strong>，其餘所有值都被視為 <strong>truthy（等同 True）</strong>。這讓程式可以寫得更精簡：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line">name = <span class="str">''</span></span>
+<span class="line"><span class="kw">while</span> <span class="kw">not</span> name:      <span class="com"># 等同於 while name == ''</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'請輸入你的名字:'</span>)</span>
+<span class="line">    name = <span class="fn">input</span>()</span>
+<span class="line"></span>
+<span class="line"><span class="kw">if</span> numOfGuests:       <span class="com"># 等同於 if numOfGuests != 0</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'請確保有足夠的空間容納所有客人。'</span>)</span></div>
+  <p>只要使用者輸入空字串，<code>not name</code> 就是 True，迴圈會持續要求輸入；用 truthy / falsy 寫法比明確比較 <code>!= ''</code> 或 <code>!= 0</code> 更簡潔易讀。</p>
+
+  <div class="info-box">
+    <div class="info-label">📝 練習題：用無窮級數估計 π</div>
+    <p>用下方的無窮級數估計 π 值，並試著找出需要多少項才能讓誤差小於 $10^{-3}$：</p>
+    <p style="text-align:center;">$$ \pi \approx 4 \times \left(1 - \frac{1}{3} + \frac{1}{5} - \frac{1}{7} + \cdots - \frac{(-1)^{n}}{2n-1}\right) $$</p>
+    <p style="margin-bottom:0;">提示：用 <code>math</code> 模組的常數 <code>math.pi</code> 當作 π 的真實值，配合 <code>abs()</code> 計算誤差，並用一個 <code>while</code> 迴圈不斷累加級數項，直到誤差小於 <code>10**-3</code> 為止（迴圈條件要用到 <code>error</code> 這個會隨著迴圈更新的變數，才不會變成無窮迴圈！）。</p>
+  </div>
+
+  <h3>🧪 QUIZ · while 迴圈（下方測驗第 5 題）</h3>
+  <p>本節對應下方測驗第 5 題：一段程式碼包含無窮迴圈，哪個解釋最正確？</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="for-loop">
+  <div class="section-number">PART 06 · for 迴圈與 range()</div>
+  <h2>for 迴圈與 range() 函數</h2>
+  <p>while 迴圈會在條件為 True 時持續執行，但如果只想把程式碼區塊執行<strong>固定次數</strong>呢？可以用 <strong><code>for</code> 迴圈敘述</strong>搭配 <strong><code>range()</code></strong> 函數。<code>for i in range(5):</code> 包含：<code>for</code> 關鍵字 → 變數名稱 → <code>in</code> 關鍵字 → 對 <code>range()</code> 的呼叫 → 冒號 → 縮排主體：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line"><span class="fn">print</span>(<span class="str">'我的名字是'</span>)</span>
+<span class="line"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'Jimmy 會印五次 ('</span> + <span class="fn">str</span>(i) + <span class="str">')'</span>)</span></div>
+  <p>主體會執行 5 次：第一次 <code>i</code> 為 0，之後每跑完一次主體，<code>for</code> 敘述就把 <code>i</code> 加一，直到 <code>i</code> 增加到 <code>range()</code> 傳入的整數 <strong>減 1</strong> 為止。也就是說 <code>range(5)</code> 會讓 <code>i</code> 依序等於 0、1、2、3、4——<strong>共 5 個值，但不含 5</strong>！用 while 迴圈也能做到同樣的事，只是 for 迴圈更簡潔：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line">i = <span class="num">0</span></span>
+<span class="line"><span class="kw">while</span> i &lt; <span class="num">5</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'Jimmy 會印五次 ('</span> + <span class="fn">str</span>(i) + <span class="str">')'</span>)</span>
+<span class="line">    i = i + <span class="num">1</span></span></div>
+
+  <h3>range() 的三種呼叫方式</h3>
+  <p><code>range()</code> 可接受最多三個用逗號分隔的整數引數：</p>
+  <table class="cmp-table">
+    <tr><th>呼叫方式</th><th>意義</th><th>結果</th></tr>
+    <tr><td>range(stop)</td><td>從 0 開始，到 stop（不含）</td><td>range(5) → 0,1,2,3,4</td></tr>
+    <tr><td>range(start, stop)</td><td>從 start 開始，到 stop（不含）</td><td>range(12,16) → 12,13,14,15</td></tr>
+    <tr><td>range(start, stop, step)</td><td>間隔 step（可為負數，遞減）</td><td>range(5,-1,-1) → 5,4,3,2,1,0</td></tr>
+  </table>
+
+  <h3>🧪 互動：range() 調整器</h3>
+  <p>拖拉 / 輸入 start、stop、step，即時看到 <code>list(range(start, stop, step))</code> 的結果，並在下方數線上高亮被選中的整數（灰色格子＝未被選中，綠色格子＝在結果清單中）：</p>
+  <div class="sandbox">
+    <div class="sandbox-label">🧪 SANDBOX</div>
+    <div class="range-inputs">
+      <div class="ri-group"><label>start</label><input type="number" id="rangeStart" value="0" min="-20" max="20"></div>
+      <div class="ri-group"><label>stop</label><input type="number" id="rangeStop" value="10" min="-20" max="20"></div>
+      <div class="ri-group"><label>step</label><input type="number" id="rangeStep" value="1" min="-10" max="10"></div>
+    </div>
+    <div class="preset-row">
+      <button class="preset-btn" data-r="0,5,1">range(5)</button>
+      <button class="preset-btn" data-r="2,10,2">range(2,10,2)</button>
+      <button class="preset-btn" data-r="10,0,-2">range(10,0,-2)</button>
+      <button class="preset-btn" data-r="5,-1,-1">range(5,-1,-1)</button>
+      <button class="preset-btn" data-r="12,16,1">range(12,16)</button>
+      <button class="preset-btn" data-r="5,5,1">range(5,5)（空）</button>
+    </div>
+    <div class="sandbox-result" id="rangeResult"></div>
+    <div class="num-line" id="rangeNumLine"></div>
+  </div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ range(10) 不含 10！</div>
+    <p style="margin-bottom:0;"><code>range(10)</code> 產生的是 <code>0, 1, 2, ..., 9</code> 共 10 個數字，<strong>並不包含 10 本身</strong>——stop 引數永遠是「不含」的上界。這是新手最容易搞混的地方，務必用上面的沙盒多試幾組數字確認！</p>
+  </div>
+
+  <p>Python 3.10 之後也引入了 <code>match</code>／<code>case</code> 敘述，作為另一種控制敘述的選擇（進階內容，本章不深入）。</p>
+
+  <h3>📝 練習題（巢狀迴圈畫聖誕樹）</h3>
+  <p>用<strong>巢狀迴圈</strong>（外層迴圈控制「每一行」，內層迴圈控制「每一列要印幾個 <code>*</code>」）畫出星星排列的圖案；也可以只用外層一個 for 迴圈，搭配字串重複 <code>'*' * n</code> 更快完成。下面就用課本練習題 3 的「簡易版」聖誕樹來實際玩玩看：</p>
+
+  <div class="game-box" id="treeGame">
+    <div class="gb-tag">GAME · ASCII CHRISTMAS TREE</div>
+    <h3>🎄 聖誕樹產生器</h3>
+    <p>拖拉層數，按下按鈕，看巢狀迴圈怎麼一行一行把樹「疊」出來——外層迴圈跑幾次，就長出幾層；內層迴圈跑幾次，這一層就印幾個 <code>*</code>。</p>
+    <div class="game-console" id="treeOutput">（拖拉層數，按下「畫聖誕樹」開始）</div>
+    <div class="game-input-row">
+      <label for="treeLevel" style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:rgba(255,255,255,.85);">層數 = <span id="treeLevelVal">5</span></label>
+      <input type="range" id="treeLevel" min="3" max="12" value="5" step="1" style="flex:1;min-width:140px;">
+      <button class="btn btn-play" id="treeDraw">🎄 畫聖誕樹</button>
+    </div>
+    <details style="margin-top:.9rem;">
+      <summary style="cursor:pointer;color:rgba(255,255,255,.75);font-family:'JetBrains Mono',monospace;font-size:.82rem;">▸ 看看等價的 Python 原始碼</summary>
+      <div class="pseudo-code" style="margin-top:.6rem;">
+<span class="line">n = <span class="num">5</span>  <span class="com"># 層數，可改成 3~12</span></span>
+<span class="line"><span class="kw">for</span> row <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, n + <span class="num">1</span>):</span>
+<span class="line">    <span class="kw">for</span> column <span class="kw">in</span> <span class="fn">range</span>(row):</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">'*'</span>, end=<span class="str">''</span>)</span>
+<span class="line">    <span class="fn">print</span>()</span></div>
+    </details>
+    <p class="game-note">玩上癮了？打開 <code>02_Flow_control.ipynb</code> 練習 3，挑戰看看題目附的「標準版」（置中金字塔）跟「進階版」（金字塔＋樹幹）聖誕樹怎麼畫！</p>
+  </div>
+
+  <h3>🧪 QUIZ · for 迴圈（下方測驗第 6 題）</h3>
+  <p>本節對應下方測驗第 6 題：<code>for ch in "python rocks": print("HELLO")</code> 會印出幾次 HELLO？（提示：for 迴圈也可以逐項遍歷字串這種<strong>序列型別</strong>，不是只能搭配 range()！）</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="modules">
+  <div class="section-number">PART 07 · 匯入模組</div>
+  <h2>匯入模組：使用標準函式庫</h2>
+  <p>所有 Python 程式都能呼叫一組<strong>內建函數</strong>，例如我們已經見過的 <code>print()</code>、<code>input()</code>、<code>len()</code>、<code>range()</code>。除此之外，Python 還內建了需要另外匯入的<strong>標準函式庫（standard library）</strong>：每個<strong>模組（module）</strong>都包含一系列相關函數，需要先用 <code>import</code> 敘述匯入才能使用。</p>
+  <p><code>import</code> 敘述由：<code>import</code> 關鍵字 → 模組名稱 →（選擇性）用逗號分隔的更多模組名稱 組成。例如 <code>math</code> 模組包含數學相關函數，<code>random</code> 模組包含隨機數相關函數：</p>
+  <div class="pseudo-code" style="margin:1rem 0;">
+<span class="line"><span class="kw">import</span> random</span>
+<span class="line"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):</span>
+<span class="line">    <span class="fn">print</span>(random.randint(<span class="num">1</span>, <span class="num">10</span>))</span></div>
+  <p>因為 <code>randint()</code> 位於 <code>random</code> 模組中，必須用 <code>random.randint()</code> 這種<strong>模組名稱 + 點 + 函數名稱</strong>的寫法，才能告訴 Python 到 <code>random</code> 模組裡尋找這個函數。<code>random.randint(1, 10)</code> 會回傳一個介於 1 與 10（含兩端）之間的隨機整數。</p>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 小結</div>
+    <p style="margin-bottom:0;">透過結果為 <code>True</code> / <code>False</code> 的條件，我們可以決定要執行哪些程式碼、略過哪些程式碼；也可以在迴圈中反覆執行程式碼，直到條件不成立。流程控制敘述讓我們能寫出更實用的程式——下一章我們會學到另一種流程控制的方式：<strong>撰寫自訂函數</strong>。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<section id="reference">
+  <div class="section-number">REFERENCE · 速查表</div>
+  <h2>本章速查表</h2>
+
+  <h3>比較運算子</h3>
+  <table class="cmp-table">
+    <tr><th>運算子</th><th>意義</th><th>範例</th><th>結果</th></tr>
+    <tr><td>==</td><td>等於</td><td>42 == 42.0</td><td>True</td></tr>
+    <tr><td>!=</td><td>不等於</td><td>2 != 3</td><td>True</td></tr>
+    <tr><td>&gt; / &lt;</td><td>大於 / 小於</td><td>42 &lt; 100</td><td>True</td></tr>
+    <tr><td>&gt;= / &lt;=</td><td>大於等於 / 小於等於</td><td>42 &gt;= 100</td><td>False</td></tr>
+    <tr><td>is / is not</td><td>是否同一物件</td><td class="worst">≠ ==（比較值）</td><td>-</td></tr>
+  </table>
+
+  <h3>布林運算子真值表</h3>
+  <table class="cmp-table">
+    <tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not A</th></tr>
+    <tr><td>True</td><td>True</td><td class="best">True</td><td class="best">True</td><td class="worst">False</td></tr>
+    <tr><td>True</td><td>False</td><td class="worst">False</td><td class="best">True</td><td class="worst">False</td></tr>
+    <tr><td>False</td><td>True</td><td class="worst">False</td><td class="best">True</td><td class="best">True</td></tr>
+    <tr><td>False</td><td>False</td><td class="worst">False</td><td class="worst">False</td><td class="best">True</td></tr>
+  </table>
+
+  <h3>流程控制敘述語法</h3>
+  <table class="cmp-table">
+    <tr><th>敘述</th><th>語法</th><th>提醒</th></tr>
+    <tr><td>if</td><td>if 條件:</td><td>條件為 True 才執行縮排區塊</td></tr>
+    <tr><td>if / else</td><td>if 條件: ... else: ...</td><td>二選一，必執行其中一個分支</td></tr>
+    <tr><td>if / elif / else</td><td>if: ... elif: ... else: ...</td><td>由上而下找第一個 True 的分支</td></tr>
+    <tr><td>while</td><td>while 條件: ...</td><td>條件為 True 就一直重複</td></tr>
+    <tr><td>break</td><td>迴圈內使用</td><td>立即跳出整個迴圈</td></tr>
+    <tr><td>continue</td><td>迴圈內使用</td><td>跳過本輪剩餘部分，回到條件檢查</td></tr>
+    <tr><td>for ... in range()</td><td>for i in range(n): ...</td><td>固定執行 n 次，i 從 0 到 n-1</td></tr>
+    <tr><td>import</td><td>import 模組名稱</td><td>用 模組.函數() 呼叫模組內的函數</td></tr>
+  </table>
+
+  <h3>range() 三種寫法</h3>
+  <table class="cmp-table">
+    <tr><th>寫法</th><th>範例</th><th>結果</th></tr>
+    <tr><td>range(stop)</td><td>range(5)</td><td>0, 1, 2, 3, 4</td></tr>
+    <tr><td>range(start, stop)</td><td>range(12, 16)</td><td>12, 13, 14, 15</td></tr>
+    <tr><td>range(start, stop, step)</td><td>range(10, 0, -2)</td><td>10, 8, 6, 4, 2</td></tr>
+  </table>
+
+  <h3>Truthy 與 Falsy</h3>
+  <p><span class="pill pill-red">Falsy（視為 False）</span> <code>0</code>、<code>0.0</code>、<code>None</code>、<code>''</code>（空字串）、空的容器（如 <code>[]</code>）。<span class="pill pill-green">Truthy（視為 True）</span> 除了上述之外的所有值。</p>
+
+  <div class="bridge-box">
+    <div class="bb-title">🎓 學完這章，你已經能</div>
+    <ul>
+      <li>用布林運算式、比較運算子與 <code>and</code> / <code>or</code> / <code>not</code>，讓程式判斷「真的假的」</li>
+      <li>用 <code>if</code> / <code>elif</code> / <code>else</code> 讓程式在兩條、甚至更多條路之間做選擇</li>
+      <li>用 <code>while</code> / <code>for</code> 迴圈重複執行程式碼——還親手用一個迴圈畫出了聖誕樹</li>
+    </ul>
+    <p class="bb-next">NEXT ▸ CH03 函數：把常常重複用到的程式碼打包成一塊塊「積木」，接下來我們會用函數做出猜數字遊戲，還有「龍與洞穴」文字冒險遊戲！</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這一頁在資料結構課哪裡會用到</div><p><b>第 07 章</b>二分搜尋的骨架就是一個 <code>while low &lt;= high</code>；六種排序法全部是巢狀 <code>for</code>；<b>第 08 章</b>的 BFS 是「<code>while</code> 佇列不空」。看不懂迴圈的終止條件，就無法分析複雜度。</p></div>
+
+</section>
+
+<section id="bankquiz">
+  <div class="section-number">QUIZ · 自我檢測</div>
+  <h2>自我檢測：流程控制 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
+  <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q1.</span>下列哪一項&lt;b&gt;不是&lt;/b&gt;布林運算式？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="True 的求值結果是布林值，所以它&lt;b&gt;是&lt;/b&gt;布林運算式。">True</button>
+      <button class="sq-opt" data-c="0" data-fb="3 == 4 的求值結果是布林值，所以它&lt;b&gt;是&lt;/b&gt;布林運算式。">3 == 4</button>
+      <button class="sq-opt" data-c="1" data-fb="正確。3 + 4 是算術運算式，結果是整數 7，不是 True 或 False。布林運算式的結果必須是布林值。">3 + 4</button>
+      <button class="sq-opt" data-c="0" data-fb="3 + 4 == 7 的求值結果是布林值，所以它&lt;b&gt;是&lt;/b&gt;布林運算式。">3 + 4 == 7</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q2.</span>要檢查變數 x 是否介於 0 與 5 之間，下列哪一項是 Python 特有的「連鎖比較」寫法？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="每個比較運算子必須兩邊都有值。在這裡右側的表達式 &lt; 5 缺少左邊的值。">x &gt; 0 and &lt; 5</button>
+      <button class="sq-opt" data-c="1" data-fb="這個運算式等同於寫成 x &gt; 0 and x &lt; 5，但這種寫法比較簡潔！">0 &lt; x &lt; 5</button>
+      <button class="sq-opt" data-c="0" data-fb="這個表達式對所有大於 0 或小於 5 的數都會回傳 True，而所有數字都滿足這個條件，所以結果總是 True！">x &gt; 0 or x &lt; 5</button>
+      <button class="sq-opt" data-c="0" data-fb="這個寫法也正確，但它是所有語言都通用的寫法。Python 額外支援連鎖比較，可以直接寫成 0 &lt; x &lt; 5。">x &gt; 0 and x &lt; 5</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q3.</span>在 if 和 else 行下方的縮排程式碼區塊中，可以出現多少行程式碼（敘述）？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="每個區塊也可以包含多於一行的程式碼。">只有一行。</button>
+      <button class="sq-opt" data-c="0" data-fb="每個區塊至少必須包含一行程式碼。">零行或更多行。</button>
+      <button class="sq-opt" data-c="1" data-fb="正確，每個區塊至少必須包含一行程式碼，而且可以有多行。">一行或更多行。</button>
+      <button class="sq-opt" data-c="0" data-fb="不同的區塊可以包含不同數量的程式碼行。">一行或更多行，且每個區塊中的行數必須相同。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q4.</span>當 x = 3, y = 5, 且 z = 2 時，下列程式碼會印出什麼？</div>
+    <pre class="sq-code">if x &lt; y and x &lt; z: 
+    print&#40;&quot;a&quot;) 
+el&#105;f y &lt; x and y &lt; z:
+    print&#40;&quot;b&quot;) 
+else:
+    print&#40;&quot;c&quot;)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="雖然 x 的值小於 y (3 小於 5)，但 x 的值並不小於 z (3 不小於 2)。">a</button>
+      <button class="sq-opt" data-c="0" data-fb="y 的值並不小於 x (5 不小於 3)。">b</button>
+      <button class="sq-opt" data-c="1" data-fb="由於前兩個布林運算式皆為 False，所以執行 else 區塊。">c</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q5.</span>下列程式碼包含一個無限迴圈。哪一個是迴圈不會終止的最佳解釋？</div>
+    <pre class="sq-code">n = 10 
+answer = 1 
+while ( n &gt; 0 ):
+    answer = answer + n
+    n = n + 1
+print&#40;answer)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="只要 n 為正數，迴圈就會一直運行。在這個例子中，可以看到 n 永遠不會變成非正數。">n 從 10 開始，每次迴圈都遞增 1，因此它永遠是正數。</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然 answer 永遠是正數，但迴圈條件並未考慮 answer 的值。">answer 從 1 開始，每次迴圈都加上 n，因此它永遠是正數。</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然這是間接導致無限迴圈的原因，但比較 n 與 0 是合法的。">在 while 迴圈中，你不能將 n 與 0 進行比較。你必須將它與另一個變數比較。</button>
+      <button class="sq-opt" data-c="0" data-fb="迴圈條件必須變為 False 以使迴圈終止，但在這個例子中，n 本身並不是條件。">在 while 迴圈的主體中，我們必須將 n 設定為 False，而這段程式碼沒有這麼做。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q6.</span>下列敘述會印出 HELLO 字串多少次？</div>
+    <pre class="sq-code">s = &quot;python rocks&quot;
+for ch in s:
+    print&#40;&quot;HELLO&quot;)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="逐項走訪序列時，每個項目只處理一次。">10</button>
+      <button class="sq-opt" data-c="0" data-fb="空白字元也是序列的一部分。">11</button>
+      <button class="sq-opt" data-c="1" data-fb="正確，共有 12 個字元，包括空白。">12</button>
+      <button class="sq-opt" data-c="0" data-fb="for 敘述實際可以搭配序列並逐項走訪序列。">語法錯誤，for 敘述需要使用 range() 函數。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+</section>
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="p1_python_basics.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">Python 基礎</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="p3_functions.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">函數</div></a></div>
+</div><!-- /container -->
+
+<footer>
+  先備知識 P2 · 流程控制 · 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============================================================
+   共用引擎：StepRunner / Quiz / Flashcards
+   （與 CH01 完全相同的引擎程式碼，逐字複用）
+   ============================================================ */
+
+/** 逐步執行引擎：steps = [{line, vars, out, note, custom}] */
+function StepRunner(prefix, steps, opts) {
+  opts = opts || {};
+  const codeEl  = document.getElementById(prefix + 'Code');
+  const statusEl= document.getElementById(prefix + 'Status');
+  const varsEl  = document.getElementById(prefix + 'Vars');
+  const outEl   = document.getElementById(prefix + 'Out');
+  const playBtn = document.getElementById(prefix + 'Play');
+  const stepBtn = document.getElementById(prefix + 'Step');
+  const resetBtn= document.getElementById(prefix + 'Reset');
+  let idx = -1, timer = null;
+
+  function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
+
+  function render() {
+    lines().forEach((l,i)=>{
+      l.classList.toggle('active', idx>=0 && steps[idx].line===i);
+    });
+    if (idx < 0) {
+      if (statusEl) statusEl.textContent = '按「單步 ▸」開始';
+      if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
+      if (outEl) outEl.innerHTML = '';
+      if (opts.onReset) opts.onReset();
+      return;
+    }
+    const s = steps[idx];
+    if (statusEl) statusEl.textContent = s.note || '';
+    if (varsEl) {
+      if (s.vars && s.vars.length) {
+        varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
+          `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
+        ).join('') + '</table>';
+      } else {
+        varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+      }
+    }
+    if (outEl) {
+      outEl.innerHTML = (s.out||[]).map((o,i)=>{
+        const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
+        return `<div class="${cls}">${o}</div>`;
+      }).join('');
+      outEl.scrollTop = outEl.scrollHeight;
+    }
+    if (opts.onStep) opts.onStep(s, idx);
+  }
+
+  function step() {
+    if (idx < steps.length - 1) { idx++; render(); }
+    if (idx >= steps.length - 1) stopPlay();
+  }
+  function stopPlay(){
+    if (timer) { clearInterval(timer); timer = null; }
+    if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
+  }
+  function play(){
+    if (timer) { stopPlay(); return; }
+    if (idx >= steps.length - 1) { idx = -1; render(); }
+    playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
+    timer = setInterval(()=>{
+      if (idx >= steps.length - 1) stopPlay(); else step();
+    }, opts.interval || 1600);
+  }
+  function reset(){ stopPlay(); idx = -1; render(); }
+
+  if (playBtn) playBtn.addEventListener('click', play);
+  if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (resetBtn) resetBtn.addEventListener('click', reset);
+  render();
+  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+}
+
+/** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
+
+/** Flashcards：data = [{front, back}] */
+
+/* ============================================================
+   P02 真值表互動（and / or / not）
+   ============================================================ */
+(function initTruthTable(){
+  const aButtons = document.querySelectorAll('#truthAButtons .preset-btn');
+  const bButtons = document.querySelectorAll('#truthBButtons .preset-btn');
+  const result = document.getElementById('truthResult');
+  const table = document.getElementById('truthTable');
+  let A = true, B = true;
+
+  const ROWS = [[true,true],[true,false],[false,true],[false,false]];
+
+  function renderTable(){
+    // 移除舊資料列（保留表頭第一列）
+    table.querySelectorAll('tr.data-row').forEach(r => r.remove());
+    ROWS.forEach(([a,b])=>{
+      const tr = document.createElement('tr');
+      tr.className = 'data-row' + (a===A && b===B ? ' hl-row' : '');
+      tr.innerHTML = `<td>${a}</td><td>${b}</td><td>${a && b}</td><td>${a || b}</td><td>${!a}</td>`;
+      table.appendChild(tr);
+    });
+  }
+
+  function renderResult(){
+    result.innerHTML =
+      `<span class="ok">A and B</span> = ${A && B}　` +
+      `<span class="ok">A or B</span> = ${A || B}　` +
+      `<span class="ok">not A</span> = ${!A}`;
+  }
+
+  function update(){ renderResult(); renderTable(); }
+
+  aButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      aButtons.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      A = btn.dataset.val === 'true';
+      update();
+    });
+  });
+  bButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      bButtons.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      B = btn.dataset.val === 'true';
+      update();
+    });
+  });
+
+  update();
+})();
+
+/* ============================================================
+   P04 if / elif / else 逐步執行
+   name = 'Carol', age = 3000
+   ============================================================ */
+StepRunner('cond', [
+  { line:0, vars:[['name',"'Carol'",'str',1]], out:[], note:"name 被指派為 'Carol'" },
+  { line:1, vars:[['name',"'Carol'",'str'],['age','3000','int',1]], out:[], note:'age 被指派為 3000' },
+  { line:2, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:[], note:"檢查 if 條件：'Carol' == 'Alice' → False，跳過此區塊，繼續檢查 elif" },
+  { line:4, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:[], note:'檢查 elif 條件：3000 < 12 → False，繼續往下' },
+  { line:6, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:[], note:'if 與 elif 條件皆為 False → 執行 else 區塊' },
+  { line:7, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:['You are neither Alice nor a little kid.'], newOut:true, note:'✔ 印出 else 區塊的內容，鏈式判斷結束' },
+]);
+
+/* ============================================================
+   P05 while 迴圈逐步展開（spam = 0; while spam < 5: ...）
+   ============================================================ */
+(function(){
+  const steps = [
+    { line:0, vars:[['spam','0','int',1]], out:[], note:'spam 初始化為 0' },
+  ];
+  let out = [];
+  for (let i = 0; i < 5; i++) {
+    const before = i; // spam value entering this round
+    steps.push({ line:1, vars:[['spam',String(before),'int']], out:[...out], note:`第 ${i+1} 輪檢查條件：${before} < 5 → True，進入迴圈主體` });
+    out = [...out, 'Hello, world.'];
+    steps.push({ line:2, vars:[['spam',String(before),'int']], out:[...out], newOut:true, note:`執行 print('Hello, world.')（第 ${i+1} 次）` });
+    steps.push({ line:3, vars:[['spam',String(before+1),'int',1]], out:[...out], note:`spam += 1 → spam = ${before+1}，回到迴圈開頭重新檢查條件` });
+  }
+  steps.push({ line:1, vars:[['spam','5','int']], out:[...out], note:'第 6 輪檢查條件：5 < 5 → False，條件不成立，跳出迴圈' });
+  StepRunner('wl', steps);
+})();
+
+/* ============================================================
+   P06 range() 調整器沙盒
+   ============================================================ */
+(function initRangeSandbox(){
+  const startInput = document.getElementById('rangeStart');
+  const stopInput  = document.getElementById('rangeStop');
+  const stepInput  = document.getElementById('rangeStep');
+  const result = document.getElementById('rangeResult');
+  const numLine = document.getElementById('rangeNumLine');
+
+  /** 與 Python range() 語意一致（已用 python3 逐一驗證） */
+  function pyRange(start, stop, step) {
+    start = Math.trunc(start); stop = Math.trunc(stop); step = Math.trunc(step);
+    if (step === 0) return { error: 'ValueError: range() arg 3 must not be zero' };
+    const list = [];
+    if (step > 0) {
+      for (let i = start; i < stop; i += step) list.push(i);
+    } else {
+      for (let i = start; i > stop; i += step) list.push(i);
+    }
+    return { list, start, stop, step };
+  }
+
+  function update() {
+    const start = Number(startInput.value);
+    const stop  = Number(stopInput.value);
+    const step  = Number(stepInput.value);
+    const r = pyRange(start, stop, step);
+
+    if (r.error) {
+      result.innerHTML = `<span class="bad">⚠ ${r.error}</span>`;
+      numLine.innerHTML = '';
+      return;
+    }
+
+    result.innerHTML =
+      `<span class="ok">list(range(${r.start}, ${r.stop}, ${r.step}))</span> = [${r.list.join(', ')}]　` +
+      `<span class="type-badge">共 ${r.list.length} 個數字</span>`;
+
+    // 數線視覺化：顯示 start 與 stop 涵蓋範圍內的整數格子
+    const lo = Math.min(r.start, r.stop, ...(r.list.length ? r.list : [r.start]));
+    const hi = Math.max(r.start, r.stop, ...(r.list.length ? r.list : [r.start]));
+    const cells = [];
+    const selectedSet = new Set(r.list);
+    // 為避免格子過多，最多顯示 60 個
+    const span = hi - lo;
+    if (span > 60) {
+      numLine.innerHTML = '<span class="var-empty">（範圍過大，僅顯示上方清單，數線省略）</span>';
+      return;
+    }
+    for (let n = lo; n <= hi; n++) {
+      const sel = selectedSet.has(n);
+      const isStart = n === r.start && r.list.length > 0 && n === r.list[0];
+      cells.push(`<div class="num-cell${sel?' sel':''}${isStart?' start-marker':''}" title="${n}">${n}</div>`);
+    }
+    numLine.innerHTML = cells.join('');
+  }
+
+  [startInput, stopInput, stepInput].forEach(inp => inp.addEventListener('input', update));
+  document.querySelectorAll('#for-loop .preset-btn[data-r]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [s, e, st] = btn.dataset.r.split(',').map(Number);
+      startInput.value = s; stopInput.value = e; stepInput.value = st;
+      update();
+    });
+  });
+
+  update();
+})();
+
+/* ============================================================
+   P06 練習題 3：聖誕樹產生器（等價於巢狀 for 迴圈，簡易版）
+   for row in range(1, n+1):
+       for column in range(row):
+           print('*', end='')
+       print()
+   （已用 python3 逐一驗證 n=5、n=8 兩組輸出，逐字元一致）
+   ============================================================ */
+(function initTreeGame(){
+  const levelInput = document.getElementById('treeLevel');
+  const levelVal   = document.getElementById('treeLevelVal');
+  const output     = document.getElementById('treeOutput');
+  const drawBtn    = document.getElementById('treeDraw');
+  if (!levelInput || !output || !drawBtn) return;
+
+  function generateTreeLines(n) {
+    const lines = [];
+    for (let row = 1; row <= n; row++) {
+      let line = '';
+      for (let column = 0; column < row; column++) line += '*';
+      lines.push(line);
+    }
+    return lines;
+  }
+
+  function draw() {
+    const n = Number(levelInput.value);
+    const lines = generateTreeLines(n);
+    output.innerHTML =
+      `<div class="g-sys">&gt;&gt;&gt; 執行中 ... 層數 n = ${n}</div>` +
+      lines.map(l => `<div>${l}</div>`).join('') +
+      `<div class="g-win">✔ 完成！共 ${n} 層，${lines.reduce((s,l)=>s+l.length,0)} 顆星星</div>`;
+  }
+
+  levelInput.addEventListener('input', () => { levelVal.textContent = levelInput.value; });
+  drawBtn.addEventListener('click', draw);
+
+  draw(); // 預設先畫一次，讓畫面一進來就有內容
+})();
+
+/* ============================================================
+   QUIZ 資料（取自課程題庫 questions-TW/ch2，含原題 feedback）
+   順序：bool → logical → block → conditions → while → for
+   ============================================================ */
+
+/* ============================================================
+   FLASHCARDS 資料（取自課程字卡 flashcards-TW/ch2.json）
+   ============================================================ */
+
+/* ============================================================
+   Floating nav active highlight
+   ============================================================ */
+(function initFloatNav(){
+  const links = document.querySelectorAll('.float-nav a[data-target]');
+  const sections = [...links].map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update(){
+    let active = sections[0] && sections[0].id;
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.35) active = s.id;
+    }
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  update();
+})();
+</script>
+<script>
+const FLASHCARDS = [{"front": "流程控制敘述（Control Flow Statement）", "back": "決定程式碼執行順序的指令。"}, {"front": "布林運算式（Boolean Expression）", "back": "運算結果為 True 或 False 的運算式。"}, {"front": "布林值（Boolean Value）", "back": "Python 中的兩個真值：True 與 False。"}, {"front": "比較運算子（Comparison Operator）", "back": "用來比較值的運算子，如 ==、!=、<、>、<= 和 >=。"}, {"front": "布林運算子（Boolean Operator）", "back": "用來組合或反轉布林運算式的運算子，例如 and、or 和 not。"}, {"front": "循序執行（Sequential Execution）", "back": "程式碼依序逐條執行的過程。"}, {"front": "選擇敘述（Selection Statement）", "back": "根據條件讓程式選擇不同執行路徑的敘述（例如 if 敘述）。"}, {"front": "重複敘述（Iteration Statement）", "back": "反覆執行程式碼區塊的迴圈，直到滿足某個條件（例如 for 或 while 迴圈）。"}, {"front": "結構化程式設計（Structured Programming）", "back": "利用區塊、迴圈和函數撰寫清晰、邏輯性強程式碼的程式設計風格。"}, {"front": "條件（Condition）", "back": "用於決定執行哪個程式碼路徑的布林運算式。"}, {"front": "子句（Clause）", "back": "控制結構中的一部分，例如 if 敘述中的條件部分。"}, {"front": "程式碼區塊（Code Block）", "back": "一組會一起執行的敘述，通常由縮排定義。"}, {"front": "縮排（Indentation）", "back": "行首的空格，用以定義 Python 中的程式碼區塊。"}, {"front": "控制結構（Control Structure）", "back": "控制程式執行流程的結構，如迴圈與條件敘述。"}, {"front": "條件敘述（if Statement）", "back": "僅在指定條件為 True 時執行程式碼的條件敘述。"}, {"front": "條件迴圈（while Statement）", "back": "只要條件保持為 True 就重複執行程式碼區塊的迴圈。"}, {"front": "增強指派運算子（Augmented Assignment Operator）", "back": "用於原地更新變數值的簡寫運算子（例如 +=、-=、*=）。"}, {"front": "跳出迴圈（break Statement）", "back": "一個立即退出迴圈的指令。"}, {"front": "無窮迴圈（Infinite Loop）", "back": "除非被中斷，否則永不停止運行的迴圈。"}, {"front": "跳過本輪（continue Statement）", "back": "一個跳過當前迴圈剩餘部分並進入下一次迭代的指令。"}, {"front": "計數迴圈（for Statement）", "back": "對序列中的每個項目進行迭代，並對每個項目執行一個程式碼區塊的迴圈。"}, {"front": "成員運算子（in Operator）", "back": "用於檢查某值是否存在於序列中或對序列項目進行迭代的關鍵字。"}, {"front": "序列型別（Sequence Type）", "back": "儲存有序項目集合的資料型別，如串列、元組與字串。"}, {"front": "標準函式庫（Standard Library）", "back": "Python 內建的一系列模組與函數，用於執行許多常見任務。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+
+(function(){
+  document.querySelectorAll('.sq-item').forEach(item => {
+    const fb = item.querySelector('.sq-fb');
+    item.querySelectorAll('.sq-opt').forEach(btn => btn.addEventListener('click', () => {
+      const good = btn.dataset.c === '1';
+      item.querySelectorAll('.sq-opt').forEach(b => b.classList.remove('correct','wrong'));
+      btn.classList.add(good ? 'correct' : 'wrong');
+      fb.textContent = btn.dataset.fb;
+      fb.classList.add('show');
+      fb.classList.toggle('good', good);
+      fb.classList.toggle('bad', !good);
+    }));
+  });
+})();
+</script>
+</body>
+</html>

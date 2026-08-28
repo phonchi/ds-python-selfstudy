@@ -1,0 +1,147 @@
+[
+ {
+  "question": "在 Python 中，什麼是函數？",
+  "answers": [
+   {
+    "answer": "一個具名稱的程式區塊。",
+    "correct": true,
+    "feedback": "正確！函數是一個具名稱的程式區塊。"
+   },
+   {
+    "answer": "任何一連串的指令。",
+    "correct": false,
+    "feedback": "雖然函數包含一連串的指令，但不是所有的一連串的指令都被視為函數。"
+   },
+   {
+    "answer": "一個計算數值的數學表達式。",
+    "correct": false,
+    "feedback": "雖然有些函數會計算出數值，但 Python 中的函數概念與數學中的函數略有不同，並非所有函數都用來計算數值。例如，print() 函數就沒有計算數值。"
+   },
+   {
+    "answer": "像 x = 5 + 4 這樣的敘述。",
+    "correct": false,
+    "feedback": "這樣的敘述被稱為指派（賦值）敘述，而不是函數。"
+   }
+  ]
+ },
+ {
+  "question": "執行以下程式碼會輸出幾行？",
+  "code": "def hello():\n    print(\"Hello\")\n    print(\"NSYSU\")",
+  "answers": [
+   {
+    "answer": "0 行",
+    "correct": true,
+    "feedback": "這段程式碼只是定義了函數，並沒有呼叫該函數，所以什麼都不會輸出。"
+   },
+   {
+    "answer": "2 行",
+    "correct": false,
+    "feedback": "當函數被呼叫時，會輸出兩行，但這段程式碼只是定義了函數，尚未呼叫它。"
+   },
+   {
+    "answer": "3 行",
+    "correct": false,
+    "feedback": "雖然有三行程式碼，但目前只有定義函數，未執行呼叫，因此不會輸出任何內容。"
+   }
+  ]
+ },
+ {
+  "question": "以下函數定義有什麼問題：",
+  "code": "def add_em(x, y, z):\n    return x + y + z\n    print(\"the answer is\", x + y + z)",
+  "answers": [
+   {
+    "answer": "函數定義中不應該使用 print 敘述。",
+    "correct": false,
+    "feedback": "你可以在函數中加入 print 敘述，這是允許的。"
+   },
+   {
+    "answer": "在 return 敘述之後不應該有其他敘述。一旦執行到 return，函數會立即停止執行。",
+    "correct": true,
+    "feedback": "這是一個非常常見的錯誤，撰寫程式時務必要特別留意！"
+   },
+   {
+    "answer": "你必須在 return 前先計算 x + y + z 的值。",
+    "correct": false,
+    "feedback": "Python 會自動計算 x + y + z 並直接在 return 敘述中傳回這個值，不需要額外計算。"
+   },
+   {
+    "answer": "函數不能傳回數值。",
+    "correct": false,
+    "feedback": "函數可以傳回任何合法的資料型別，包括（但不限於）數值、字串、布林值等等。"
+   }
+  ]
+ },
+ {
+  "question": "如果我們希望從這個函數取得加總結果，下面的函數定義有什麼問題？",
+  "code": "def add_em(x, y, z):\n    print(x + y + z)",
+  "answers": [
+   {
+    "answer": "傳回值是 None",
+    "correct": true,
+    "feedback": "我們不小心使用了 print，而其實應該使用 return。這樣的話，函數預設會傳回 None。這個錯誤特別難發現，因為執行函數時，輸出的結果看起來一樣。"
+   },
+   {
+    "answer": "傳回值是 x+y+z 的結果",
+    "correct": false,
+    "feedback": "要小心！這是很常見的錯誤。我們這裡只是印出了 x+y+z 的結果，但並沒有傳回它。要傳回值，必須使用 return 關鍵字。"
+   },
+   {
+    "answer": "傳回字串 'x+y+z'",
+    "correct": false,
+    "feedback": "這裡的 x+y+z 是計算數值，代表 x、y 和 z 的總和，並不是字串。"
+   }
+  ]
+ },
+ {
+  "question": "執行下列程式碼後，結果會是什麼？",
+  "code": "x = 3 * 2 \ny = 1\ndef subtract(z):\n    y = 10\n    return y - z\nprint(subtract(x))",
+  "answers": [
+   {
+    "answer": "4",
+    "correct": true,
+    "feedback": "正確！subtract 函式接收來自全域變數 x 的值作為參數 z，然後使用區域變數 y 來計算回傳值。結果為 10 - 6 = 4。"
+   },
+   {
+    "answer": "6",
+    "correct": false,
+    "feedback": "錯誤，請再看看 subtract 函式內部是如何計算的。"
+   },
+   {
+    "answer": "10",
+    "correct": false,
+    "feedback": "錯誤，subtract 函式內使用的是區域變數 y 並減去 z，不是直接回傳 y 的值。"
+   },
+   {
+    "answer": "程式碼會報錯，因為有兩個不同的 y 值。",
+    "correct": false,
+    "feedback": "錯誤，雖然有兩個 y，但它們分別存在於全域範圍與區域範圍，不會造成錯誤。"
+   }
+  ]
+ },
+ {
+  "question": "執行以下程式碼會得到什麼結果？",
+  "code": "x = 9\ndef adding():\n    x+=1\n    print(x)\nadding()",
+  "answers": [
+   {
+    "answer": "1",
+    "correct": false,
+    "feedback": "錯誤，請注意函式中的區域變數範圍 (local scope)。"
+   },
+   {
+    "answer": "9",
+    "correct": false,
+    "feedback": "錯誤，請注意函式中的區域變數範圍 (local scope)。"
+   },
+   {
+    "answer": "10",
+    "correct": false,
+    "feedback": "錯誤，請注意函式中的區域變數範圍 (local scope)。"
+   },
+   {
+    "answer": "錯誤，區域變數 'x' 在賦值前被引用。",
+    "correct": true,
+    "feedback": "這段程式碼會產生錯誤，因為區域變數 'x' 在賦值之前就被引用了。"
+   }
+  ]
+ }
+]

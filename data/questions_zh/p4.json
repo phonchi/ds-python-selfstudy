@@ -1,0 +1,156 @@
+[
+ {
+  "question": "以下語句會印出什麼？",
+  "code": "alist = [3, 67, \"cat\", [56, 57, \"dog\"], [ ], 3.14, False]\nprint(alist[5])",
+  "answers": [
+   {
+    "answer": "[ ]",
+    "correct": false,
+    "feedback": "空串列在索引 4。"
+   },
+   {
+    "answer": "3.14",
+    "correct": true,
+    "feedback": "是的，3.14 位於索引 5，因為我們從 0 開始計數，而子串列計算為一個項目。"
+   },
+   {
+    "answer": "False",
+    "correct": false,
+    "feedback": "False 在索引 6。"
+   },
+   {
+    "answer": "dog",
+    "correct": false,
+    "feedback": "索引 3 的元素是另一個內部串列。這個串列在外部串列中只算作一個元素。"
+   }
+  ]
+ },
+ {
+  "question": "以下哪一項正確使用了索引？假設 a 是一個串列或字串。",
+  "answers": [
+   {
+    "answer": "w = [a]",
+    "correct": false,
+    "feedback": "不對，這段代碼的寫法會建立一個串列，該串列只會包含一個元素，即變數 a 所指向的值。"
+   },
+   {
+    "answer": "a[]",
+    "correct": false,
+    "feedback": "雖然這嘗試使用索引，但它並未指定應該從 a 中取出哪個元素。"
+   },
+   {
+    "answer": "x = [8]",
+    "correct": false,
+    "feedback": "不對，這是建立一個包含單個元素 8 的串列的例子。"
+   },
+   {
+    "answer": "t = a[0]",
+    "correct": true,
+    "feedback": "是的，這會使用索引來獲取 a 的第一個元素的值。"
+   }
+  ]
+ },
+ {
+  "question": "以下語句會印出什麼？",
+  "code": "alist = [3, 67, \"cat\", [56, 57, \"dog\"], 2.5, 3.14, False]\nprint(alist[4:])",
+  "answers": [
+   {
+    "answer": "[2.5, 3.14, False]",
+    "correct": true,
+    "feedback": "是的，這個切片從索引 4 開始，直到包含最後一個項目。"
+   },
+   {
+    "answer": "[2.5, 3.14]",
+    "correct": false,
+    "feedback": "因為在切片中省略了上限，我們會一直切到並包括最後一個項目。"
+   },
+   {
+    "answer": "[[56, 57, \"dog\"], 2.5, 3.14, False]",
+    "correct": false,
+    "feedback": "索引從 0 開始。"
+   },
+   {
+    "answer": "2.5",
+    "correct": false,
+    "feedback": "切片運算子將建立一個新的串列，其中包含數個元素。"
+   }
+  ]
+ },
+ {
+  "question": "以下語句會輸出什麼？",
+  "code": "alist = [1,3,5]\nblist = [2,4,6]\nprint(alist + blist)",
+  "answers": [
+   {
+    "answer": "6",
+    "correct": false,
+    "feedback": "連接不會加總串列的長度。"
+   },
+   {
+    "answer": "[1,2,3,4,5,6]",
+    "correct": false,
+    "feedback": "串接不會重新排序項目。"
+   },
+   {
+    "answer": "[1,3,5,2,4,6]",
+    "correct": true,
+    "feedback": "是的，會產生一個新串列，包含第一個串列的所有項目，然後是第二個串列的所有項目。"
+   },
+   {
+    "answer": "[3,7,11]",
+    "correct": false,
+    "feedback": "串接不會將各個項目相加。"
+   }
+  ]
+ },
+ {
+  "question": "以下語句會印出什麼？",
+  "code": "my_list = [1, 2, 3]\nmy_list.append([4, 5])\nmy_list.extend([6, 7])\nprint(my_list)",
+  "answers": [
+   {
+    "answer": "[1, 2, 3, [4, 5], 6, 7]",
+    "correct": true,
+    "feedback": "正確！append 方法會將整個 [4, 5] 串列作為單一元素添加，而 extend 會走訪它的參數，逐個添加 6 和 7。"
+   },
+   {
+    "answer": "[1, 2, 3, 4, 5, 6, 7]",
+    "correct": false,
+    "feedback": "錯誤。雖然 extend 會逐個添加每個元素，但 append 會將其參數作為單一項目添加，結果會形成巢狀串列。"
+   },
+   {
+    "answer": "[1, 2, 3, [4, 5, 6, 7]]",
+    "correct": false,
+    "feedback": "錯誤。只有 append 方法會將串列作為單一元素添加，extend 則不會。"
+   },
+   {
+    "answer": "[1, 2, 3, 4, 5, [6, 7]]",
+    "correct": false,
+    "feedback": "錯誤。extend 方法不會將其串列參數作為單一巢狀元素添加。"
+   }
+  ]
+ },
+ {
+  "question": "下列關於串列與元組的說法，哪一項是<b>錯誤</b>的？",
+  "answers": [
+   {
+    "answer": "元組是可變的，這意味著它們的元素可以在建立後修改。",
+    "correct": true,
+    "feedback": "正確，這句話是錯的。元組是不可變的：建立之後不能修改元素，也不能改變大小。這正是它可以當字典的鍵、而串列不行的原因。"
+   },
+   {
+    "answer": "串列和元組都支援索引和切片操作。",
+    "correct": false,
+    "feedback": "這句話是對的，所以不是本題要選的答案。"
+   },
+   {
+    "answer": "串列有像 append() 和 extend() 這樣的方法，而元組不支援這些方法。",
+    "correct": false,
+    "feedback": "這句話是對的，所以不是本題要選的答案。"
+   },
+   {
+    "answer": "串列可以儲存不同資料型別的元素。",
+    "correct": false,
+    "feedback": "這句話是對的，所以不是本題要選的答案。"
+   }
+  ]
+ }
+]

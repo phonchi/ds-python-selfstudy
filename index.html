@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>資料結構 × Python 互動自學網站</title>
-<meta name="description" content="NSYSU 資料結構課程的 Python 互動自學網站：九章互動教材、每節 quiz、關鍵詞彙卡與速查表，配合 pythonds 教科書與課程講義使用。">
+<meta name="description" content="NSYSU 資料結構課程的 Python 互動自學網站：兩章課前準備、九章互動教材、九頁選讀先備知識，每節 quiz、關鍵詞彙卡與速查表，配合 pythonds 教科書與課程講義使用。">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -69,7 +69,7 @@ s = Stack()
 s.push(42)
 print(s.pop())</div>
   <h1>資料結構 <span class="cpp">× Python</span> 互動自學網站</h1>
-  <div class="subtitle">九章互動教材：每一節都能動手玩、預測、驗證，配上每節 quiz、關鍵詞彙卡與速查表。搭配課程講義與 pythonds 教科書，把資料結構從「看得懂」練到「寫得出來」。</div>
+  <div class="subtitle">兩章課前準備 ＋ 九章互動教材 ＋ 九頁選讀先備知識：每一節都能動手玩、預測、驗證，配上每節 quiz、關鍵詞彙卡與速查表。搭配課程講義與 pythonds 教科書，把資料結構從「看得懂」練到「寫得出來」。</div>
   <div class="big-formula">list｜dict｜stack｜queue｜deque｜recursion｜hash｜sort｜tree｜graph</div>
 </div>
 
@@ -78,13 +78,31 @@ print(s.pop())</div>
 <section>
   <div class="loop-box">
     <div class="lb-title">📌 建議學習迴圈（每一章都照這個節奏）</div>
-    <p>這個網站是課程講義的互動版配套：講義給完整程式與推導，這裡給你「動手驗證直覺」的空間。每頁的 §徽章對應 pythonds 教科書節號，方便左右對照。</p>
+    <p>這個網站是課程講義的互動版配套：講義給完整程式與推導，這裡給你「動手驗證直覺」的空間。每頁的 §徽章對應 pythonds 教科書節號，方便左右對照。不確定 Python 基礎夠不夠？先掃一遍<a href="#prereq">先備頁 P1–P9</a>（選讀、不評分），尤其是 P8／P9 的物件導向。</p>
     <div class="loop-steps">
       <div class="step"><b>① READ &amp; PLAY</b>逐節閱讀，動手操作互動元件：先預測結果，再按按鈕驗證。</div>
       <div class="step"><b>② CROSS-CHECK</b>對照講義 PDF 與 pythonds 原文，把完整程式碼看懂、抄一遍、跑一遍。</div>
       <div class="step"><b>③ QUIZ</b>每節 quiz 立刻自測：答錯就回頭重讀該節，不要往下跳。</div>
       <div class="step"><b>④ FLASHCARDS &amp; REF</b>翻完詞彙卡、掃過 REF 速查表，能不看答案講出定義才算過關。</div>
     </div>
+  </div>
+</section>
+
+<section>
+  <h2>課前準備（先讀這兩頁）</h2>
+  <div class="ch-grid">
+    <a class="ch-card" href="00a_why_code.html">
+      <div class="ch-num">00A · WHY</div><h3>AI 時代，為什麼還要學資料結構？</h3>
+      <div class="ch-badge">先讀 · 約 15 分鐘</div>
+      <p>AI 三秒就寫得出一棵 BST，那你在這裡幹嘛？從「能跑」到「n 變一百萬還能跑」的距離、AI 選錯資料結構的三個真實代價，以及為什麼「看得懂」正在變稀有。</p>
+      <div class="ch-meta">6 節互動 · 自我檢核 3 題 · 10 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="00b_setup.html">
+      <div class="ch-num">00B · SETUP</div><h3>課前準備與環境安裝</h3>
+      <div class="ch-badge">動手 · 約 20 分鐘</div>
+      <p>三條路擇一：Colab 免安裝（推薦）、Anaconda 本機、VS Code + pip。含 pythonds3／jupyterquiz／jupytercards 安裝、turtle 在 Colab 的坑，以及一段可貼可跑的驗收程式。</p>
+      <div class="ch-meta">7 節 · 環境驗收清單 · 10 張詞彙卡</div>
+    </a>
   </div>
 </section>
 
@@ -144,6 +162,72 @@ print(s.pop())</div>
       <div class="ch-badge">pythonds Ch.6</div>
       <p>樹的術語與表示法、解析樹、三種走訪、Binary Heap 與優先佇列、BST 的插入/搜尋/刪除三情境，到 AVL 旋轉與 Map ADT 總比較。</p>
       <div class="ch-meta">11 節互動 · 題庫自測 5 題 · 34 張詞彙卡</div>
+    </a>
+  </div>
+</section>
+
+<section id="prereq">
+  <h2>先備知識（選讀，不列入評分）</h2>
+  <div class="loop-box" style="margin-bottom:1.4rem;">
+    <div class="lb-title">📌 補充先備知識 · 不列入作業與考試範圍</div>
+    <p style="margin-bottom:0;">這九頁複習資料結構課程「預設你已經會」的基本 Python。<strong>完全選讀：沒有作業、不會考</strong>。
+    照順序走一遍，或直接跳到你心虛的那一頁。<strong>唯一強烈建議不要跳過的是 P8／P9 物件導向</strong>——
+    第 04 章之後，幾乎每一個資料結構都是一個 <code>class</code>。</p>
+  </div>
+  <div class="ch-grid">
+    <a class="ch-card" href="p1_python_basics.html">
+      <div class="ch-num">PREREQ P1</div><h3>Python 基礎</h3>
+      <div class="ch-badge">選讀 · 不評分</div>
+      <p>數值型別與運算子優先順序、名字與物件的綁定、型別轉換，以及語法／語意／執行期三種錯誤的分辨。</p>
+      <div class="ch-meta">7 節互動 · 自測 7 題 · 22 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p2_flow_control.html">
+      <div class="ch-num">PREREQ P2</div><h3>流程控制</h3>
+      <div class="ch-badge">選讀 · 不評分</div>
+      <p>布林運算式與比較運算子、縮排界定的程式碼區塊、if／elif／else、while 與 for + range()，以及匯入模組。</p>
+      <div class="ch-meta">8 節互動 · 自測 6 題 · 24 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p3_functions.html">
+      <div class="ch-num">PREREQ P3</div><h3>函數</h3>
+      <div class="ch-badge">選讀 · 不評分</div>
+      <p>定義與呼叫、位置與關鍵字引數、預設參數、回傳值與 None，以及區域與全域範圍——遞迴的前置知識。</p>
+      <div class="ch-meta">6 節互動 · 自測 6 題 · 18 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p4_lists_tuples.html">
+      <div class="ch-num">PREREQ P4</div><h3>串列與元組</h3>
+      <div class="ch-badge">選讀 · 不評分</div>
+      <p>索引與切片、修改與刪除的成本、串接與走訪、串列生成式、元組拆解，以及參照與複製的差別。</p>
+      <div class="ch-meta">11 節互動 · 自測 6 題 · 16 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p5_dicts_sets.html">
+      <div class="ch-num">PREREQ P5</div><h3>字典與集合</h3>
+      <div class="ch-badge">選讀 · 不評分</div>
+      <p>鍵值對、get 與 setdefault、字典生成式、費波那契 memoization，以及集合的四種運算與 O(1) 成員檢查。</p>
+      <div class="ch-meta">10 節互動 · 自測 6 題 · 13 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p6_strings.html">
+      <div class="ch-num">PREREQ P6</div><h3>字串操作</h3>
+      <div class="ch-badge">選讀 · 不評分</div>
+      <p>建立、索引與切片、跳脫字元與原始字串、f-string 格式化，以及最常用的字串方法。</p>
+      <div class="ch-meta">4 節互動 · 自測 6 題 · 13 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p7_files_exceptions.html">
+      <div class="ch-num">PREREQ P7</div><h3>檔案與例外</h3>
+      <div class="ch-badge">選讀 · 不評分</div>
+      <p>pathlib 路徑、with open 讀寫、JSON 存取、從網址讀資料，以及 try／except／else／finally 的執行路徑與 raise。</p>
+      <div class="ch-meta">7 節互動 · 自測 6 題 · 16 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p8_oop_basics.html">
+      <div class="ch-num">PREREQ P8</div><h3>物件導向（基礎）</h3>
+      <div class="ch-badge">強烈建議</div>
+      <p>class 與實例、__init__ 與 self、屬性查找逐步器、封裝與 @property、__str__ 與 __repr__，並用組合從零蓋出一個 Stack。</p>
+      <div class="ch-meta">8 節互動 · 自測 6 題 · 17 張詞彙卡</div>
+    </a>
+    <a class="ch-card" href="p9_oop_advanced.html">
+      <div class="ch-num">PREREQ P9</div><h3>物件導向（進階）</h3>
+      <div class="ch-badge">強烈建議</div>
+      <p>繼承與 super()、多型與鴨子型別、__eq__ 配 __hash__、__lt__ 驅動排序與優先佇列的逐步器、容器協定，以及組合 vs 繼承。</p>
+      <div class="ch-meta">8 節互動 · 自測 7 題 · 17 張詞彙卡</div>
     </a>
   </div>
 </section>

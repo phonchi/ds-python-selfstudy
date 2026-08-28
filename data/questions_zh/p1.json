@@ -1,0 +1,177 @@
+[
+ {
+  "question": "下列哪一項<b>最完整</b>地描述演算法的定義？",
+  "answers": [
+   {
+    "answer": "用來描述如何解決問題的一種特殊符號表示法。",
+    "correct": false,
+    "feedback": "程式設計師會使用虛擬碼等符號表示法來說明演算法，但這並不是演算法的定義。"
+   },
+   {
+    "answer": "必須使用程式語言來描述。",
+    "correct": false,
+    "feedback": "演算法可以用多種方式描述，包括虛擬碼和程式語言。"
+   },
+   {
+    "answer": "針對可能發生的任何問題實例而設計的一系列逐步指令。",
+    "correct": false,
+    "feedback": "這句話沒有錯，但少了兩個關鍵條件：步驟必須明確無歧義，而且必須在有限時間內結束。"
+   },
+   {
+    "answer": "它包含明確、無歧義的步驟，並且必須在有限時間內產生結果。",
+    "correct": true,
+    "feedback": "這是演算法的正式定義。"
+   }
+  ]
+ },
+ {
+  "question": "下列敘述執行後，輸出視窗中會顯示什麼？",
+  "code": "print(\"Hello!\")",
+  "answers": [
+   {
+    "answer": "什麼都不會印出，而且會產生執行時錯誤。",
+    "correct": false,
+    "feedback": "語法是正確的！"
+   },
+   {
+    "answer": "\"Hello!\"",
+    "correct": false,
+    "feedback": "程式中的字面值包含引號，但印出來的結果不包含引號。"
+   },
+   {
+    "answer": "Hello!",
+    "correct": true,
+    "feedback": "正確。"
+   },
+   {
+    "answer": "哈囉!",
+    "correct": false,
+    "feedback": "它不會進行翻譯。"
+   }
+  ]
+ },
+ {
+  "question": "當下列敘述執行時會印出什麼數值？",
+  "code": "print(18.0 // 4)",
+  "answers": [
+   {
+    "answer": "4.5",
+    "correct": false,
+    "feedback": "// 運算子會無條件捨去小數部分。"
+   },
+   {
+    "answer": "5",
+    "correct": false,
+    "feedback": "不論使用 / 或 // 都不會進行四捨五入。"
+   },
+   {
+    "answer": "4",
+    "correct": false,
+    "feedback": "儘管運算子會無條件捨去，但結果仍會以浮點數表示。"
+   },
+   {
+    "answer": "4.0",
+    "correct": true,
+    "feedback": "在處理不同數值型態時，會隱式轉換成較寬或較精確的型態再進行運算。"
+   }
+  ]
+ },
+ {
+  "question": "下列運算式的值是多少？",
+  "code": "16 - 2 * 5 // 3 + 1",
+  "answers": [
+   {
+    "answer": "14",
+    "correct": true,
+    "feedback": "依序計算 (2*5) 得到 10，再計算 (10 // 3) 得到 3，接著 (16-3) 得到 13，最後 (13+1) 得到 14。"
+   },
+   {
+    "answer": "24",
+    "correct": false,
+    "feedback": "請記得，* 的優先順序高於 -。"
+   },
+   {
+    "answer": "3",
+    "correct": false,
+    "feedback": "請記得，// 的優先順序高於 -。"
+   },
+   {
+    "answer": "13.667",
+    "correct": false,
+    "feedback": "請記得，// 是整數除法。"
+   }
+  ]
+ },
+ {
+  "question": "下列敘述執行後，輸出視窗會印出什麼？",
+  "code": "day = \"Thursday\"\nday = 32.5\nday = 19\nprint(day)",
+  "answers": [
+   {
+    "answer": "什麼都不會印出，而且會產生執行時錯誤。",
+    "correct": false,
+    "feedback": "在 Python 中，變數儲存的資料型態可以合法地變更。"
+   },
+   {
+    "answer": "Thursday",
+    "correct": false,
+    "feedback": "這是變數 day 的第一個值，但接下來的敘述會重新給予該變數新值。"
+   },
+   {
+    "answer": "32.5",
+    "correct": false,
+    "feedback": "這是變數 day 的第二個值，但接下來的敘述會重新給予該變數新值。"
+   },
+   {
+    "answer": "19",
+    "correct": true,
+    "feedback": "當印出時，變數 day 將包含最後賦予它的值。"
+   }
+  ]
+ },
+ {
+  "question": "下列敘述執行後，輸出視窗會印出什麼數值？",
+  "code": "print(int(53.785))",
+  "answers": [
+   {
+    "answer": "什麼都不會印出，而且會產生執行時錯誤。",
+    "correct": false,
+    "feedback": "這是有效的 Python 程式碼。它呼叫 int 函式將 53.785 轉換為整數，然後印出回傳的值。"
+   },
+   {
+    "answer": "53",
+    "correct": true,
+    "feedback": "int 函式會捨棄小數部分，僅保留整數部分，因此印出 53。"
+   },
+   {
+    "answer": "54",
+    "correct": false,
+    "feedback": "轉換為整數時，int 函式不會進行四捨五入。"
+   },
+   {
+    "answer": "53.785",
+    "correct": false,
+    "feedback": "int 函式會移除 53.785 的小數部分，傳回整數 53。"
+   }
+  ]
+ },
+ {
+  "question": "以下哪一項是語意錯誤？",
+  "answers": [
+   {
+    "answer": "嘗試除以 0。",
+    "correct": false,
+    "feedback": "語意錯誤是邏輯錯誤。在這種情況下，程式因問題未能正確解決而產生錯誤的輸出，這通常被視為執行時錯誤。"
+   },
+   {
+    "answer": "在 print 敘述中遺漏了右括號 )。",
+    "correct": false,
+    "feedback": "這種錯誤使程式碼無法被編譯器或直譯器處理，屬於語法錯誤，而不是語意錯誤。"
+   },
+   {
+    "answer": "在印出百分比數值時，遺漏了除以 100。",
+    "correct": true,
+    "feedback": "這會導致錯誤的結果，因為程式設計師在實現解決方案時犯了錯誤，這屬於語意錯誤。"
+   }
+  ]
+ }
+]

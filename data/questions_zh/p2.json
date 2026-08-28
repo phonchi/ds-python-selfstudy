@@ -1,0 +1,150 @@
+[
+ {
+  "question": "下列哪一項<b>不是</b>布林運算式？",
+  "answers": [
+   {
+    "answer": "True",
+    "correct": false,
+    "feedback": "True 的求值結果是布林值，所以它<b>是</b>布林運算式。"
+   },
+   {
+    "answer": "3 == 4",
+    "correct": false,
+    "feedback": "3 == 4 的求值結果是布林值，所以它<b>是</b>布林運算式。"
+   },
+   {
+    "answer": "3 + 4",
+    "correct": true,
+    "feedback": "正確。3 + 4 是算術運算式，結果是整數 7，不是 True 或 False。布林運算式的結果必須是布林值。"
+   },
+   {
+    "answer": "3 + 4 == 7",
+    "correct": false,
+    "feedback": "3 + 4 == 7 的求值結果是布林值，所以它<b>是</b>布林運算式。"
+   }
+  ]
+ },
+ {
+  "question": "要檢查變數 x 是否介於 0 與 5 之間，下列哪一項是 Python 特有的「連鎖比較」寫法？",
+  "answers": [
+   {
+    "answer": "x > 0 and < 5",
+    "correct": false,
+    "feedback": "每個比較運算子必須兩邊都有值。在這裡右側的表達式 < 5 缺少左邊的值。"
+   },
+   {
+    "answer": "0 < x < 5",
+    "correct": true,
+    "feedback": "這個運算式等同於寫成 x > 0 and x < 5，但這種寫法比較簡潔！"
+   },
+   {
+    "answer": "x > 0 or x < 5",
+    "correct": false,
+    "feedback": "這個表達式對所有大於 0 或小於 5 的數都會回傳 True，而所有數字都滿足這個條件，所以結果總是 True！"
+   },
+   {
+    "answer": "x > 0 and x < 5",
+    "correct": false,
+    "feedback": "這個寫法也正確，但它是所有語言都通用的寫法。Python 額外支援連鎖比較，可以直接寫成 0 < x < 5。"
+   }
+  ]
+ },
+ {
+  "question": "在 if 和 else 行下方的縮排程式碼區塊中，可以出現多少行程式碼（敘述）？",
+  "answers": [
+   {
+    "answer": "只有一行。",
+    "correct": false,
+    "feedback": "每個區塊也可以包含多於一行的程式碼。"
+   },
+   {
+    "answer": "零行或更多行。",
+    "correct": false,
+    "feedback": "每個區塊至少必須包含一行程式碼。"
+   },
+   {
+    "answer": "一行或更多行。",
+    "correct": true,
+    "feedback": "正確，每個區塊至少必須包含一行程式碼，而且可以有多行。"
+   },
+   {
+    "answer": "一行或更多行，且每個區塊中的行數必須相同。",
+    "correct": false,
+    "feedback": "不同的區塊可以包含不同數量的程式碼行。"
+   }
+  ]
+ },
+ {
+  "question": "當 x = 3, y = 5, 且 z = 2 時，下列程式碼會印出什麼？",
+  "code": "if x < y and x < z: \n    print(\"a\") \nelif y < x and y < z:\n    print(\"b\") \nelse:\n    print(\"c\")",
+  "answers": [
+   {
+    "answer": "a",
+    "correct": false,
+    "feedback": "雖然 x 的值小於 y (3 小於 5)，但 x 的值並不小於 z (3 不小於 2)。"
+   },
+   {
+    "answer": "b",
+    "correct": false,
+    "feedback": "y 的值並不小於 x (5 不小於 3)。"
+   },
+   {
+    "answer": "c",
+    "correct": true,
+    "feedback": "由於前兩個布林運算式皆為 False，所以執行 else 區塊。"
+   }
+  ]
+ },
+ {
+  "question": "下列程式碼包含一個無限迴圈。哪一個是迴圈不會終止的最佳解釋？",
+  "code": "n = 10 \nanswer = 1 \nwhile ( n > 0 ):\n    answer = answer + n\n    n = n + 1\nprint(answer)",
+  "answers": [
+   {
+    "answer": "n 從 10 開始，每次迴圈都遞增 1，因此它永遠是正數。",
+    "correct": true,
+    "feedback": "只要 n 為正數，迴圈就會一直運行。在這個例子中，可以看到 n 永遠不會變成非正數。"
+   },
+   {
+    "answer": "answer 從 1 開始，每次迴圈都加上 n，因此它永遠是正數。",
+    "correct": false,
+    "feedback": "雖然 answer 永遠是正數，但迴圈條件並未考慮 answer 的值。"
+   },
+   {
+    "answer": "在 while 迴圈中，你不能將 n 與 0 進行比較。你必須將它與另一個變數比較。",
+    "correct": false,
+    "feedback": "雖然這是間接導致無限迴圈的原因，但比較 n 與 0 是合法的。"
+   },
+   {
+    "answer": "在 while 迴圈的主體中，我們必須將 n 設定為 False，而這段程式碼沒有這麼做。",
+    "correct": false,
+    "feedback": "迴圈條件必須變為 False 以使迴圈終止，但在這個例子中，n 本身並不是條件。"
+   }
+  ]
+ },
+ {
+  "question": "下列敘述會印出 HELLO 字串多少次？",
+  "code": "s = \"python rocks\"\nfor ch in s:\n    print(\"HELLO\")",
+  "answers": [
+   {
+    "answer": "10",
+    "correct": false,
+    "feedback": "逐項走訪序列時，每個項目只處理一次。"
+   },
+   {
+    "answer": "11",
+    "correct": false,
+    "feedback": "空白字元也是序列的一部分。"
+   },
+   {
+    "answer": "12",
+    "correct": true,
+    "feedback": "正確，共有 12 個字元，包括空白。"
+   },
+   {
+    "answer": "語法錯誤，for 敘述需要使用 range() 函數。",
+    "correct": false,
+    "feedback": "for 敘述實際可以搭配序列並逐項走訪序列。"
+   }
+  ]
+ }
+]

@@ -1,0 +1,158 @@
+[
+ {
+  "question": "以下語句會輸出什麼？",
+  "code": "print(\"Hello\\nWorld!\\tWelcome to \\\"Python\\\" programming.\\\\\")",
+  "answers": [
+   {
+    "answer": "Hello\nWorld!\tWelcome to \"Python\" programming.\\",
+    "correct": true,
+    "feedback": "正確！跳脫字元 \\n 會產生換行，\\t 會產生 Tab 鍵，\\\" 會顯示雙引號，而 \\\\ 會顯示反斜線。"
+   },
+   {
+    "answer": "Hello\\nWorld!\tWelcome to \"Python\" programming.\\",
+    "correct": false,
+    "feedback": "錯誤。\\n 跳脫字元會處理為換行，而不是字面顯示。"
+   },
+   {
+    "answer": "Hello\nWorld!\\tWelcome to \"Python\" programming.\\",
+    "correct": false,
+    "feedback": "錯誤。\\t 跳脫字元應該會產生 Tab 鍵，而不是顯示字面上的 \\t。"
+   },
+   {
+    "answer": "Hello\\nWorld!\\tWelcome to \\\"Python\\\" programming.\\\\",
+    "correct": false,
+    "feedback": "錯誤。這個答案顯示的是帶有跳脫字元的字面字串，而不是處理後的輸出。"
+   }
+  ]
+ },
+ {
+  "question": "以下程式碼會輸出什麼結果？",
+  "code": "s = \"python rocks\"\nprint(s[2] + s[-4])",
+  "answers": [
+   {
+    "answer": "tr",
+    "correct": false,
+    "feedback": "很接近了，t 在位置 2，從左到右從 0 開始計算；但 r 在 -5，從右到左從 -1 開始計算。"
+   },
+   {
+    "answer": "to",
+    "correct": true,
+    "feedback": "對於 -4，從右到左計算，從 -1 開始。"
+   },
+   {
+    "answer": "ps",
+    "correct": false,
+    "feedback": "p 在位置 0，而不是 2。"
+   },
+   {
+    "answer": "錯誤，不能將 [ ] 運算子與 + 運算子一起使用。",
+    "correct": false,
+    "feedback": "[ ] 運算子回傳一個字串，可以與另一個字串進行串聯。"
+   }
+  ]
+ },
+ {
+  "question": "下列程式碼會印出什麼？",
+  "code": "name = \"Alice\"\nage = 30\nbalance = 1234.5678\nprint(f\"{name} 是 {age} 歲，餘額為 {balance:.2f}\")",
+  "answers": [
+   {
+    "answer": "Alice 是 30 歲，餘額為 1234.57",
+    "correct": true,
+    "feedback": "正確！f-string 會將變數值代入並將餘額格式化為兩位小數。"
+   },
+   {
+    "answer": "Alice 是 30 歲，餘額為 1234.5678",
+    "correct": false,
+    "feedback": "錯誤。餘額已格式化為兩位小數，因此會四捨五入為 1234.57。"
+   },
+   {
+    "answer": "Alice 是 {age} 歲，餘額為 {balance:.2f}",
+    "correct": false,
+    "feedback": "錯誤。大括號內的表達式會被計算，而不是字面印出。"
+   },
+   {
+    "answer": "name 是 30 歲，餘額為 1234.57",
+    "correct": false,
+    "feedback": "錯誤。變數 'name' 應該被其值 'Alice' 取代。"
+   }
+  ]
+ },
+ {
+  "question": "<span class=\"pill pill-orange\">補充題</span> 執行下列程式碼會印出什麼？",
+  "code": "x = 7.2\nprint(f'{x:06.2f}')",
+  "answers": [
+   {
+    "answer": "7.20",
+    "correct": false,
+    "feedback": "06 表示總欄寬要補到 6 個字元，'7.20' 只有 4 個字元，還缺 2 個字元沒有補齊。"
+   },
+   {
+    "answer": "007.20",
+    "correct": true,
+    "feedback": "正確！:06.2f 先把 x 取到小數點後 2 位得到 7.20，再把總寬度補齊到 6 個字元，不足的部分因為前面的 0 而在左側補零，所以是 007.20。"
+   },
+   {
+    "answer": "7.2000",
+    "correct": false,
+    "feedback": "06.2f 中的 2 是小數位數，不是總寬度，小數只會到第 2 位，不會補到 4 位。"
+   },
+   {
+    "answer": " 7.20",
+    "correct": false,
+    "feedback": "06 的 0 表示補零而不是補空格，所以左側補的是 0，不是空格。"
+   }
+  ]
+ },
+ {
+  "question": "<span class=\"pill pill-orange\">補充題</span> 執行下列程式碼後，最後 print(s) 會輸出什麼？",
+  "code": "s = '  Data Science  '\nr = s.strip().upper()\nprint(s)",
+  "answers": [
+   {
+    "answer": "DATA SCIENCE",
+    "correct": false,
+    "feedback": "這是變數 r 的值。strip() 和 upper() 都會回傳新字串並指派給 r，不會修改變數 s 本身。"
+   },
+   {
+    "answer": "  Data Science  ",
+    "correct": true,
+    "feedback": "正確！字串是不可變（immutable）的，s.strip().upper() 只是回傳一個新字串指派給 r，原本的 s 完全沒有被改變，仍保留前後空白。"
+   },
+   {
+    "answer": "Data Science",
+    "correct": false,
+    "feedback": "這只是「假設」只呼叫 strip() 之後的結果，但程式中呼叫方法的結果被指派給 r，s 本身完全沒變。"
+   },
+   {
+    "answer": "程式會出現錯誤，因為字串是不可變的。",
+    "correct": false,
+    "feedback": "字串不可變指的是無法用索引賦值修改（如 s[0]='x'），呼叫方法本身不會出錯，只是會回傳新字串。"
+   }
+  ]
+ },
+ {
+  "question": "<span class=\"pill pill-orange\">補充題</span> 執行下列程式碼會印出什麼？",
+  "code": "s = 'Hello, World!'\nprint(s[7:-1])",
+  "answers": [
+   {
+    "answer": "World",
+    "correct": true,
+    "feedback": "正確！索引 7 是 'W'，-1 代表倒數第一個字元 '!' 的位置且切片不包含它，所以切出來的是 'World'。"
+   },
+   {
+    "answer": "World!",
+    "correct": false,
+    "feedback": "這是 s[7:]（不加 -1）的結果，會包含最後的驚嘆號；但 -1 會排除最後一個字元。"
+   },
+   {
+    "answer": " World",
+    "correct": false,
+    "feedback": "索引 7 對應到的字元是 'W'，不是空白，起始位置沒有多算一個空格。"
+   },
+   {
+    "answer": "orld",
+    "correct": false,
+    "feedback": "這是 s[8:-1] 的結果，比題目起始位置多跳過了一個字元 'W'。"
+   }
+  ]
+ }
+]

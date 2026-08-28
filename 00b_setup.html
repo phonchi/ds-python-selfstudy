@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>課前準備與環境安裝 — 課前準備 00B</title>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+  --node-white:#ffffff;--node-gray:#bdc3c7;--node-black:#34495e;
+  --node-current:#f39c12;--node-found:#16a085;--node-start:#9b59b6;
+  --edge-default:#95a5a6;--edge-tree:#27ae60;--edge-explore:#f39c12;--edge-mst:#1a6b4a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero h1 .purple{color:#bb8fce;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.05rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Hero mini-graph illustration */
+.hero-graph{position:absolute;right:5%;top:50%;transform:translateY(-50%);opacity:.18;pointer-events:none;}
+@media(max-width:900px){.hero-graph{display:none;}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.92em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+strong{color:var(--ink);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:34px;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+
+/* Graph SVG canvas */
+.graph-canvas{position:relative;width:100%;height:380px;background:#fafafa;border-radius:8px;overflow:hidden;border:1px solid #ececec;}
+.graph-canvas svg{width:100%;height:100%;display:block;}
+
+/* SVG elements styles */
+.graph-edge{stroke:var(--edge-default);stroke-width:2;fill:none;transition:stroke .25s, stroke-width .25s;}
+.graph-edge.tree{stroke:var(--edge-tree);stroke-width:3.5;}
+.graph-edge.exploring{stroke:var(--edge-explore);stroke-width:3.5;stroke-dasharray:5 4;animation:dash 1s linear infinite;}
+.graph-edge.mst{stroke:var(--edge-mst);stroke-width:4;}
+.graph-edge.path{stroke:var(--accent);stroke-width:4;}
+.graph-edge.dotted{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 4;}
+@keyframes dash{to{stroke-dashoffset:-18;}}
+
+.edge-label{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);pointer-events:none;}
+.edge-label-bg{fill:#fafafa;stroke:#ececec;stroke-width:1;}
+
+.graph-node{cursor:pointer;}
+.graph-node circle{fill:var(--node-white);stroke:var(--ink);stroke-width:2;transition:fill .25s, stroke .25s, r .2s;}
+.graph-node.gray circle{fill:var(--node-gray);}
+.graph-node.black circle{fill:var(--node-black);stroke:var(--node-black);}
+.graph-node.current circle{fill:var(--node-current);stroke:#d68910;stroke-width:3;}
+.graph-node.start circle{fill:var(--node-start);stroke:#7d3c98;stroke-width:3;}
+.graph-node.found circle{fill:var(--node-found);stroke:#117a65;stroke-width:3;}
+.graph-node.in-mst circle{fill:#82e0aa;stroke:var(--accent3);stroke-width:3;}
+.graph-node text.node-key{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none;}
+.graph-node.black text.node-key{fill:#fff;}
+.graph-node.current text.node-key{fill:#fff;}
+.graph-node.start text.node-key{fill:#fff;}
+.graph-node.found text.node-key{fill:#fff;}
+.graph-node text.node-meta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;fill:var(--accent);text-anchor:middle;pointer-events:none;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+.btn-toggle{background:var(--accent2);color:#fff;}
+.btn-toggle:hover{background:#1f2e5f;}
+.btn-toggle.off{background:#bbb;color:#555;}
+.btn-shuffle{background:#8e44ad;color:#fff;}
+.btn-shuffle:hover{background:#6c3485;}
+
+/* Slider row */
+.slider-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;background:var(--paper);border-radius:8px;margin-bottom:.5rem;}
+.slider-row .slider-label{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent2);font-weight:600;min-width:60px;}
+.slider-row input[type="range"]{flex:1;accent-color:var(--accent3);height:5px;cursor:pointer;}
+.slider-row .slider-val{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent);font-weight:600;min-width:60px;text-align:right;}
+
+/* Side panel */
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+.info-card .ic-row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.83rem;padding:.2rem 0;}
+.info-card .ic-label{color:var(--muted);}
+.info-card .ic-value{color:var(--ink);font-weight:600;}
+.info-card .ic-value.highlight{color:var(--accent);}
+.info-card .ic-value.big{font-size:1.4rem;color:var(--accent2);}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.4rem;}
+.stat-tile{background:var(--paper);border-radius:8px;padding:.5rem .7rem;text-align:center;}
+.stat-tile .stat-label{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+.stat-tile .stat-value{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent2);}
+
+/* Queue / Stack / PQ visualization */
+.ds-display{font-family:'JetBrains Mono',monospace;font-size:.8rem;background:var(--paper);border-radius:6px;padding:.5rem .7rem;min-height:36px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;border:1px dashed var(--card-border);}
+.ds-display .ds-empty{color:var(--muted);font-style:italic;}
+.ds-item{background:var(--accent2);color:#fff;padding:2px 8px;border-radius:4px;font-weight:600;}
+.ds-item.front{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-item.top{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-item.pq{background:var(--accent3);}
+.ds-item.pq.min{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-arrow{color:var(--muted);}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.6;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid var(--node-current);padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+.pseudo-code .str{color:#f1fa8c;}
+
+/* Adjacency table */
+.adj-display{margin:.5rem 0;font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.adj-matrix{border-collapse:collapse;margin:.5rem auto;}
+.adj-matrix td,.adj-matrix th{border:1px solid var(--card-border);padding:6px 10px;text-align:center;min-width:34px;background:#fff;}
+.adj-matrix th{background:var(--accent2);color:#fff;font-weight:700;}
+.adj-matrix td.zero{color:#ccc;}
+.adj-matrix td.nonzero{background:#eafaf1;color:var(--accent3);font-weight:700;}
+.adj-matrix td.highlight{background:#fff3cd;}
+.adj-list{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:.7rem 1rem;}
+.adj-list .adj-row{padding:3px 0;border-bottom:1px dashed var(--card-border);}
+.adj-list .adj-row:last-child{border-bottom:none;}
+.adj-list .adj-key{color:var(--accent);font-weight:700;display:inline-block;min-width:32px;}
+.adj-list .adj-arrow{color:var(--muted);margin:0 6px;}
+.adj-list .adj-neighbor{background:#eef2ff;color:var(--accent2);padding:1px 8px;border-radius:4px;margin:1px 3px;display:inline-block;font-weight:600;}
+
+/* Chess board for Knight's tour */
+.chess-board{display:grid;background:#fff;border:2px solid var(--ink);border-radius:6px;overflow:hidden;margin:.5rem auto;width:fit-content;}
+.chess-cell{display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:700;position:relative;transition:background .2s;}
+.chess-cell.light{background:#f0d9b5;color:#666;}
+.chess-cell.dark{background:#b58863;color:#fff;}
+.chess-cell.visited{background:#27ae60 !important;color:#fff;}
+.chess-cell.current{background:#f39c12 !important;color:#fff;box-shadow:inset 0 0 0 3px #d68910;}
+.chess-cell.start{background:#9b59b6 !important;color:#fff;}
+.chess-cell .knight{font-size:1.4em;line-height:1;}
+.chess-cell .step-num{font-size:.7em;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box.purple{background:#f4ecf7;border-color:#8e44ad;}
+.info-box.purple .info-label{background:#8e44ad;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+.pill-gray{background:rgba(0,0,0,.06);color:var(--muted);border:1px solid rgba(0,0,0,.12);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;margin:.6rem 0;font-family:'JetBrains Mono',monospace;font-size:.75rem;}
+.legend-item{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;background:var(--paper);border-radius:5px;}
+.legend-item .lg-swatch{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink);}
+.legend-item .lg-edge{width:18px;height:3px;border-radius:2px;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0;}
+.quiz-opt{display:flex;align-items:center;gap:.6rem;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;font-size:.86rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-letter{font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.wrong{background:#fef5e7;border-color:var(--accent);}
+.quiz-opt.wrong .opt-letter{color:var(--accent);}
+.quiz-feedback{margin-top:.7rem;padding:.7rem 1rem;border-radius:8px;font-size:.88rem;display:none;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct{background:#eafaf1;color:var(--accent3);border-left:4px solid var(--accent3);}
+.quiz-feedback.wrong{background:#fef5e7;color:var(--accent);border-left:4px solid var(--accent);}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:30px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+
+/* Distance / table inside graph viz */
+.vert-table{margin-top:.6rem;width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.78rem;}
+.vert-table th,.vert-table td{padding:4px 6px;text-align:center;border:1px solid var(--card-border);}
+.vert-table th{background:var(--accent2);color:#fff;font-weight:600;font-size:.74rem;}
+.vert-table td.tcell-current{background:#fff3cd;font-weight:700;color:var(--accent);}
+.vert-table td.tcell-done{background:#eafaf1;color:var(--accent3);}
+.vert-table td.tcell-inf{color:#ccc;}
+.sec-badge{font-size:.6em;color:var(--muted);border:1px solid var(--card-border);background:var(--card);padding:2px 10px;border-radius:999px;vertical-align:middle;margin-left:.6rem;font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.02em;white-space:nowrap;}
+
+/* Phase 8 shared widgets */
+.bs-stack{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;min-height:180px;justify-content:flex-start;padding:.6rem;}
+.bs-item{width:110px;text-align:center;padding:.4rem .6rem;background:#5b7eb8;color:#fff;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;box-shadow:0 2px 5px rgba(0,0,0,.15);}
+.bs-hl{background:#f39c12;}
+.bs-toplabel,.bq-label{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.bq-row{display:flex;align-items:center;gap:6px;min-height:64px;flex-wrap:wrap;padding:.4rem;}
+.bq-item{min-width:52px;text-align:center;padding:.45rem .5rem;background:#5b7eb8;color:#fff;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+.char-strip{display:flex;gap:3px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;padding:.4rem 0;}
+.char-cell{min-width:30px;text-align:center;padding:.35rem .25rem;border:1px solid var(--card-border);border-radius:5px;background:var(--card);}
+.char-cur{background:#f39c12;color:#fff;border-color:#f39c12;}
+.char-done{background:#e8f5ec;color:#1a6b4a;border-color:#bfe3cd;}
+.char-bad{background:#c0392b;color:#fff;border-color:#c0392b;}
+.token-out{display:flex;gap:4px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;min-height:40px;padding:.3rem 0;}
+.tok{padding:.3rem .55rem;border-radius:5px;background:#2c3e7a;color:#fff;font-weight:600;}
+.tok-op{background:#8e44ad;}
+.tok-new{outline:3px solid #f39c12;}
+.mono{font-family:'JetBrains Mono',monospace;}
+</style>
+<style>
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+</style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+</style>
+</head>
+<body>
+
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#prologue" data-target="prologue"><span class="fn-num">P00</span><span class="fn-name">為什麼先弄環境</span></a>
+  <a href="#colab" data-target="colab"><span class="fn-num">P01</span><span class="fn-name">方法一：Colab</span></a>
+  <a href="#anaconda" data-target="anaconda"><span class="fn-num">P02</span><span class="fn-name">方法二：Anaconda</span></a>
+  <a href="#vscode" data-target="vscode"><span class="fn-num">P03</span><span class="fn-name">方法三：VS Code</span></a>
+  <a href="#verify" data-target="verify"><span class="fn-num">P04</span><span class="fn-name">環境驗收</span></a>
+  <a href="#learnmode" data-target="learnmode"><span class="fn-num">P05</span><span class="fn-name">AI 家教模式</span></a>
+  <a href="#faq" data-target="faq"><span class="fn-num">P06</span><span class="fn-name">疑難排解</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">參考資源</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <svg class="hero-graph" width="300" height="260" viewBox="0 0 300 260">
+  <g stroke="#fff" stroke-width="2.5" fill="none" opacity=".85">
+    <rect x="45" y="45" width="210" height="150" rx="10"/>
+    <line x1="45" y1="78" x2="255" y2="78"/>
+    <circle cx="62" cy="61" r="5"/><circle cx="80" cy="61" r="5"/><circle cx="98" cy="61" r="5"/>
+    <line x1="70" y1="105" x2="150" y2="105"/>
+    <line x1="70" y1="130" x2="200" y2="130"/>
+    <line x1="70" y1="155" x2="120" y2="155"/>
+    <line x1="120" y1="195" x2="120" y2="215"/><line x1="90" y1="215" x2="210" y2="215"/>
+  </g>
+</svg>
+  <div class="hero-content">
+    <div class="chapter-tag">CHAPTER 00B</div>
+    <h1><span class="green">課前準備</span>與環境安裝</h1>
+    <div class="subtitle">三條路擇一，二十分鐘之內讓你能跑本課程的每一份 notebook。</div>
+    <div class="big-formula">Colab｜Anaconda｜VS Code｜pythonds3｜jupyterquiz｜jupytercards</div>
+    <div class="scroll-hint">向下捲動開始<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（課前準備 · 讀完再進第 01 章）</div>
+  <p>① <strong>照節次讀</strong>：每一節都短，不要跳著看。
+  ② <strong>動手驗證</strong>：有互動元件的地方先自己預測答案，再按按鈕對照。
+  ③ <strong>做完自我檢核</strong>再往下：答錯就回頭重讀該節。
+  ④ 最後翻 <a href="#cards">關鍵詞彙卡</a>，能不看答案講出定義才算過關。</p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#prologue"><span class="toc-num">P00</span>為什麼要先準備環境</a>
+    <a href="#colab"><span class="toc-num">P01</span>方法一：Google Colab</a>
+    <a href="#anaconda"><span class="toc-num">P02</span>方法二：Anaconda + Jupyter</a>
+    <a href="#vscode"><span class="toc-num">P03</span>方法三：VS Code / pip</a>
+    <a href="#verify"><span class="toc-num">P04</span>環境驗收</a>
+    <a href="#learnmode"><span class="toc-num">P05</span>Colab 的 AI 家教模式</a>
+    <a href="#faq"><span class="toc-num">P06</span>疑難排解</a>
+    <a href="#reference"><span class="toc-num">REF</span>參考資源</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<section id="prologue">
+  <div class="section-number">PROLOGUE · 開場</div>
+  <h2>為什麼要先把環境準備好？</h2>
+  <p>要寫 Python 程式，你需要兩樣東西：一個能<strong>執行</strong> Python 的直譯器，跟一個能<strong>寫</strong>程式的地方。這門課全部用 <strong>Jupyter Notebook</strong> —— 一種可以把說明文字、程式碼、執行結果放在同一份檔案裡的格式，非常適合邊讀邊試。</p>
+  <p>下面三條路都能達成，選一條做完就好。如果你完全沒有頭緒，<strong>直接選方法一（Colab）</strong>：不用安裝任何東西，開瀏覽器就能用。</p>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>方法</th><th>安裝時間</th><th>需要什麼</th><th>適合誰</th><th>限制</th></tr></thead>
+    <tbody>
+      <tr><td><strong>① Google Colab</strong><br><span class="pill pill-green">推薦</span></td><td>0 分鐘</td><td>Google 帳號、瀏覽器</td><td>所有人，尤其筆電空間不夠的</td><td>要有網路；<code>turtle</code> 畫圖不能用</td></tr>
+      <tr><td><strong>② Anaconda + Jupyter</strong></td><td>10–20 分鐘</td><td>約 5 GB 硬碟</td><td>想離線寫、想長期用 Python 的</td><td>佔空間；第一次裝比較久</td></tr>
+      <tr><td><strong>③ VS Code / pip</strong></td><td>5 分鐘</td><td>已裝好的 Python</td><td>已經有 Python 環境的人</td><td>要自己管虛擬環境</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="info-box">
+    <div class="info-label">💡 可以同時裝兩套嗎？</div>
+    <p style="margin-bottom:0;">可以，而且蠻常見的：平常用 Colab（隨開隨用、換電腦也不用重裝），第 06 章要跑 <code>turtle</code> 畫碎形樹的時候切到本機 Jupyter。兩者互不干擾。</p>
+  </div>
+</section>
+
+<section id="colab">
+  <div class="section-number">PART 01 · 方法一 · 免安裝</div>
+  <h2>Google Colab —— 在瀏覽器裡直接跑 Python <span class="sec-badge">推薦初學者</span></h2>
+  <p>Colab 是 Google 提供的免費雲端 Jupyter 環境。程式在 Google 的機器上跑，你只需要一個瀏覽器跟 Google 帳號。</p>
+
+  <div class="info-card">
+    <div class="ic-title">使用步驟 <span class="ic-badge">5 步</span></div>
+    <p style="font-size:.9rem;">① 開 <a href="https://colab.research.google.com/" target="_blank" rel="noopener">colab.research.google.com</a>，用 Google 帳號登入。<br>
+    ② 選「檔案 → 新增筆記本」，或直接把課程的 <code>.ipynb</code> 拖進去上傳。<br>
+    ③ 點一個程式碼儲存格，按 <code>Shift + Enter</code> 執行。<br>
+    ④ 第一次執行前，先跑下面那一格安裝套件。<br>
+    ⑤ 檔案會自動存進你的 Google 雲端硬碟（「Colab Notebooks」資料夾）。</p>
+  </div>
+
+  <div class="deck-extra">
+    <div class="dx-label">每次開新的 Colab session 都要先跑這一格</div>
+    <div class="pseudo-code" style="font-size:.85rem;"><span class="line"><span class="com"># 安裝本課程需要的三個套件（Colab 已內建 matplotlib）</span></span>
+<span class="line">!pip install -q pythonds3 jupyterquiz jupytercards</span></div>
+    <p class="dx-note">⚠️ <strong>Colab 的 runtime 一旦重開（閒置太久、或你自己選了「重新啟動」），裝好的套件會消失。</strong>這不是壞掉，是設計如此 —— 每次重連都重跑一次這一格就好，只要幾秒鐘。建議把它固定放在每份 notebook 的第一格。</p>
+  </div>
+
+  <div class="info-box green">
+    <div class="info-label">📁 想讀自己的檔案？掛載 Google Drive</div>
+    <div class="pseudo-code" style="font-size:.82rem;margin:.5rem 0;"><span class="line"><span class="kw">from</span> google.colab <span class="kw">import</span> drive</span>
+<span class="line">drive.mount(<span class="str">'/content/drive'</span>)</span></div>
+    <p style="margin-bottom:0;font-size:.88rem;">執行後會跳出授權視窗，同意之後檔案就在 <code>/content/drive/MyDrive/</code> 底下。第 08 章讀字梯字典檔時會用到類似的做法。</p>
+  </div>
+</section>
+
+<section id="anaconda">
+  <div class="section-number">PART 02 · 方法二 · 本機</div>
+  <h2>Anaconda + Jupyter —— 你自己的機器，離線也能寫</h2>
+  <p>Anaconda 是一包「Python + 常用科學運算套件 + 環境管理工具」的懶人包。裝完之後你的電腦就有一套完整、離線可用的環境，而且 <code>turtle</code> 繪圖能正常運作（第 06 章遞迴會用到）。</p>
+
+  <div class="info-card">
+    <div class="ic-title">安裝步驟 <span class="ic-badge">4 步</span></div>
+    <p style="font-size:.9rem;">① 到 <a href="https://www.anaconda.com/download" target="_blank" rel="noopener">anaconda.com/download</a> 下載對應作業系統的版本（約 1 GB，安裝後約佔 5 GB）。<br>
+    ② 一路下一步裝完。Windows 使用者建議勾選「Add to PATH」。<br>
+    ③ 打開「Anaconda Prompt」（Windows）或終端機（macOS / Linux），建立這門課專用的環境並安裝套件。<br>
+    ④ 啟動 Jupyter，瀏覽器會自動開啟。</p>
+  </div>
+
+  <div class="deck-extra">
+    <div class="dx-label">終端機指令（第 ③ ④ 步）</div>
+    <div class="pseudo-code" style="font-size:.85rem;"><span class="line"><span class="com"># 建一個獨立環境，避免跟你其他專案的套件版本打架</span></span>
+<span class="line">conda create -n ds python=3.11 -y</span>
+<span class="line">conda activate ds</span>
+<span class="line"> </span>
+<span class="line">pip install pythonds3 jupyterquiz jupytercards matplotlib notebook</span>
+<span class="line"> </span>
+<span class="line"><span class="com"># 切到放課程 notebook 的資料夾，再啟動</span></span>
+<span class="line">jupyter notebook</span></div>
+    <p class="dx-note">用 <code>conda create</code> 開獨立環境是好習慣：以後某個專案需要不同版本的套件時，不會把這門課的環境弄壞。之後每次要用，先 <code>conda activate ds</code> 再啟動 Jupyter。</p>
+  </div>
+</section>
+
+<section id="vscode">
+  <div class="section-number">PART 03 · 方法三 · 輕量</div>
+  <h2>VS Code 或 pip —— 已經有 Python 的人走這條</h2>
+  <p>如果你電腦裡已經有 Python 3.9 以上，不必再裝 Anaconda。</p>
+
+  <div class="deck-extra">
+    <div class="dx-label">用虛擬環境 + pip</div>
+    <div class="pseudo-code" style="font-size:.85rem;"><span class="line"><span class="com"># 在課程資料夾裡建立虛擬環境</span></span>
+<span class="line">python -m venv .venv</span>
+<span class="line"> </span>
+<span class="line"><span class="com"># 啟用（macOS / Linux）</span></span>
+<span class="line">source .venv/bin/activate</span>
+<span class="line"><span class="com"># 啟用（Windows PowerShell）</span></span>
+<span class="line">.venv\Scripts\Activate.ps1</span>
+<span class="line"> </span>
+<span class="line">pip install pythonds3 jupyterquiz jupytercards matplotlib notebook</span></div>
+    <p class="dx-note">VS Code 使用者：安裝官方的 <strong>Python</strong> 與 <strong>Jupyter</strong> 兩個擴充套件，直接開 <code>.ipynb</code> 就能跑。右上角記得把 kernel 選成你剛剛建立的 <code>.venv</code>，這是最常見的「明明裝了卻說找不到套件」的原因。</p>
+  </div>
+</section>
+
+<section id="verify">
+  <div class="section-number">PART 04 · 驗收</div>
+  <h2>跑這一段，就知道環境好了沒</h2>
+  <p>不管你選哪一條路，把下面這段貼進一個儲存格執行。<strong>沒有噴錯、而且印出四行，就代表環境沒問題。</strong></p>
+
+  <div class="deck-extra">
+    <div class="dx-label">環境驗收 snippet</div>
+    <div class="pseudo-code" style="font-size:.85rem;"><span class="line"><span class="kw">import</span> sys, matplotlib</span>
+<span class="line"><span class="kw">from</span> pythonds3.basic <span class="kw">import</span> Stack, Queue, Deque</span>
+<span class="line"><span class="kw">from</span> pythonds3.trees <span class="kw">import</span> BinaryTree</span>
+<span class="line"><span class="kw">from</span> pythonds3.graphs <span class="kw">import</span> Graph</span>
+<span class="line"><span class="kw">from</span> pythonds3.trees.priority_queue <span class="kw">import</span> PriorityQueue</span>
+<span class="line"><span class="kw">import</span> jupyterquiz, jupytercards</span>
+<span class="line"> </span>
+<span class="line">s = <span class="fn">Stack</span>()</span>
+<span class="line">s.<span class="fn">push</span>(<span class="num">42</span>)</span>
+<span class="line">s.<span class="fn">push</span>(<span class="num">7</span>)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">'Python     '</span>, sys.version.split()[<span class="num">0</span>])</span>
+<span class="line"><span class="fn">print</span>(<span class="str">'matplotlib '</span>, matplotlib.__version__)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">'Stack  pop/peek/size ->'</span>, s.<span class="fn">pop</span>(), s.<span class="fn">peek</span>(), s.<span class="fn">size</span>())</span>
+<span class="line"><span class="fn">print</span>(<span class="str">'環境檢查通過，可以開始第 01 章。'</span>)</span></div>
+    <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>Python      3.13.12
+matplotlib  3.10.9
+Stack  pop/peek/size -> 7 42 1
+環境檢查通過，可以開始第 01 章。</pre></div>
+    <p class="dx-note">版本號跟你的不一樣沒關係，Python 3.9 以上都可以。重點是<strong>六行 import 全部沒噴錯</strong>，而且第三行印出 <code>7 42 1</code> —— 那代表 <code>pythonds3</code> 的 Stack 真的能用。</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">六行 import 沒噴錯</div></div>
+    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">印出 7 42 1</div></div>
+    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">能新增並執行儲存格</div></div>
+    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">檔案存得起來</div></div>
+  </div>
+  <p style="margin-top:1rem;">四項都打勾就可以往下走了。接下來去 <a href="introduction.html">第 01 章 · Python 導論</a>；若對 Python 本身還不熟，先掃 <a href="index.html#prereq">先備頁 P1–P9</a>（選讀，不評分）。</p>
+</section>
+
+<section id="learnmode">
+  <div class="section-number">PART 05 · AI 家教</div>
+  <h2>把 Colab 的 Gemini 調成「家教模式」而不是「代工模式」</h2>
+  <p><a href="00a_why_code.html">00A</a> 說過：AI 要當助教，不要當代工。Colab 內建的 Gemini 提供兩個設定，剛好能把它調成家教。</p>
+
+  <div class="info-card">
+    <div class="ic-title">Learn Mode 學習模式 <span class="ic-badge">推薦打開</span></div>
+    <p style="font-size:.9rem;margin-bottom:0;">在 Colab 右下角的 Gemini 面板裡切換到 <strong>Learn</strong>。開啟後它會改成一步一步引導你、反問你想法，而不是直接吐出完整解答。對自學來說這是<strong>加速</strong>學習迴圈，不是<strong>繞過</strong>它。</p>
+  </div>
+
+  <div class="info-card">
+    <div class="ic-title">Custom Instructions 自訂指令 <span class="ic-badge">可貼上</span></div>
+    <p style="font-size:.9rem;">在 Gemini 設定裡找到自訂指令，貼上類似這樣的一段：</p>
+    <div class="pseudo-code" style="font-size:.8rem;"><span class="line">我正在修一門資料結構與演算法的課，使用 Python 與 pythonds3。</span>
+<span class="line">請不要直接給我完整的解答程式碼。</span>
+<span class="line">請改成：先反問我目前的想法，指出我的錯誤在哪一行、為什麼，</span>
+<span class="line">並提示下一步該想什麼。只有在我明確說「給我完整答案」時才給。</span>
+<span class="line">回答時請一併說明這段程式的時間複雜度。</span></div>
+    <p class="dx-note" style="margin-top:.5rem;">最後一行很值得加：讓它每次都順便講複雜度，你會被動地熟悉這門課最重要的思考方式。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="info-label">⚠️ 提醒</div>
+    <p style="margin-bottom:0;">AI 給的程式碼<strong>你要為它負責</strong>。作業與考試考的是你會不會，不是它會不會。把它當成隨時在旁邊的助教：可以問、可以吵、但最後那一行要自己按下去。</p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="section-number">PART 06 · 疑難排解</div>
+  <h2>常見問題</h2>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>症狀</th><th>原因與解法</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="mono" style="font-size:.82rem;">ModuleNotFoundError:<br>No module named 'pythonds3'</td>
+        <td>① 在 Colab：runtime 重開過了，重跑安裝那一格。② 在本機：套件名稱是 <code>pythonds3</code> 不是 <code>pythonds</code>。③ VS Code：右上角的 kernel 選錯環境了。</td>
+      </tr>
+      <tr>
+        <td class="mono" style="font-size:.82rem;">turtle 在 Colab<br>畫不出東西</td>
+        <td><strong>這是預期的。</strong><code>turtle</code> 需要本機視窗，雲端環境沒有。第 06 章的螺旋、碎形樹、Sierpinski 三角形請改用本機 Jupyter；或在 Colab 裝 <code>ColabTurtle</code> 這個替代套件（圖形較陽春）。本站的 06 章有等價的互動視覺化，讀網頁不受影響。</td>
+      </tr>
+      <tr>
+        <td class="mono" style="font-size:.82rem;">matplotlib 中文<br>顯示成方框</td>
+        <td>系統缺中文字型。畫圖前指定一個有中文的字型即可，例如 <code>plt.rcParams['font.sans-serif'] = ['Noto Sans CJK TC']</code>；Colab 上需先安裝字型套件。</td>
+      </tr>
+      <tr>
+        <td class="mono" style="font-size:.82rem;">RecursionError:<br>maximum recursion depth</td>
+        <td>不是環境壞掉，是<strong>遞迴沒有正確收斂</strong>。第 06 章會詳細講；先檢查基底情況有沒有寫、以及每次呼叫是不是真的讓問題變小。</td>
+      </tr>
+      <tr>
+        <td>作業要交 <code>.ipynb</code>，<br>Colab 怎麼下載？</td>
+        <td>「檔案 → 下載 → 下載 .ipynb」。交出去之前建議先「執行階段 → 全部執行」確認整份從頭到尾跑得過。</td>
+      </tr>
+      <tr>
+        <td>一定要有 Google 帳號嗎？</td>
+        <td>用 Colab 需要。不想用的話走方法二或方法三，完全在本機完成。</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="reference">
+  <div class="section-number">REFERENCE · 參考資源</div>
+  <h2>參考資源</h2>
+  <table class="cmp-table">
+    <thead><tr><th>資源</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a></td><td>免安裝的雲端 Jupyter 環境。</td></tr>
+      <tr><td><a href="https://www.anaconda.com/download" target="_blank" rel="noopener">Anaconda</a></td><td>本機 Python + Jupyter 懶人包。</td></tr>
+      <tr><td><a href="https://pypi.org/project/pythonds3/" target="_blank" rel="noopener">pythonds3（PyPI）</a></td><td>教科書配套的資料結構套件，本課全程使用。</td></tr>
+      <tr><td><a href="https://github.com/phonchi/nsysu-math208-2025" target="_blank" rel="noopener">nsysu-math208-2025</a></td><td>課程講義、投影片與 notebook。</td></tr>
+      <tr><td><a href="https://pythontutor.com/" target="_blank" rel="noopener">Python Tutor</a></td><td>逐行視覺化執行過程，不需要安裝任何東西。</td></tr>
+      <tr><td><a href="https://github.com/RunestoneInteractive/pythonds" target="_blank" rel="noopener">pythonds 教科書原文</a></td><td>本站每章 §徽章對應的章節。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="00a_why_code.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">為什麼還要學資料結構</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="introduction.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">Python 導論</div></a></div>
+</div>
+
+<footer>
+  課前準備 00B · 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============ shared utilities ============ */
+const $ = id => document.getElementById(id);
+
+function quizCheck(quizId, optEl) {
+  const isCorrect = optEl.dataset.correct === 'true';
+  optEl.parentElement.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('correct','wrong'));
+  optEl.classList.add(isCorrect ? 'correct' : 'wrong');
+  const fb = $(quizId + 'Feedback');
+  fb.classList.remove('correct','wrong');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  fb.innerHTML = (isCorrect ? '<strong>正確 ✓</strong> ' : '<strong>不對 ✗</strong> ') + (optEl.dataset.fb || '');
+}
+
+function hlLine(rootId, n) {
+  const root = $(rootId);
+  if (!root) return;
+  root.querySelectorAll('.line').forEach(l => l.classList.remove('active'));
+  if (n != null) {
+    const line = root.querySelector(`.line[data-l="${n}"]`);
+    if (line) line.classList.add('active');
+  }
+}
+
+/* step player: frames = [{...}], apply(frame) renders */
+class Player {
+  constructor({frames, apply, delayInput, onDone}) {
+    this.frames = frames; this.apply = apply;
+    this.delayInput = delayInput; this.i = -1; this.timer = null;
+    this.onDone = onDone || (()=>{});
+  }
+  step() {
+    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+    this.i += 1; this.apply(this.frames[this.i]);
+  }
+  play() {
+    this.stop();
+    const tick = () => {
+      if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+      this.step();
+      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+    };
+    tick();
+  }
+  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
+  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+}
+
+function setStatus(id, html) {
+  const el = $(id); if (el) el.querySelector('.status-text').innerHTML = html;
+}
+
+/* vertical box stack renderer (DOM) */
+function renderBoxStack(containerId, items, opts={}) {
+  const el = $(containerId); if (!el) return;
+  const hl = opts.highlight ?? -1;   // index from top (0 = top)
+  el.innerHTML = '';
+  const label = document.createElement('div');
+  label.className = 'bs-toplabel';
+  label.textContent = items.length ? 'top ↓' : '(empty)';
+  el.appendChild(label);
+  items.slice().reverse().forEach((v, idx) => {
+    const d = document.createElement('div');
+    d.className = 'bs-item' + (idx === hl ? ' bs-hl' : '');
+    d.textContent = v;
+    el.appendChild(d);
+  });
+}
+
+/* horizontal queue renderer: front at left */
+function renderBoxQueue(containerId, items, opts={}) {
+  const el = $(containerId); if (!el) return;
+  el.innerHTML = '';
+  const front = document.createElement('div');
+  front.className = 'bq-label'; front.textContent = items.length ? 'front →' : '(empty)';
+  el.appendChild(front);
+  items.forEach((v, idx) => {
+    const d = document.createElement('div');
+    d.className = 'bq-item' + (idx === (opts.highlight ?? -1) ? ' bs-hl' : '');
+    d.textContent = v;
+    el.appendChild(d);
+  });
+  const rear = document.createElement('div');
+  rear.className = 'bq-label'; rear.textContent = items.length ? '← rear' : '';
+  el.appendChild(rear);
+}
+
+/* floating nav scroll spy */
+(function setupNav() {
+  const nav = $('floatNav');
+  const links = nav.querySelectorAll('a[data-target]');
+  const sections = Array.from(links).map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update() {
+    const y = window.scrollY + window.innerHeight * 0.3;
+    let active = sections[0]?.id;
+    for (const s of sections) if (s.offsetTop <= y) active = s.id;
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+
+
+</script>
+<script>
+const FLASHCARDS = [{"front": "直譯器（Interpreter）", "back": "逐行讀取並執行程式碼的程式。你電腦上的 python 指令就是直譯器；Colab 則是把直譯器放在 Google 的機器上，你透過瀏覽器操作它。"}, {"front": "Jupyter 筆記本（Jupyter Notebook）", "back": "把說明文字、程式碼與執行結果放在同一份 .ipynb 檔案裡的互動式格式。以「儲存格（cell）」為單位執行，適合邊讀邊試，本課程全程使用。"}, {"front": "儲存格（Cell）", "back": "Notebook 的最小執行單位，分成程式碼與文字兩種。按 Shift + Enter 執行目前的儲存格並跳到下一格。"}, {"front": "執行階段（Runtime）", "back": "實際跑你程式的那個行程與它的記憶體狀態。Colab 的 runtime 閒置太久會被回收，屆時已安裝的套件與變數都會消失，需要重跑安裝與初始化的儲存格。"}, {"front": "套件管理工具（Package Manager, pip / conda）", "back": "負責下載、安裝與升級第三方套件的工具。本課程用它安裝 pythonds3、jupyterquiz 與 jupytercards。在 notebook 裡要在指令前加驚嘆號，例如 !pip install。"}, {"front": "虛擬環境（Virtual Environment）", "back": "一個彼此隔離的套件安裝空間，例如 conda create -n ds 或 python -m venv。用意是讓不同專案各自持有自己的套件版本，不會互相破壞。"}, {"front": "核心（Kernel）", "back": "Notebook 背後負責執行程式碼的直譯器行程。VS Code 或 Jupyter 裡「明明裝了套件卻說找不到」，最常見的原因就是選到了另一個環境的 kernel。"}, {"front": "pythonds3", "back": "教科書 Problem Solving with Algorithms and Data Structures using Python 的配套套件，提供 Stack、Queue、Deque、BinaryTree、Graph、PriorityQueue 等現成實作，本課程全程使用。"}, {"front": "海龜繪圖（Turtle Graphics）", "back": "Python 標準函式庫的繪圖模組，第 06 章用它畫螺旋與碎形樹。它需要本機視窗，因此在 Colab 這類雲端環境無法使用。"}, {"front": "學習模式（Learn Mode）", "back": "Colab 內建 Gemini 的一種對話模式：改成一步步引導與反問，而不是直接給出完整解答。目的是加速學習迴圈而不是繞過它。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+</script>
+</body>
+</html>

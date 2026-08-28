@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>串列與元組 — 先備 P4（Python）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f39c12;letter-spacing:.3em;margin-bottom:.8rem;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{font-family:'JetBrains Mono',monospace;color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.0rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:40px;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box p:last-child{margin-bottom:0;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.65;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid #f39c12;padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .str{color:#f1fa8c;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+
+/* Preset buttons */
+.preset-row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 1rem;}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:.4rem .85rem;border-radius:6px;border:2px solid var(--card-border);background:var(--card);cursor:pointer;transition:all .2s;color:var(--ink);}
+.preset-btn:hover{border-color:var(--accent2);}
+.preset-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+
+/* Variable state table */
+.var-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+.var-table td{padding:.25rem .4rem;border-bottom:1px dashed var(--card-border);}
+.var-table td.vname{color:var(--accent2);font-weight:600;}
+.var-table td.vval{color:var(--ink);}
+.var-table td.vtype{color:var(--muted);font-size:.72rem;text-align:right;}
+.var-table tr.changed td{background:var(--highlight);}
+.var-empty{color:var(--muted);font-size:.8rem;font-style:italic;}
+
+/* Console */
+.console{background:#111;border-radius:8px;padding:.6rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#d4d4d4;min-height:70px;max-height:220px;overflow-y:auto;line-height:1.6;}
+.console .out-line{white-space:pre-wrap;}
+.console .out-line.new{color:#2ecc71;}
+.console .in-line{color:#f39c12;}
+.console .err-line{color:#e74c3c;}
+
+/* Expression stepper */
+.expr-view{background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.6rem 1rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.5rem;letter-spacing:.05em;min-height:90px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.2rem;}
+.expr-view .hl{background:var(--highlight);border:2px solid #f39c12;border-radius:6px;padding:0 .35rem;color:#b9770e;}
+.expr-view .result{color:var(--accent3);font-weight:700;}
+
+/* Object/tag visualization (variables) */
+.obj-canvas{position:relative;background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.2rem;min-height:150px;display:flex;align-items:center;justify-content:center;gap:2.2rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.obj-box{border:2px solid var(--accent2);border-radius:10px;padding:.6rem 1.1rem;background:#fff;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600;color:var(--ink);position:relative;transition:all .3s;box-shadow:0 3px 10px rgba(0,0,0,.06);}
+.obj-box .obj-type{position:absolute;top:-10px;right:-8px;font-size:.62rem;background:var(--accent2);color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;}
+.obj-box.faded{opacity:.3;border-style:dashed;}
+.obj-box.faded::after{content:'（被遺忘 → 資源回收）';position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:.62rem;color:var(--muted);white-space:nowrap;}
+.obj-box .tag{position:absolute;top:-34px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:12px;white-space:nowrap;transition:all .3s;}
+.obj-box .tag::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--accent);}
+
+/* Sandbox */
+.sandbox{background:var(--card);border:2px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.sandbox .sandbox-label{position:absolute;top:-11px;left:14px;background:var(--accent3);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.input-row{display:flex;gap:.5rem;align-items:center;margin:.5rem 0;flex-wrap:wrap;}
+.input-row label{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent2);font-weight:600;}
+.input-row input[type="text"]{font-family:'JetBrains Mono',monospace;font-size:.9rem;padding:.45rem .7rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;flex:1;min-width:160px;}
+.sandbox-result{margin-top:.6rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.9rem;min-height:46px;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.sandbox-result .ok{color:#2ecc71;font-weight:700;}
+.sandbox-result .bad{color:#e67e22;font-weight:700;}
+.sandbox-result .type-badge{background:#50fa7b;color:#1a1a2e;font-weight:700;padding:1px 10px;border-radius:4px;font-size:.82rem;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+.quiz-box .quiz-label .multi-badge{background:#8e44ad;color:#fff;font-size:.68rem;padding:1px 8px;border-radius:3px;}
+.quiz-box .quiz-q{font-weight:600;margin-bottom:.6rem;}
+.quiz-box .quiz-code{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:.6rem .9rem;font-family:'JetBrains Mono',monospace;font-size:.84rem;margin-bottom:.8rem;white-space:pre-wrap;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0 0;}
+.quiz-opt{display:flex;flex-direction:column;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:.9rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-head{display:flex;align-items:baseline;gap:.6rem;}
+.quiz-opt .opt-letter{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt .opt-fb{display:none;font-size:.82rem;margin-top:.4rem;padding-top:.4rem;border-top:1px dashed var(--card-border);color:#555;}
+.quiz-opt.revealed .opt-fb{display:block;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.correct .opt-fb{color:#14532d;}
+.quiz-opt.wrong{background:#fef5e7;border-color:#d68910;}
+.quiz-opt.wrong .opt-letter{color:#d68910;}
+.quiz-progress{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;margin:.8rem 0;}
+
+/* Flashcards */
+.card-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.flashcard{perspective:900px;height:150px;cursor:pointer;}
+.flashcard .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .fc-inner{transform:rotateY(180deg);}
+.flashcard .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.flashcard .fc-front{background:linear-gradient(150deg,#2c3e7a,#1a1a2e);color:#fff;font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;letter-spacing:.05em;flex-direction:column;gap:.4rem;}
+.flashcard .fc-front .fc-hint{font-size:.66rem;color:rgba(255,255,255,.45);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.flashcard .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.8rem;line-height:1.6;transform:rotateY(180deg);overflow-y:auto;}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:34px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+/* Chapter nav */
+.chapter-nav{display:flex;justify-content:space-between;gap:1rem;margin:2rem 0 0;flex-wrap:wrap;}
+.chapter-nav a{flex:1;min-width:220px;background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1rem 1.3rem;text-decoration:none;color:var(--ink);transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.chapter-nav a:hover{border-color:var(--accent2);transform:translateY(-2px);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.1em;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+footer a{color:var(--accent2);}
+
+/* ============================================================
+   CH04 新增樣式：切片格子 / list 方法動畫 / 多標籤物件方塊
+   ============================================================ */
+.seq-row{display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;margin:0 0 1rem;}
+.seq-cell-wrap{display:flex;flex-direction:column;align-items:center;gap:.25rem;}
+.seq-idx{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--accent3);height:1em;}
+.seq-idx.neg{color:var(--muted);}
+.seq-cell{position:relative;min-width:64px;padding:.55rem .5rem;display:flex;align-items:center;justify-content:center;border:2px solid var(--card-border);border-radius:8px;background:#fff;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.8rem;transition:all .3s;}
+.seq-cell.hit{background:var(--highlight);border-color:#f39c12;color:#b9770e;transform:translateY(-4px);box-shadow:0 4px 10px rgba(243,156,18,.3);}
+.seq-cell.newcell{background:#eafaf1;border-color:var(--accent3);color:#14532d;animation:popIn .4s ease;}
+.seq-cell.shifted{border-color:#2980b9;}
+.seq-cell.removed{opacity:.3;border-style:dashed;text-decoration:line-through;}
+.seq-cell .order-badge{position:absolute;top:-9px;right:-9px;background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;}
+@keyframes popIn{0%{transform:scale(.4);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.slice-expr{font-family:'JetBrains Mono',monospace;text-align:center;font-size:.95rem;color:var(--accent2);margin-bottom:.6rem;}
+.obj-box .tag.tag-a{left:26%;}
+.obj-box .tag.tag-b{left:74%;}
+.obj-box.pulse{box-shadow:0 0 0 3px rgba(243,156,18,.55);}
+
+/* --- New rules for this page only --- */
+/* 🎮 Game box */
+.game-box{background:linear-gradient(150deg,#1a1a2e 0%,#232345 100%);border-radius:14px;padding:1.5rem 1.7rem;margin:1.5rem 0;color:#fff;position:relative;overflow:hidden;}
+.game-box::before{content:'🎮';position:absolute;top:-14px;right:6px;font-size:5.2rem;opacity:.08;}
+.game-box .gb-tag{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#f39c12;letter-spacing:.2em;margin-bottom:.4rem;}
+.game-box h3{color:#fff;margin-top:0;}
+.game-box p{color:rgba(255,255,255,.82);}
+.game-console{background:#111;border-radius:8px;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#d4d4d4;min-height:120px;max-height:260px;overflow-y:auto;line-height:1.7;margin:.8rem 0;}
+.game-console .g-sys{color:#5dade2;}
+.game-console .g-win{color:#2ecc71;font-weight:700;}
+.game-console .g-lose{color:#e74c3c;font-weight:700;}
+.game-console .g-me{color:#f39c12;}
+.game-input-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.game-input-row input{font-family:'JetBrains Mono',monospace;font-size:.95rem;padding:.5rem .8rem;border:none;border-radius:8px;width:130px;}
+.game-note{font-size:.8rem;color:rgba(255,255,255,.72);margin-top:.7rem;}
+.game-note a{color:#2ecc71;}
+
+/* 🤖 Ask-AI exercise box */
+.ai-box{background:var(--card);border:2px dashed #8e44ad;border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.ai-box .ai-label{position:absolute;top:-11px;left:14px;background:#8e44ad;color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.ai-box p:last-child{margin-bottom:0;}
+.ai-box .ai-prompt{font-family:'JetBrains Mono',monospace;font-size:.85rem;background:rgba(142,68,173,.08);border-radius:6px;padding:.4rem .8rem;display:block;margin:.4rem 0;color:#6c3485;}
+
+/* 🎓 Chapter-end bridge */
+.bridge-box{background:#eafaf1;border:2px solid var(--accent3);border-radius:12px;padding:1.3rem 1.5rem;margin:2rem 0 0;}
+.bridge-box .bb-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent3);font-weight:700;letter-spacing:.12em;margin-bottom:.5rem;}
+.bridge-box ul{margin:.3rem 0 .8rem 1.3rem;font-size:.92rem;}
+.bridge-box .bb-next{font-size:.9rem;color:var(--accent2);border-top:1px dashed var(--accent3);padding-top:.6rem;margin-bottom:0;}
+
+/* 深色容器內的可讀性修正（code/summary/pill 在深色背景上原樣式太深） */
+.game-box code,.cta-box code{background:rgba(255,255,255,.14);color:#8be9fd;}
+.game-box details summary{cursor:pointer;color:#5dade2;font-size:.85rem;}
+.game-box .pill{background:rgba(255,255,255,.14);color:#f1fa8c;border-color:rgba(255,255,255,.28);}
+.game-box a{color:#2ecc71;}
+.cta-box a{color:#2ecc71;}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+
+/* ===== 題庫自測區 ===== */
+.sq-item{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.sq-item .sq-q{font-weight:700;margin-bottom:.7rem;}
+.sq-item .sq-q .sq-num{font-family:'JetBrains Mono',monospace;color:var(--accent);margin-right:.4rem;}
+.sq-opts{display:flex;flex-direction:column;gap:.45rem;}
+.sq-opt{text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;line-height:1.6;padding:.55rem .9rem;border-radius:8px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;}
+.sq-opt:hover{border-color:var(--accent2);}
+.sq-opt.correct{border-color:var(--accent3);background:rgba(26,107,74,.10);}
+.sq-opt.wrong{border-color:var(--accent);background:rgba(192,57,43,.08);}
+.sq-fb{display:none;margin-top:.7rem;font-size:.86rem;line-height:1.7;border-left:4px solid var(--accent2);padding:.5rem .9rem;background:var(--paper);border-radius:0 8px 8px 0;}
+.sq-fb.show{display:block;}
+.sq-fb.good{border-left-color:var(--accent3);}
+.sq-fb.bad{border-left-color:var(--accent);}
+
+.sq-code{background:var(--code-bg);color:var(--code-fg);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;padding:.7rem .9rem;border-radius:8px;margin:.2rem 0 .8rem;overflow-x:auto;white-space:pre;}
+</style>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<!-- Floating navigation sidebar -->
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#intro" data-target="intro"><span class="fn-num">P01</span><span class="fn-name">容器與序列簡介</span></a>
+  <a href="#indexing" data-target="indexing"><span class="fn-num">P02</span><span class="fn-name">索引與 len()</span></a>
+  <a href="#slicing" data-target="slicing"><span class="fn-num">P03</span><span class="fn-name">切片子串列</span></a>
+  <a href="#mutate" data-target="mutate"><span class="fn-num">P04</span><span class="fn-name">修改與刪除</span></a>
+  <a href="#concat" data-target="concat"><span class="fn-num">P05</span><span class="fn-name">串接與重複</span></a>
+  <a href="#iterate" data-target="iterate"><span class="fn-num">P06</span><span class="fn-name">遍歷與 in</span></a>
+  <a href="#methods" data-target="methods"><span class="fn-num">P07</span><span class="fn-name">常見方法動畫</span></a>
+  <a href="#comprehension" data-target="comprehension"><span class="fn-num">P08</span><span class="fn-name">串列生成式</span></a>
+  <a href="#seqtypes" data-target="seqtypes"><span class="fn-num">P09</span><span class="fn-name">序列型別家族</span></a>
+  <a href="#tuple" data-target="tuple"><span class="fn-num">P10</span><span class="fn-name">元組與拆解</span></a>
+  <a href="#refs" data-target="refs"><span class="fn-num">P11</span><span class="fn-name">參照 vs 複製</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">速查表</span></a>
+  <a href="#bankquiz" data-target="bankquiz"><span class="fn-num">QUIZ</span><span class="fn-name">自我檢測</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="chapter-tag">PREREQ P4</div>
+    <h1><span class="blue">串列</span>與<span class="green">元組</span>：第一個容器</h1>
+    <div class="subtitle">先備知識複習 · 選讀，不列入作業與考試範圍</div>
+    <div class="big-formula">list[start:stop:step]｜append/insert/sort｜tuple｜參照 vs 複製</div>
+    <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（先備複習 · 選讀，不列入評分）</div>
+  <p>① 這頁複習資料結構課程<strong>預設你已經會</strong>的 Python。已經熟的可以直接跳過。
+  ② 每節都附一個<strong>「這在資料結構課哪裡會用到」</strong>的小方框——那才是你該記住的部分。
+  ③ 讀完做 <a href="#bankquiz">自我檢測</a>，再翻 <a href="#cards">關鍵詞彙卡</a>。
+  <br><strong>本頁屬補充先備知識，不列入作業與考試範圍。</strong></p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#intro"><span class="toc-num">P01</span>容器與序列簡介</a>
+    <a href="#indexing"><span class="toc-num">P02</span>索引與 len()</a>
+    <a href="#slicing"><span class="toc-num">P03</span>切片子串列（互動試算器）</a>
+    <a href="#mutate"><span class="toc-num">P04</span>修改與刪除</a>
+    <a href="#concat"><span class="toc-num">P05</span>串接與重複</a>
+    <a href="#iterate"><span class="toc-num">P06</span>遍歷與 in / not in</a>
+    <a href="#methods"><span class="toc-num">P07</span>常見方法逐步動畫</a>
+    <a href="#comprehension"><span class="toc-num">P08</span>串列生成式</a>
+    <a href="#seqtypes"><span class="toc-num">P09</span>序列型別家族</a>
+    <a href="#tuple"><span class="toc-num">P10</span>元組與序列拆解</a>
+    <a href="#refs"><span class="toc-num">P11</span>參照 vs 複製</a>
+    <a href="#reference"><span class="toc-num">REF</span>本章速查表</a>
+    <a href="#bankquiz"><span class="toc-num">QUIZ</span>自我檢測</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<section id="intro">
+  <div class="section-number">PART 01 · 簡介</div>
+  <h2>容器與序列：不只能裝一個值</h2>
+  <p style="color:var(--accent3);font-weight:600;">🎯 這一章的終點：學完 list 和 tuple，你就能親手寫出經典猜數字遊戲「1A2B」——先把基礎練熟，後面遊戲一次派上用場！</p>
+  <p>到目前為止，一個變數只能存一個值。這一章要介紹 <code>list</code>（串列）和 <code>tuple</code>（元組）——想像成一整排<strong>置物櫃</strong>：每一格（元素）都有自己的<strong>櫃號（索引）</strong>，你可以直接憑號碼打開任何一格，不用從頭一格一格找起。像這樣可以「裝進」其他物件的資料型別，就稱為 <strong>容器（containers）</strong>；容器自己也帶了一套專屬工具，叫做 <strong>方法（methods）</strong>，用來操作櫃子裡的東西。</p>
+  <p><code>list</code> 和 <code>tuple</code> 都屬於 <strong>序列（sequence）</strong>資料型別——代表<strong>有序的項目集合</strong>，就像置物櫃是按號碼排好的，順序不會亂跑。它們與 <code>string</code>、以及 <code>range()</code> 回傳的 <code>range</code> 物件享有相同的特性：都可以用索引、切片、<code>for</code> 迴圈、<code>len()</code>、以及 <code>in</code> / <code>not in</code> 運算子來操作。</p>
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 學習心法</div>
+    <p style="margin-bottom:0;">串列最重要的兩個觀念是本章的核心：<strong>索引與切片</strong>如何精確取值，以及<strong>變數其實只是「參照」</strong>——這會影響串列被複製、被傳進函數時的行為。先把這兩個心法建立起來，後面所有操作都會豁然開朗。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="indexing">
+  <div class="section-number">PART 02 · 索引</div>
+  <h2>使用索引取出串列中的單一元素</h2>
+  <p>在 <code>string</code> 中，值是字元；在 <code>list</code> 中，它們可以是<strong>任何型別</strong>。用逗號分隔的值放進中括號 <code>[ ]</code> 就能建立 <code>list</code>；空的中括號 <code>[]</code> 建立空串列。</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">subjects = [<span class="str">'邏輯與集合'</span>, <span class="str">'離散數學'</span>, <span class="str">'初等數論'</span>, <span class="str">'基礎數學'</span>]</span>
+<span class="line"><span class="fn">print</span>(subjects[<span class="num">0</span>])  <span class="com"># 邏輯與集合，索引從 0 開始！</span></span>
+<span class="line"><span class="fn">print</span>(subjects[<span class="num">3</span>])  <span class="com"># 基礎數學</span></span></div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 常見錯誤</div>
+    <p style="margin-bottom:0;">如果索引超過串列長度，例如 <code>subjects[4]</code>（這個串列只有索引 0~3），Python 會丟出 <code>IndexError</code>——這是一種<strong>執行時錯誤</strong>。另外要小心區分：中括號用來<strong>建立</strong>串列（<code>[1,2,3]</code>）還是用來<strong>索引</strong>已存在的串列（<code>subjects[0]</code>），語法看起來很像但意義完全不同！</p>
+  </div>
+
+  <p><code>list</code> 的元素不必是相同型別，甚至可以包含另一個 <code>list</code>（巢狀串列），這時要用<strong>多重索引</strong>來取值：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">spam = [<span class="str">'spam'</span>, <span class="num">2.0</span>, <span class="num">5</span>, [<span class="num">10</span>, <span class="num">20</span>]]</span>
+<span class="line">spam[<span class="num">3</span>][<span class="num">1</span>]  <span class="com"># 20 —— 第一個索引選外層 list，第二個索引選內層 list</span></span>
+<span class="line">spam[<span class="num">3</span>]     <span class="com"># [10, 20] —— 只用一個索引會取出整個內層 list</span></span></div>
+
+  <h3>負數索引與 len()</h3>
+  <p>索引也可以用<strong>負整數</strong>：<code>-1</code> 代表 <code>list</code> 的最後一個元素，<code>-2</code> 代表倒數第二個，依此類推。<code>len()</code> 函數會回傳串列中的元素個數（就像它能算字串的字元數一樣）。</p>
+  <div class="pseudo-code"><span class="line">subjects = [<span class="str">'邏輯與集合'</span>, <span class="str">'離散數學'</span>, <span class="str">'初等數論'</span>, <span class="str">'基礎數學'</span>]</span>
+<span class="line"><span class="fn">print</span>(subjects[-<span class="num">1</span>])  <span class="com"># 基礎數學 —— 最後一個</span></span>
+<span class="line"><span class="fn">print</span>(subjects[-<span class="num">2</span>])  <span class="com"># 初等數論 —— 倒數第二個</span></span>
+<span class="line"><span class="fn">len</span>(subjects)      <span class="com"># 4</span></span></div>
+
+  <div class="info-box warm">
+    <div class="info-label">🤔 先猜猜看</div>
+    <p style="margin-bottom:0;"><code>alist = [3, 67, "cat", [56, 57, "dog"], [ ], 3.14, False]</code>，那麼 <code>alist[5]</code> 是什麼？先想一想，答案在下方 <a href="#bankquiz">QUIZ 自我檢測</a> 第一題可以直接作答！</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="slicing">
+  <div class="section-number">PART 03 · 切片</div>
+  <h2>使用切片從串列中取出子串列</h2>
+  <p>索引可以取出單一值，<strong>切片（slicing）</strong>則可以取出多個值，並回傳一個<strong>全新的 list</strong>。語法是 <code>list[start:stop:step]</code>：從索引 <code>start</code> 開始，一路取到 <code>stop</code>（<strong>但不包含 stop</strong>），<code>step</code> 是間隔（預設 1，可省略）。</p>
+  <p>省略 <code>start</code> 等於從 0（或最尾端）開始；省略 <code>stop</code> 等於取到底；<code>step</code> 為負數時會反向取值——<code>list[::-1]</code> 就是把整個串列反轉的經典寫法！</p>
+
+  <div class="info-box">
+    <div class="info-label">🧪 互動：切片試算器</div>
+    <p style="margin-bottom:0;">下面固定示範串列 <code>spam = ['cat', 'bat', 'rat', 'elephant']</code>，每個格子上方是<strong>正索引</strong>、下方是<strong>負索引</strong>。在三個欄位輸入 start / stop / step（可留空），格子會即時高亮出被切到的元素，橘色數字代表該元素在結果中的<strong>順序</strong>。</p>
+  </div>
+
+  <div class="sandbox">
+    <div class="sandbox-label">🧪 SANDBOX · 切片試算器</div>
+    <div class="seq-row" id="sliceGrid"></div>
+    <div class="input-row">
+      <label>spam[</label>
+      <input type="text" id="sliceStart" placeholder="start" value="1" style="max-width:90px;">
+      <label>:</label>
+      <input type="text" id="sliceStop" placeholder="stop" value="3" style="max-width:90px;">
+      <label>:</label>
+      <input type="text" id="sliceStep" placeholder="step（可留空）" value="" style="max-width:120px;">
+      <label>]</label>
+    </div>
+    <div class="preset-row" id="slicePresets"></div>
+    <div class="sandbox-result" id="sliceResult"></div>
+  </div>
+
+  <h3>用 del 從串列中移除值</h3>
+  <p><code>del</code> 敘述可以刪除 <code>list</code> 中指定索引處的值，後面的元素會自動往前移動；也可以搭配切片一次刪除多個相鄰元素：</p>
+  <div class="pseudo-code"><span class="line">t = [<span class="str">'a'</span>, <span class="str">'b'</span>, <span class="str">'c'</span>, <span class="str">'d'</span>, <span class="str">'e'</span>]</span>
+<span class="line"><span class="kw">del</span> t[<span class="num">1</span>]      <span class="com"># t 變成 ['a', 'c', 'd', 'e']</span></span>
+<span class="line"><span class="kw">del</span> t[<span class="num">1</span>:<span class="num">3</span>]    <span class="com"># t 變成 ['a', 'e']，一次刪除索引 1、2</span></span></div>
+</section>
+
+<!-- ============================================================ -->
+<section id="mutate">
+  <div class="section-number">PART 04 · 修改元素</div>
+  <h2>用索引更改串列中的值</h2>
+  <p>與 <code>string</code> 不同，<code>list</code> 是<strong>可變的（mutable）</strong>：你可以重新指定串列中的項目。當中括號操作符出現在指派敘述的<strong>左邊</strong>，就代表要修改該索引處的元素，這個動作稱為<strong>項目指派（item assignment）</strong>：</p>
+  <div class="pseudo-code"><span class="line">numbers = [<span class="num">17</span>, <span class="num">123</span>, <span class="num">42</span>, <span class="num">7</span>]</span>
+<span class="line">numbers[<span class="num">1</span>] = <span class="num">5</span></span>
+<span class="line">numbers  <span class="com"># [17, 5, 42, 7] —— 原本的 123 被 5 取代</span></span></div>
+
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">name = <span class="str">'pokemon tcg pocket'</span></span>
+<span class="line">name[<span class="num">7</span>] = <span class="str">'a'</span></span>
+<span class="line"><span class="com"># TypeError: 'str' object does not support item assignment</span></span></div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ string 做不到！</div>
+    <p style="margin-bottom:0;"><code>string</code> 是<strong>不可變（immutable）</strong>的，就算只是想把 <code>name</code> 裡的一個字元換掉，Python 也會丟出 <code>TypeError</code>。這是 <code>list</code> 與 <code>string</code> 最關鍵的差異，後面「序列型別家族」會整理成表格比較。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="concat">
+  <div class="section-number">PART 05 · 串接與重複</div>
+  <h2>串接 List 與複製 List</h2>
+  <p>串列可以像字串一樣進行串接（concatenation）和重複（repetition）。<code>+</code> 運算符把兩個串列合併成一個<strong>新串列</strong>；<code>*</code> 運算符搭配整數值可以重複整個串列。</p>
+  <table class="cmp-table">
+    <tr><th>運算式</th><th>結果</th></tr>
+    <tr><td>[1, 2, 3] + ['A', 'B', 'C']</td><td>[1, 2, 3, 'A', 'B', 'C']</td></tr>
+    <tr><td>['X', 'Y', 'Z'] * 3</td><td>['X','Y','Z','X','Y','Z','X','Y','Z']</td></tr>
+  </table>
+  <div class="info-box">
+    <div class="info-label">💡 提醒</div>
+    <p style="margin-bottom:0;"><code>+</code> 不會把數字相加、也不會重新排序項目，它只是單純把兩個串列的元素依序接在一起，產生一個全新的串列（原本兩個串列不會被改變）。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="iterate">
+  <div class="section-number">PART 06 · 遍歷</div>
+  <h2>List 遍歷：for、range()、enumerate()</h2>
+  <p><code>for</code> 迴圈的本質，就是沿著置物櫃排成的走廊，從第一格走到最後一格，每經過一格就把裡面的東西拿出來做點事——這種「一項一項處理」的動作稱為<strong>逐項迭代</strong>。<code>range(4)</code> 回傳的其實也是一個序列，Python 會把它當成類似 <code>[0, 1, 2, 3]</code> 的東西：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line"><span class="kw">for</span> subject <span class="kw">in</span> subjects:  <span class="com"># 只需要讀取元素時，直接遍歷串列最簡潔</span></span>
+<span class="line">    <span class="fn">print</span>(subject)</span></div>
+
+  <p>如果需要索引來<strong>寫入或更新</strong>元素，常見做法是搭配 <code>range(len(...))</code>：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">numbers = [<span class="num">17</span>, <span class="num">5</span>, <span class="num">42</span>, <span class="num">7</span>]</span>
+<span class="line"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(numbers)):</span>
+<span class="line">    numbers[i] = numbers[i] ** <span class="num">2</span>  <span class="com"># [289, 25, 1764, 49]</span></span></div>
+
+  <p>更常見、更 Python 風格的寫法是用 <code>enumerate()</code>——它每次迴圈會同時回傳<strong>索引</strong>和<strong>項目本身</strong>：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line"><span class="kw">for</span> i, number <span class="kw">in</span> <span class="fn">enumerate</span>(numbers):</span>
+<span class="line">    <span class="fn">print</span>(i, number)</span>
+<span class="line">    numbers[i] = number ** <span class="num">2</span></span></div>
+
+  <h3>in 與 not in 運算子</h3>
+  <p>用 <code>in</code> 和 <code>not in</code> 可以判斷某個值是否存在於 <code>list</code> 中，結果是一個 <code>Boolean</code>：</p>
+  <div class="pseudo-code"><span class="line"><span class="fn">print</span>(<span class="str">'hello'</span> <span class="kw">in</span> [<span class="str">'hello'</span>, <span class="str">'hi'</span>, <span class="str">'haha'</span>, <span class="str">'he'</span>])  <span class="com"># True</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">'國文'</span> <span class="kw">not in</span> subjects)  <span class="com"># True，subjects 沒有「國文」</span></span></div>
+</section>
+
+<!-- ============================================================ -->
+<section id="methods">
+  <div class="section-number">PART 07 · 常見方法</div>
+  <h2>list 的常見方法：append、insert、del、sort</h2>
+  <p><strong>方法（method）</strong>與函數相同，只是它是「對一個物件」呼叫，寫法是 <code>物件.方法名()</code>。<code>append()</code> 把新元素加到串列<strong>尾端</strong>；<code>insert(索引, 值)</code> 把元素插入到<strong>指定位置</strong>（原本在那之後的元素都會往右移一格）。</p>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 回傳值是 None！</div>
+    <p style="margin-bottom:0;"><code>append()</code>、<code>insert()</code>、<code>sort()</code> 都是<strong>就地修改（modify in-place）</strong>串列本身，回傳值是 <code>None</code>。千萬不要寫 <code>t = t.append('d')</code>——這會把 <code>t</code> 變成 <code>None</code>！正確寫法是直接呼叫 <code>t.append('d')</code>，串列會自動被改變。方法屬於單一資料型別：<code>append()</code> 是 <code>list</code> 的方法，不能用在 <code>string</code> 或 <code>integer</code> 上。</p>
+  </div>
+
+  <p>🎬 逐步執行下面這段程式，觀察 <code>t</code> 的內容如何一步步變化（黃色 = 這步驟受影響的元素，橘色編號 = 插入的新位置）：</p>
+
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="seq-row" id="methodCells"></div>
+      <div class="pseudo-code" id="methodCode">
+<span class="line">t = [<span class="str">'bat'</span>, <span class="str">'cat'</span>, <span class="str">'rat'</span>]</span>
+<span class="line">t.append(<span class="str">'elephant'</span>)</span>
+<span class="line">t.insert(<span class="num">1</span>, <span class="str">'ant'</span>)</span>
+<span class="line"><span class="kw">del</span> t[<span class="num">3</span>]</span>
+<span class="line">t.sort()             <span class="com"># 預設遞增排序</span></span>
+<span class="line">t.sort(reverse=<span class="kw">True</span>)  <span class="com"># 反向（遞減）排序</span></span>
+<span class="line"><span class="fn">print</span>(t)</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="methodStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="methodPlay">▶ 播放</button>
+        <button class="btn btn-step" id="methodStep">單步 ▸</button>
+        <button class="btn btn-reset" id="methodReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="methodOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">extend() 呢？</div>
+        <p style="font-size:.82rem;margin:0;"><code>extend()</code> 會把<strong>另一個序列的所有元素</strong>逐一加到尾端，例如 <code>color_names.extend(['藍色','紫色'])</code>，相當於 <code>color_names += ['藍色','紫色']</code>。這跟 <code>append()</code> 把整個引數當成單一元素加入不同（下方測驗會考這個！）。</p>
+      </div>
+      <div class="info-card">
+        <div class="ic-title">key=str.lower 排序</div>
+        <p style="font-size:.82rem;margin:0;"><code>sort()</code> 預設會把大寫字母排在小寫前面（依 ASCII 碼）。若想「不分大小寫」排序，可以用 <code>spam.sort(key=str.lower)</code>，讓 Python 排序時先把每個字串轉成小寫再比較。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="comprehension">
+  <div class="section-number">PART 08 · 串列生成式</div>
+  <h2>串列生成式：一行程式碼建立新串列</h2>
+  <p>想像一個問題：如何做出一個包含 1~10 平方數的 <code>list</code>？傳統寫法要先建立空串列，再用 <code>for</code> 迴圈搭配 <code>append()</code>：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">squares = []</span>
+<span class="line"><span class="kw">for</span> value <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>):</span>
+<span class="line">    squares.append(value ** <span class="num">2</span>)</span>
+<span class="line"><span class="com"># squares = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]</span></span></div>
+
+  <p><strong>串列生成式（list comprehension）</strong>把 <code>for</code> 迴圈和新元素的建立結合為一行，自動把每個新元素附加到串列中：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">squares = [value ** <span class="num">2</span> <span class="kw">for</span> value <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>)]</span>
+<span class="line"><span class="com"># 一模一樣的結果：[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]</span></span></div>
+
+  <p>還可以加上 <code>if</code> 子句來<strong>過濾</strong>元素，只保留符合條件的值——這裡示範只保留偶數：</p>
+  <div class="pseudo-code"><span class="line">list1 = [item <span class="kw">for</span> item <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>) <span class="kw">if</span> item % <span class="num">2</span> == <span class="num">0</span>]</span>
+<span class="line"><span class="com"># list1 = [2, 4, 6, 8, 10]</span></span></div>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 語法拆解</div>
+    <p style="margin-bottom:0;">① 一個有意義的變數名稱存放新 <code>list</code>（如 <code>squares</code>）。② 中括號內先寫「要儲存的運算式」（<code>value**2</code>）。③ 接著寫 <code>for</code> 迴圈提供輸入值。注意 <code>for</code> 後面<strong>不需要冒號</strong>——語法和一般 <code>for</code> 迴圈不同！這也很像數學的集合建構式：$\{x^2 \mid x \in \{1,...,10\}\}$。</p>
+  </div>
+
+  <div class="game-box" id="bullsCowsGame">
+    <div class="gb-tag">GAME · 取自課本練習 1</div>
+    <h3>🎯 1A2B 猜數字（Bulls and Cows）</h3>
+    <p>電腦會用 <code>random.shuffle()</code> 想好一個 4 位數的秘密數字（數字不重複）。輸入你的猜測，系統用 <code>nAmB</code> 回報：n 個數字「位置也對」，m 個數字「存在但位置錯」——目標是讓 A 變成 4！</p>
+    <div class="game-console" id="bcConsole"><div class="g-sys">按「開始遊戲」讓電腦想一個新的秘密數字……</div></div>
+    <div class="game-input-row">
+      <button class="btn btn-play" id="bcStart">🎲 開始遊戲</button>
+      <input type="text" id="bcInput" maxlength="4" placeholder="輸入 4 位數字" disabled>
+      <button class="btn btn-step" id="bcGuess" disabled>猜！</button>
+      <button class="btn btn-reset" id="bcReset">↺ 重新開始</button>
+    </div>
+    <details>
+      <summary>這個遊戲的 Python 程式碼（取自 04_Lists_tuples.ipynb 練習 1）</summary>
+      <div class="pseudo-code" style="margin-top:.7rem;"><span class="line"><span class="kw">import</span> random</span>
+<span class="line"></span>
+<span class="line"><span class="com"># 生成隨機的四位數字</span></span>
+<span class="line"><span class="kw">def</span> <span class="fn">generate_number</span>():</span>
+<span class="line">    digits = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">10</span>))</span>
+<span class="line">    random.<span class="fn">shuffle</span>(digits)  <span class="com"># 隨機打亂串列！</span></span>
+<span class="line">    <span class="kw">return</span> digits[:<span class="num">4</span>]</span>
+<span class="line"></span>
+<span class="line"><span class="com"># 檢查玩家的猜測是否符合秘密數字</span></span>
+<span class="line"><span class="kw">def</span> <span class="fn">check_guess</span>(guess, secret):</span>
+<span class="line">    <span class="com"># 請注意，guess 和 secret 都是串列！</span></span>
+<span class="line">    a = <span class="num">0</span>  <span class="com"># 正確且在正確位置的數字數量</span></span>
+<span class="line">    b = <span class="num">0</span>  <span class="com"># 正確但在錯誤位置的數字數量</span></span>
+<span class="line">    <span class="kw">for</span> _________________:  <span class="com"># 遍歷 guess 和 secret 的長度並取出索引</span></span>
+<span class="line">        <span class="kw">if</span> _________________:  <span class="com"># 使用運算符來確定該數字是否在正確的位置</span></span>
+<span class="line">            a += <span class="num">1</span></span>
+<span class="line">        <span class="kw">elif</span> _______:  <span class="com"># 使用運算符來確定該數字是否在秘密數字中</span></span>
+<span class="line">            b += <span class="num">1</span></span>
+<span class="line">    <span class="kw">return</span> a, b</span>
+<span class="line"></span>
+<span class="line"><span class="com"># 開始遊戲</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">"歡迎來到 1A2B！"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"我想了一個四位數的神祕數字，你能猜到它嗎？"</span>)</span>
+<span class="line">secret = <span class="fn">generate_number</span>()</span>
+<span class="line">guesses = <span class="num">0</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">while</span> <span class="kw">True</span>:</span>
+<span class="line">    guess = <span class="fn">input</span>(<span class="str">"請輸入你的猜測或輸入 'quit' 來放棄："</span>)</span>
+<span class="line">    <span class="kw">if</span> guess == <span class="str">'quit'</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"秘密數字是"</span>, secret)</span>
+<span class="line">        <span class="kw">break</span></span>
+<span class="line">    <span class="kw">elif</span> <span class="fn">len</span>(guess) != <span class="num">4</span> <span class="kw">or</span> <span class="kw">not</span> guess.isdigit():</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"無效的猜測，請輸入四位數字。"</span>)</span>
+<span class="line">        <span class="kw">continue</span></span>
+<span class="line"></span>
+<span class="line">    <span class="com"># 使用串列生成式將猜測轉換為四位數字的列表</span></span>
+<span class="line">    guess = ________________________</span>
+<span class="line"></span>
+<span class="line">    guesses += <span class="num">1</span></span>
+<span class="line">    result = <span class="fn">check_guess</span>(guess, secret)</span>
+<span class="line">    <span class="fn">print</span>(result[<span class="num">0</span>], <span class="str">'A'</span>, result[<span class="num">1</span>], <span class="str">'B'</span>, sep=<span class="str">""</span>)</span>
+<span class="line"></span>
+<span class="line">    <span class="kw">if</span> result[<span class="num">0</span>] == <span class="num">4</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"恭喜你，你在"</span>, guesses, <span class="str">"次猜測中猜對了神秘數字！"</span>)</span>
+<span class="line">        <span class="kw">break</span></span></div>
+    </details>
+    <div class="game-note">玩上癮了？打開 <code>04_Lists_tuples.ipynb</code> 練習 1，自己把它做出來——這是你的「這是我做出來的」時刻！</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="seqtypes">
+  <div class="section-number">PART 09 · 序列型別</div>
+  <h2>序列資料型別：可變 vs 不可變</h2>
+  <p><code>list</code> 並不是唯一表示有序值序列的資料型別。<code>string</code>、<code>range</code> 物件和 <code>tuple</code> 都共享序列的特性——都能索引、切片、放進 <code>for</code> 迴圈、搭配 <code>len()</code>，以及使用 <code>in</code> / <code>not in</code>（<code>'a' in 'apple'</code> 也成立！）。但它們在<strong>可變性</strong>上分成兩派：</p>
+
+  <table class="cmp-table">
+    <tr><th>型別</th><th>可變性</th><th>可修改元素？</th><th>典型建構</th></tr>
+    <tr><td>list 串列</td><td class="best">可變 mutable</td><td class="best">可以（項目指派、append 等）</td><td>[1, 2, 3]</td></tr>
+    <tr><td>tuple 元組</td><td class="worst">不可變 immutable</td><td class="worst">不行（TypeError）</td><td>(1, 2, 3)</td></tr>
+    <tr><td>string 字串</td><td class="worst">不可變 immutable</td><td class="worst">不行（TypeError）</td><td>'abc'</td></tr>
+    <tr><td>range 物件</td><td class="worst">不可變 immutable</td><td class="worst">不行</td><td>range(3)</td></tr>
+  </table>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 重新指派 ≠ 修改</div>
+    <p style="margin-bottom:0;">變數可以被覆寫成新的 <code>tuple</code> 或 <code>string</code>（<code>name = name + '!'</code>），但這不等於「修改現有的值」——這其實是建立了一個全新的物件，讓變數改指向它。因為不可變，<code>tuple</code> 沒有 <code>sort()</code>、<code>reverse()</code> 這類就地修改的方法；但可以用內建函數 <code>sorted()</code>、<code>reversed()</code>，它們接受任何序列並<strong>回傳一個新序列</strong>。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="tuple">
+  <div class="section-number">PART 10 · 元組</div>
+  <h2>元組（tuple）與序列拆解</h2>
+  <p><code>tuple</code> 是一種與 <code>list</code> 類似的序列型別，可以儲存任何型別的值，並用整數索引。最關鍵的差異：<code>tuple</code> 是<strong>不可變的</strong>。雖然不是必要，但通常會用小括號 <code>( )</code> 把 <code>tuple</code> 包起來，方便一眼認出：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">t = (<span class="str">'a'</span>, <span class="str">'b'</span>, <span class="str">'c'</span>, <span class="str">'d'</span>, <span class="str">'e'</span>)</span>
+<span class="line"><span class="fn">print</span>(t[<span class="num">0</span>])    <span class="com"># 'a'，索引用法跟 list 一樣</span></span>
+<span class="line"><span class="fn">print</span>(t[<span class="num">1</span>:<span class="num">3</span>])  <span class="com"># ('b', 'c')，切片也一樣可以用</span></span>
+<span class="line">t[<span class="num">0</span>] = <span class="str">'A'</span>    <span class="com"># TypeError！tuple 不能項目指派</span></span></div>
+
+  <div class="info-box">
+    <div class="info-label">⚠ 只有一個元素的 tuple</div>
+    <p style="margin-bottom:0;">要建立只有一個元素的 <code>tuple</code>，<strong>結尾一定要加逗號</strong>：<code>t1 = ('a',)</code>。如果忘記逗號寫成 <code>t3 = ('a')</code>，Python 只會把它當成加了括號的字串，<code>type(t3)</code> 會是 <code>str</code> 而不是 <code>tuple</code>！另一種安全的寫法是用 <code>tuple()</code> 函數：<code>tuple('a')</code>。若 <code>tuple()</code> 的引數是序列（string、list、tuple），結果會是一個包含該序列所有元素的 tuple，例如 <code>tuple('nsysu')</code> 會拆成 5 個字元的 tuple。</p>
+  </div>
+
+  <h3>序列拆解（unpacking）</h3>
+  <p>可以把一個序列的元素，依序拆解賦值給多個以逗號分隔的變數——這也是上一章「多重指派」<code>a, b = 1, 2</code> 背後的真正原理：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">student_tuple = (<span class="str">'Alice'</span>, [<span class="num">98</span>, <span class="num">85</span>, <span class="num">87</span>])</span>
+<span class="line">first_name, grades = student_tuple</span>
+<span class="line"><span class="fn">print</span>(first_name, grades)  <span class="com"># Alice [98, 85, 87]</span></span></div>
+
+  <p>這種拆解技巧常用在函數需要<strong>回傳多個值</strong>的時候（函數其實是把多個值包成一個 tuple 回傳）：</p>
+  <div class="pseudo-code"><span class="line"><span class="kw">def</span> <span class="fn">total_ave</span>(grade):</span>
+<span class="line">    total = <span class="fn">sum</span>(grade)</span>
+<span class="line">    ave = total / <span class="fn">len</span>(grade)</span>
+<span class="line">    <span class="kw">return</span> total, ave  <span class="com"># 回傳一個 tuple: (total, ave)</span></span>
+<span class="line">total, ave = total_ave([<span class="num">85</span>, <span class="num">70</span>, <span class="num">100</span>, <span class="num">90</span>])  <span class="com"># 345, 86.25</span></span></div>
+
+  <div class="info-box">
+    <div class="info-label">🃏 挑戰預告 · 取自課本練習 2</div>
+    <p>學完 <code>tuple</code> 之後，你已經有能力挑戰一個更硬派的練習：用一副標準的 52 張撲克牌（13 種牌面 × 4 種花色，每張牌就是一個 <code>(牌面, 花色)</code> tuple），洗牌後隨機發 40 張、平分給兩位玩家各 20 張，再寫程式找出每個人手上有幾組「對子」（兩張牌面相同的牌），比較誰的對子比較多。</p>
+    <p style="margin-bottom:0;">串列生成式、切片、tuple、<code>enumerate()</code>——這些工具你在本章已經全部學過了。打開 <code>04_Lists_tuples.ipynb</code> 練習 2，自己動手挑戰看看！</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="refs">
+  <div class="section-number">PART 11 · 參照</div>
+  <h2>參照（reference）：變數不是盒子，是一張標籤</h2>
+  <p>在 Python 中，變數儲存的是<strong>參照</strong>——也就是物件在記憶體中的位址（可以用 <code>id()</code> 查詢）。對<strong>不可變</strong>物件（整數、字串），這件事幾乎感覺不到，因為你永遠無法「修改」它，只能讓變數改指向新物件。但對<strong>可變</strong的 <code>list</code>，這會產生一個關鍵後果：<strong>兩個變數可以同時指向同一個串列！</strong></p>
+
+  <p>🎬 逐步執行，觀察 <code>spam</code> 和 <code>cheese</code> 這兩個標籤的關係：</p>
+
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="obj-canvas" id="refCanvas"><span class="var-empty">按「單步 ▸」開始執行</span></div>
+      <div class="pseudo-code" id="refCode">
+<span class="line">spam = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>]</span>
+<span class="line">cheese = spam         <span class="com"># 複製「參照」，不是複製 list！</span></span>
+<span class="line">cheese[<span class="num">1</span>] = <span class="str">'Hello!'</span>  <span class="com"># 修改的是同一個 list</span></span>
+<span class="line"><span class="fn">print</span>(spam)          <span class="com"># spam 也被改變了！</span></span>
+<span class="line">clone = copy.copy(spam)  <span class="com"># 真正複製一份新 list</span></span>
+<span class="line">clone[<span class="num">0</span>] = <span class="num">99</span>       <span class="com"># 只改到 clone，不影響 spam</span></span>
+<span class="line"><span class="fn">print</span>(spam, clone)</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="refStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="refPlay">▶ 播放</button>
+        <button class="btn btn-step" id="refStep">單步 ▸</button>
+        <button class="btn btn-reset" id="refReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="refOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">傳遞參照給函數</div>
+        <p style="font-size:.82rem;margin:0;">呼叫函數時，引數的值會被複製到參數變數中；對 <code>list</code> 來說，被複製的是<strong>參照的副本</strong>，兩者仍指向同一個串列：<code>def eggs(p): p.append('Hello')</code>，呼叫 <code>eggs(spam)</code> 後 <code>spam</code> 也會被改變！</p>
+      </div>
+      <div class="info-card">
+        <div class="ic-title">copy() vs deepcopy()</div>
+        <p style="font-size:.82rem;margin:0;"><code>copy.copy()</code> 複製一份新的串列（但若串列裡還有子串列，內層仍共用參照）。如果串列包含其他串列，要用 <code>copy.deepcopy()</code> 才能連內層也一併複製，得到完全獨立的物件。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 就地修改小結</div>
+    <p style="margin-bottom:0;">Python 的垃圾回收器會自動清除不再被任何變數參照的值，不需要手動管理記憶體。但也因為如此：<strong>若兩個變數參照同一個 list，其中一個被就地修改（append、sort、項目指派…），另一個也會跟著改變</strong>。切片則是例外——切片會建立一個全新的 list 物件，不會共用參照。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<section id="reference">
+  <div class="section-number">REFERENCE · 速查表</div>
+  <h2>本章速查表</h2>
+
+  <h3>索引與切片</h3>
+  <table class="cmp-table">
+    <tr><th>語法</th><th>功能</th><th>範例（spam = ['cat','bat','rat','elephant']）</th></tr>
+    <tr><td>list[i]</td><td>取單一元素</td><td>spam[1] → 'bat'</td></tr>
+    <tr><td>list[-i]</td><td>從尾端數的單一元素</td><td>spam[-1] → 'elephant'</td></tr>
+    <tr><td>list[a:b]</td><td>切片，含 a 不含 b</td><td>spam[1:3] → ['bat','rat']</td></tr>
+    <tr><td>list[:b] / list[a:]</td><td>省略端點</td><td>spam[:2] → ['cat','bat']</td></tr>
+    <tr><td>list[::-1]</td><td>反轉整個序列</td><td>→ ['elephant','rat','bat','cat']</td></tr>
+    <tr><td>list[a] = v</td><td>項目指派（修改元素）</td><td>spam[0]='dog'</td></tr>
+    <tr><td>del list[a]</td><td>刪除元素（可搭配切片）</td><td>del spam[0]</td></tr>
+  </table>
+
+  <h3>list 常用方法與函數</h3>
+  <table class="cmp-table">
+    <tr><th>方法 / 函數</th><th>功能</th><th>提醒</th></tr>
+    <tr><td>append(x)</td><td>尾端加入單一元素</td><td class="worst">就地修改，回傳 None</td></tr>
+    <tr><td>insert(i, x)</td><td>在索引 i 插入元素</td><td class="worst">就地修改，回傳 None</td></tr>
+    <tr><td>extend(seq)</td><td>把另一序列逐一元素接到尾端</td><td>相當於 list += seq</td></tr>
+    <tr><td>sort() / sort(reverse=True)</td><td>就地排序（遞增／遞減）</td><td class="worst">就地修改，回傳 None</td></tr>
+    <tr><td>sort(key=str.lower)</td><td>不分大小寫排序</td><td>key 指定排序前的轉換函數</td></tr>
+    <tr><td>del list[i]</td><td>刪除指定索引的元素</td><td>非方法，是敘述</td></tr>
+    <tr><td>len(list)</td><td>元素個數</td><td>序列型別通用</td></tr>
+    <tr><td>sorted(seq) / reversed(seq)</td><td>回傳排序／反轉後的新序列</td><td>不修改原序列，tuple/string 也能用</td></tr>
+  </table>
+
+  <h3>可變 vs 不可變、參照</h3>
+  <table class="cmp-table">
+    <tr><th>觀念</th><th>重點</th></tr>
+    <tr><td>list</td><td class="best">可變，可就地修改</td></tr>
+    <tr><td>tuple / string</td><td class="worst">不可變，(x,) 建立單一元素 tuple</td></tr>
+    <tr><td>a = b（b 是 list）</td><td>複製參照，a 和 b 指向同一個 list</td></tr>
+    <tr><td>copy.copy(b)</td><td>複製出新的獨立 list（淺複製）</td></tr>
+    <tr><td>copy.deepcopy(b)</td><td>連內層巢狀 list 都一併複製</td></tr>
+  </table>
+
+  <div class="bridge-box">
+    <div class="bb-title">🎓 學完這章，你已經能……</div>
+    <ul>
+      <li>用索引、切片精準地從串列中取出或修改任何一部分</li>
+      <li>分辨 list（可變）與 tuple / string（不可變），並理解「參照」是什麼</li>
+      <li>用串列生成式一行寫出迴圈 + append 的效果，甚至做出一個能玩的猜數字遊戲</li>
+    </ul>
+    <p class="bb-next">NEXT ▸ CH05 字串：學會 f-string 格式化，幫「神秘島嶼」冒險遊戲的玩家排出一張漂亮的狀態表——生命值、經驗值、金幣，統統對齊！</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這一頁在資料結構課哪裡會用到</div><p>這頁是整個課程成本分析的起點：<b>第 02 章</b>會實測 <code>append</code> 與 <code>pop(0)</code> 差多少；<b>第 03 章</b>自己動手把 <code>ArrayList</code> 從零蓋出來；<b>第 05 章</b>的 Stack 與 Queue 內部持有的就是一個 list。「參照 vs 複製」那一節則直接是 <b>第 04 章</b> Node 串接的前置知識。</p></div>
+
+</section>
+
+<section id="bankquiz">
+  <div class="section-number">QUIZ · 自我檢測</div>
+  <h2>自我檢測：串列與元組 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
+  <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下語句會印出什麼？</div>
+    <pre class="sq-code">alist = [3, 67, &quot;cat&quot;, [56, 57, &quot;dog&quot;], [ ], 3.14, False]
+print&#40;alist[5])</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="空串列在索引 4。">[ ]</button>
+      <button class="sq-opt" data-c="1" data-fb="是的，3.14 位於索引 5，因為我們從 0 開始計數，而子串列計算為一個項目。">3.14</button>
+      <button class="sq-opt" data-c="0" data-fb="False 在索引 6。">False</button>
+      <button class="sq-opt" data-c="0" data-fb="索引 3 的元素是另一個內部串列。這個串列在外部串列中只算作一個元素。">dog</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q2.</span>以下哪一項正確使用了索引？假設 a 是一個串列或字串。</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="不對，這段代碼的寫法會建立一個串列，該串列只會包含一個元素，即變數 a 所指向的值。">w = [a]</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然這嘗試使用索引，但它並未指定應該從 a 中取出哪個元素。">a[]</button>
+      <button class="sq-opt" data-c="0" data-fb="不對，這是建立一個包含單個元素 8 的串列的例子。">x = [8]</button>
+      <button class="sq-opt" data-c="1" data-fb="是的，這會使用索引來獲取 a 的第一個元素的值。">t = a[0]</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q3.</span>以下語句會印出什麼？</div>
+    <pre class="sq-code">alist = [3, 67, &quot;cat&quot;, [56, 57, &quot;dog&quot;], 2.5, 3.14, False]
+print&#40;alist[4:])</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="是的，這個切片從索引 4 開始，直到包含最後一個項目。">[2.5, 3.14, False]</button>
+      <button class="sq-opt" data-c="0" data-fb="因為在切片中省略了上限，我們會一直切到並包括最後一個項目。">[2.5, 3.14]</button>
+      <button class="sq-opt" data-c="0" data-fb="索引從 0 開始。">[[56, 57, &quot;dog&quot;], 2.5, 3.14, False]</button>
+      <button class="sq-opt" data-c="0" data-fb="切片運算子將建立一個新的串列，其中包含數個元素。">2.5</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q4.</span>以下語句會輸出什麼？</div>
+    <pre class="sq-code">alist = [1,3,5]
+blist = [2,4,6]
+print&#40;alist + blist)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="連接不會加總串列的長度。">6</button>
+      <button class="sq-opt" data-c="0" data-fb="串接不會重新排序項目。">[1,2,3,4,5,6]</button>
+      <button class="sq-opt" data-c="1" data-fb="是的，會產生一個新串列，包含第一個串列的所有項目，然後是第二個串列的所有項目。">[1,3,5,2,4,6]</button>
+      <button class="sq-opt" data-c="0" data-fb="串接不會將各個項目相加。">[3,7,11]</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q5.</span>以下語句會印出什麼？</div>
+    <pre class="sq-code">my_list = [1, 2, 3]
+my_list.append([4, 5])
+my_list.extend([6, 7])
+print&#40;my_list)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！append 方法會將整個 [4, 5] 串列作為單一元素添加，而 extend 會走訪它的參數，逐個添加 6 和 7。">[1, 2, 3, [4, 5], 6, 7]</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。雖然 extend 會逐個添加每個元素，但 append 會將其參數作為單一項目添加，結果會形成巢狀串列。">[1, 2, 3, 4, 5, 6, 7]</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。只有 append 方法會將串列作為單一元素添加，extend 則不會。">[1, 2, 3, [4, 5, 6, 7]]</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。extend 方法不會將其串列參數作為單一巢狀元素添加。">[1, 2, 3, 4, 5, [6, 7]]</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q6.</span>下列關於串列與元組的說法，哪一項是&lt;b&gt;錯誤&lt;/b&gt;的？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確，這句話是錯的。元組是不可變的：建立之後不能修改元素，也不能改變大小。這正是它可以當字典的鍵、而串列不行的原因。">元組是可變的，這意味著它們的元素可以在建立後修改。</button>
+      <button class="sq-opt" data-c="0" data-fb="這句話是對的，所以不是本題要選的答案。">串列和元組都支援索引和切片操作。</button>
+      <button class="sq-opt" data-c="0" data-fb="這句話是對的，所以不是本題要選的答案。">串列有像 append() 和 extend() 這樣的方法，而元組不支援這些方法。</button>
+      <button class="sq-opt" data-c="0" data-fb="這句話是對的，所以不是本題要選的答案。">串列可以儲存不同資料型別的元素。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+</section>
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="p3_functions.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">函數</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="p5_dicts_sets.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">字典與集合</div></a></div>
+</div><!-- /container -->
+
+<footer>
+  先備知識 P4 · 串列與元組 · 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============================================================
+   共用引擎：StepRunner / Quiz / Flashcards（與 CH01 完全相同，原樣複用）
+   ============================================================ */
+
+/** 逐步執行引擎：steps = [{line, vars, out, note, custom}] */
+function StepRunner(prefix, steps, opts) {
+  opts = opts || {};
+  const codeEl  = document.getElementById(prefix + 'Code');
+  const statusEl= document.getElementById(prefix + 'Status');
+  const varsEl  = document.getElementById(prefix + 'Vars');
+  const outEl   = document.getElementById(prefix + 'Out');
+  const playBtn = document.getElementById(prefix + 'Play');
+  const stepBtn = document.getElementById(prefix + 'Step');
+  const resetBtn= document.getElementById(prefix + 'Reset');
+  let idx = -1, timer = null;
+
+  function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
+
+  function render() {
+    lines().forEach((l,i)=>{
+      l.classList.toggle('active', idx>=0 && steps[idx].line===i);
+    });
+    if (idx < 0) {
+      if (statusEl) statusEl.textContent = '按「單步 ▸」開始';
+      if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
+      if (outEl) outEl.innerHTML = '';
+      if (opts.onReset) opts.onReset();
+      return;
+    }
+    const s = steps[idx];
+    if (statusEl) statusEl.textContent = s.note || '';
+    if (varsEl) {
+      if (s.vars && s.vars.length) {
+        varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
+          `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
+        ).join('') + '</table>';
+      } else {
+        varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+      }
+    }
+    if (outEl) {
+      outEl.innerHTML = (s.out||[]).map((o,i)=>{
+        const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
+        return `<div class="${cls}">${o}</div>`;
+      }).join('');
+      outEl.scrollTop = outEl.scrollHeight;
+    }
+    if (opts.onStep) opts.onStep(s, idx);
+  }
+
+  function step() {
+    if (idx < steps.length - 1) { idx++; render(); }
+    if (idx >= steps.length - 1) stopPlay();
+  }
+  function stopPlay(){
+    if (timer) { clearInterval(timer); timer = null; }
+    if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
+  }
+  function play(){
+    if (timer) { stopPlay(); return; }
+    if (idx >= steps.length - 1) { idx = -1; render(); }
+    playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
+    timer = setInterval(()=>{
+      if (idx >= steps.length - 1) stopPlay(); else step();
+    }, opts.interval || 1600);
+  }
+  function reset(){ stopPlay(); idx = -1; render(); }
+
+  if (playBtn) playBtn.addEventListener('click', play);
+  if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (resetBtn) resetBtn.addEventListener('click', reset);
+  render();
+  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+}
+
+/** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
+
+/** Flashcards：data = [{front, back}] */
+
+/* ============================================================
+   P03 切片試算器（正確實作 Python 切片語意：負索引 / 留空 / 負 step / 越界 clamp）
+   ============================================================ */
+const SLICE_DEMO = ['cat', 'bat', 'rat', 'elephant'];
+
+/** 對應 CPython PySlice_GetIndicesEx 演算法 */
+function computeSliceIndices(length, start, stop, step) {
+  step = (step === null || step === undefined) ? 1 : step;
+  if (step === 0) return null;
+  let lower, upper;
+  if (step > 0) { lower = 0; upper = length; }
+  else { lower = -1; upper = length - 1; }
+
+  if (start === null || start === undefined) {
+    start = step > 0 ? lower : upper;
+  } else {
+    start = (start < 0) ? Math.max(start + length, lower) : Math.min(start, upper);
+  }
+  if (stop === null || stop === undefined) {
+    stop = step > 0 ? upper : lower;
+  } else {
+    stop = (stop < 0) ? Math.max(stop + length, lower) : Math.min(stop, upper);
+  }
+
+  const indices = [];
+  if (step > 0) { for (let i = start; i < stop; i += step) indices.push(i); }
+  else          { for (let i = start; i > stop; i += step) indices.push(i); }
+  return indices;
+}
+
+const SLICE_PRESETS = [
+  { label: 'spam[:]',      start:'',  stop:'',  step:''   },
+  { label: 'spam[1:3]',    start:'1', stop:'3', step:''   },
+  { label: 'spam[:2]',     start:'',  stop:'2', step:''   },
+  { label: 'spam[-2:]',    start:'-2',stop:'',  step:''   },
+  { label: 'spam[::2]',    start:'',  stop:'',  step:'2'  },
+  { label: 'spam[::-1]',   start:'',  stop:'',  step:'-1' },
+  { label: 'spam[3:1]',    start:'3', stop:'1', step:''   },
+];
+
+(function initSliceSandbox(){
+  const startInput = document.getElementById('sliceStart');
+  const stopInput  = document.getElementById('sliceStop');
+  const stepInput  = document.getElementById('sliceStep');
+  const gridEl     = document.getElementById('sliceGrid');
+  const resultEl   = document.getElementById('sliceResult');
+  const presetRow  = document.getElementById('slicePresets');
+
+  function parseField(raw) {
+    const v = raw.trim();
+    if (v === '') return null;
+    if (!/^-?\d+$/.test(v)) return NaN;
+    return parseInt(v, 10);
+  }
+
+  function renderGrid(hitIdx) {
+    gridEl.innerHTML = SLICE_DEMO.map((v, i) => {
+      const hit = hitIdx.includes(i);
+      const order = hit ? hitIdx.indexOf(i) + 1 : null;
+      return `<div class="seq-cell-wrap">
+        <div class="seq-idx">${i}</div>
+        <div class="seq-cell${hit ? ' hit' : ''}">${order ? `<span class="order-badge">${order}</span>` : ''}'${v}'</div>
+        <div class="seq-idx neg">${i - SLICE_DEMO.length}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderResult() {
+    const startRaw = startInput.value, stopRaw = stopInput.value, stepRaw = stepInput.value;
+    const start = parseField(startRaw), stop = parseField(stopRaw), step = parseField(stepRaw);
+    const exprMid = `${startRaw.trim()}:${stopRaw.trim()}` + (stepRaw.trim() !== '' ? `:${stepRaw.trim()}` : '');
+
+    if ([start, stop, step].some(v => Number.isNaN(v))) {
+      renderGrid([]);
+      resultEl.innerHTML = `<span class="bad">⚠ start / stop / step 只能是整數或留空</span>`;
+      return;
+    }
+    if (step === 0) {
+      renderGrid([]);
+      resultEl.innerHTML = `<span class="bad">⚠ ValueError: slice step cannot be zero</span>`;
+      return;
+    }
+    const idx = computeSliceIndices(SLICE_DEMO.length, start, stop, step);
+    renderGrid(idx);
+    const resultList = idx.map(i => SLICE_DEMO[i]);
+    const listStr = '[' + resultList.map(x => `'${x}'`).join(', ') + ']';
+    resultEl.innerHTML = `<span class="ok">spam[${exprMid}]</span> = <span>${listStr}</span>` +
+      (resultList.length === 0 ? ' <span style="color:#f39c12;">（空串列，不是錯誤）</span>' : '');
+  }
+
+  SLICE_PRESETS.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = 'preset-btn' + (i === 1 ? ' active' : '');
+    b.textContent = p.label;
+    b.addEventListener('click', () => {
+      presetRow.querySelectorAll('.preset-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      startInput.value = p.start; stopInput.value = p.stop; stepInput.value = p.step;
+      renderResult();
+    });
+    presetRow.appendChild(b);
+  });
+
+  [startInput, stopInput, stepInput].forEach(inp => inp.addEventListener('input', () => {
+    presetRow.querySelectorAll('.preset-btn').forEach(x => x.classList.remove('active'));
+    renderResult();
+  }));
+
+  renderResult(); // 初始輸出
+})();
+
+/* ============================================================
+   P07 list 方法逐步動畫：append → insert → del → sort
+   ============================================================ */
+function renderMethodCells(cells) {
+  const el = document.getElementById('methodCells');
+  if (!cells) { el.innerHTML = '<span class="var-empty">按「單步 ▸」開始執行</span>'; return; }
+  el.innerHTML = cells.map(c => {
+    const cls = ['seq-cell'];
+    if (c.hit) cls.push('hit');
+    if (c.isNew) cls.push('newcell');
+    if (c.removed) cls.push('removed');
+    return `<div class="seq-cell-wrap"><div class="${cls.join(' ')}">'${c.v}'</div></div>`;
+  }).join('');
+}
+StepRunner('method', [
+  { line:0, out:[], note:"建立 t = ['bat', 'cat', 'rat']",
+    cells:[{v:'bat'},{v:'cat'},{v:'rat'}] },
+  { line:1, out:[], note:"t.append('elephant') → 加到尾端，回傳 None（不要寫 t = t.append(...)！）",
+    cells:[{v:'bat'},{v:'cat'},{v:'rat'},{v:'elephant', isNew:true}] },
+  { line:2, out:[], note:"t.insert(1, 'ant') → 插入索引 1，原本索引 1 之後的元素全部右移一格",
+    cells:[{v:'bat'},{v:'ant', isNew:true},{v:'cat', hit:true},{v:'rat', hit:true},{v:'elephant', hit:true}] },
+  { line:3, out:[], note:"del t[3] → 刪除索引 3（'rat'），後面的元素往前移",
+    cells:[{v:'bat'},{v:'ant'},{v:'cat'},{v:'elephant', hit:true}] },
+  { line:4, out:[], note:"t.sort() → 就地按字母遞增排序，回傳 None",
+    cells:[{v:'ant', hit:true},{v:'bat', hit:true},{v:'cat', hit:true},{v:'elephant', hit:true}] },
+  { line:5, out:[], note:"t.sort(reverse=True) → 就地反向（遞減）排序",
+    cells:[{v:'elephant', hit:true},{v:'cat', hit:true},{v:'bat', hit:true},{v:'ant', hit:true}] },
+  { line:6, out:["['elephant', 'cat', 'bat', 'ant']"], newOut:true, note:'✔ print(t) → 印出最終結果',
+    cells:[{v:'elephant'},{v:'cat'},{v:'bat'},{v:'ant'}] },
+], {
+  onStep: s => renderMethodCells(s.cells),
+  onReset: () => renderMethodCells(null),
+});
+
+/* ============================================================
+   P11 參照 vs 複製：多標籤物件視覺化（重用 obj-box / tag）
+   ============================================================ */
+function renderRefCanvas(state) {
+  const el = document.getElementById('refCanvas');
+  if (!state) { el.innerHTML = '<span class="var-empty">按「單步 ▸」開始執行</span>'; return; }
+  el.innerHTML = state.objs.map(o =>
+    `<div class="obj-box${o.pulse ? ' pulse' : ''}">
+       ${(o.tags||[]).map(t => `<span class="tag${t.cls ? ' ' + t.cls : ''}">${t.text}</span>`).join('')}
+       ${o.val}<span class="obj-type">list</span>
+     </div>`).join('');
+}
+StepRunner('ref', [
+  { line:0, out:[], note:'建立 list 物件 [0, 1, 2]，貼上標籤 spam',
+    canvas:{ objs:[{val:'[0, 1, 2]', tags:[{text:'spam'}]}] } },
+  { line:1, out:[], note:'cheese = spam → 複製的是「參照」！兩個標籤指向同一個 list',
+    canvas:{ objs:[{val:'[0, 1, 2]', tags:[{text:'spam',cls:'tag-a'},{text:'cheese',cls:'tag-b'}]}] } },
+  { line:2, out:[], note:"cheese[1] = 'Hello!' → 就地修改，spam 指向的也是這個 list，所以也變了",
+    canvas:{ objs:[{val:"[0, 'Hello!', 2]", tags:[{text:'spam',cls:'tag-a'},{text:'cheese',cls:'tag-b'}], pulse:true}] } },
+  { line:3, out:["[0, 'Hello!', 2]"], newOut:true, note:'print(spam) → 果然 spam 也被改變了！',
+    canvas:{ objs:[{val:"[0, 'Hello!', 2]", tags:[{text:'spam',cls:'tag-a'},{text:'cheese',cls:'tag-b'}]}] } },
+  { line:4, out:["[0, 'Hello!', 2]"], note:'clone = copy.copy(spam) → 真正複製一份新 list，clone 指向全新物件',
+    canvas:{ objs:[
+      {val:"[0, 'Hello!', 2]", tags:[{text:'spam',cls:'tag-a'},{text:'cheese',cls:'tag-b'}]},
+      {val:"[0, 'Hello!', 2]", tags:[{text:'clone'}], pulse:true} ] } },
+  { line:5, out:["[0, 'Hello!', 2]"], note:'clone[0] = 99 → 只有 clone 指向的新 list 被改變，spam / cheese 不受影響',
+    canvas:{ objs:[
+      {val:"[0, 'Hello!', 2]", tags:[{text:'spam',cls:'tag-a'},{text:'cheese',cls:'tag-b'}]},
+      {val:"[99, 'Hello!', 2]", tags:[{text:'clone'}], pulse:true} ] } },
+  { line:6, out:["[0, 'Hello!', 2]", "[0, 'Hello!', 2] [99, 'Hello!', 2]"], newOut:true, note:'✔ print(spam, clone) → 兩個完全獨立的 list',
+    canvas:{ objs:[
+      {val:"[0, 'Hello!', 2]", tags:[{text:'spam',cls:'tag-a'},{text:'cheese',cls:'tag-b'}]},
+      {val:"[99, 'Hello!', 2]", tags:[{text:'clone'}]} ] } },
+], {
+  onStep: s => renderRefCanvas(s.canvas),
+  onReset: () => renderRefCanvas(null),
+});
+
+/* ============================================================
+   QUIZ 資料（逐字取自 questions-TW/ch4/*.json，順序：list1→list2→slice→concate→append→tuple）
+   ============================================================ */
+
+/* ============================================================
+   FLASHCARDS 資料（逐字取自 flashcards-TW/ch4.json）
+   ============================================================ */
+
+/* ============================================================
+   Floating nav active highlight
+   ============================================================ */
+(function initFloatNav(){
+  const links = document.querySelectorAll('.float-nav a[data-target]');
+  const sections = [...links].map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update(){
+    let active = sections[0] && sections[0].id;
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.35) active = s.id;
+    }
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  update();
+})();
+</script>
+
+<script>
+/* ============================================================
+   1A2B（Bulls and Cows）猜數字遊戲 —— 對應課本練習 1
+   獨立元件，不依賴 StepRunner / buildQuiz / buildFlashcards
+   ============================================================ */
+(function initBullsCows(){
+  const consoleEl = document.getElementById('bcConsole');
+  const startBtn  = document.getElementById('bcStart');
+  const guessBtn  = document.getElementById('bcGuess');
+  const resetBtn  = document.getElementById('bcReset');
+  const inputEl   = document.getElementById('bcInput');
+  if (!consoleEl || !startBtn || !guessBtn || !resetBtn || !inputEl) return;
+
+  let secret = null;
+  let guesses = 0;
+  let over = false;
+
+  function log(text, cls){
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = text;
+    consoleEl.appendChild(line);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+
+  // 生成隨機的四位數字（對應 generate_number()）：從 0-9 洗牌後取前 4 個
+  function generateNumber(){
+    const digits = [0,1,2,3,4,5,6,7,8,9];
+    for (let i = digits.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [digits[i], digits[j]] = [digits[j], digits[i]];
+    }
+    return digits.slice(0, 4);
+  }
+
+  // 檢查猜測是否符合秘密數字（對應 check_guess()）
+  function checkGuess(guess, secret){
+    let a = 0, b = 0;
+    for (let i = 0; i < guess.length; i++) {
+      if (guess[i] === secret[i]) a += 1;
+      else if (secret.includes(guess[i])) b += 1;
+    }
+    return [a, b];
+  }
+
+  function startGame(){
+    secret = generateNumber();
+    guesses = 0;
+    over = false;
+    consoleEl.innerHTML = '';
+    log('歡迎來到 1A2B！我想了一個四位數的神祕數字（數字不重複），你能猜到它嗎？', 'g-sys');
+    inputEl.disabled = false;
+    guessBtn.disabled = false;
+    inputEl.value = '';
+    inputEl.focus();
+  }
+
+  function doGuess(){
+    if (over || !secret) return;
+    const raw = inputEl.value.trim();
+    if (raw.length !== 4 || !/^\d{4}$/.test(raw)) {
+      log('⚠️ 無效的猜測，請輸入四位數字。', 'g-lose');
+      return;
+    }
+    const digits = raw.split('').map(Number);
+    if (new Set(digits).size !== 4) {
+      log('⚠️ 四個數字不能重複喔！', 'g-lose');
+      return;
+    }
+    guesses += 1;
+    log('你猜：' + raw, 'g-me');
+    const [a, b] = checkGuess(digits, secret);
+    log(a + 'A' + b + 'B', 'g-sys');
+    if (a === 4) {
+      log('🎉 恭喜你，你在 ' + guesses + ' 次猜測中猜對了神秘數字！', 'g-win');
+      over = true;
+      inputEl.disabled = true;
+      guessBtn.disabled = true;
+    }
+    inputEl.value = '';
+    inputEl.focus();
+  }
+
+  startBtn.addEventListener('click', startGame);
+  guessBtn.addEventListener('click', doGuess);
+  resetBtn.addEventListener('click', startGame);
+  inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') doGuess(); });
+})();
+</script>
+<script>
+const FLASHCARDS = [{"front": "容器（Container）", "back": "儲存或組織多個值的結構，例如串列、元組和字典。"}, {"front": "方法（Method）", "back": "與物件相關聯的函數，並且可以在該物件上被呼叫。"}, {"front": "序列（Sequence）", "back": "有序的項目集合，每個項目可以通過其位置來存取。"}, {"front": "串列（List）", "back": "Python 中的一個可變序列型別，可以儲存一組項目。"}, {"front": "元組（Tuple）", "back": "Python 中的一個不可變序列型別，可以儲存一組項目。"}, {"front": "元素（Element）", "back": "包含在像串列或元組等容器中的個別項目或值。"}, {"front": "索引（Index）", "back": "序列中元素的數值位置，從 0 開始。"}, {"front": "下標運算子（Subscript Operator）", "back": "用於通過索引存取容器中元素的方括號（[]）。"}, {"front": "切片（Slice）", "back": "通過指定起始位置、結束位置及選擇性步驟來檢索序列子集的一種方法。"}, {"front": "可變（Mutable）", "back": "描述可以在建立後改變的物件，例如串列。"}, {"front": "項目指派（Item Assignment）", "back": "通過使用索引來更改可變容器中元素的值的過程。"}, {"front": "逐項走訪（Iteration）", "back": "逐個處理容器中每個元素的過程。"}, {"front": "串列生成式（List Comprehension）", "back": "通過對序列中每個項目應用表達式來建立串列的簡潔方法。"}, {"front": "不可變（Immutable）", "back": "描述建立後無法更改的物件，例如元組。"}, {"front": "參照（Reference）", "back": "Python 中的變數儲存一個參照，這是物件的記憶體位址。它指向物件儲存的位置，而不是包含物件本身。"}, {"front": "就地修改（In-place Modification）", "back": "在不建立新物件的情況下更改可變物件的內容。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+
+(function(){
+  document.querySelectorAll('.sq-item').forEach(item => {
+    const fb = item.querySelector('.sq-fb');
+    item.querySelectorAll('.sq-opt').forEach(btn => btn.addEventListener('click', () => {
+      const good = btn.dataset.c === '1';
+      item.querySelectorAll('.sq-opt').forEach(b => b.classList.remove('correct','wrong'));
+      btn.classList.add(good ? 'correct' : 'wrong');
+      fb.textContent = btn.dataset.fb;
+      fb.classList.add('show');
+      fb.classList.toggle('good', good);
+      fb.classList.toggle('bad', !good);
+    }));
+  });
+})();
+</script>
+</body>
+</html>

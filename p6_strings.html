@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>字串操作 — 先備 P6（Python）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f39c12;letter-spacing:.3em;margin-bottom:.8rem;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{font-family:'JetBrains Mono',monospace;color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.0rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:40px;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box p:last-child{margin-bottom:0;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.65;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid #f39c12;padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .str{color:#f1fa8c;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+
+/* Preset buttons */
+.preset-row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 1rem;}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:.4rem .85rem;border-radius:6px;border:2px solid var(--card-border);background:var(--card);cursor:pointer;transition:all .2s;color:var(--ink);}
+.preset-btn:hover{border-color:var(--accent2);}
+.preset-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+
+/* Variable state table */
+.var-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+.var-table td{padding:.25rem .4rem;border-bottom:1px dashed var(--card-border);}
+.var-table td.vname{color:var(--accent2);font-weight:600;}
+.var-table td.vval{color:var(--ink);}
+.var-table td.vtype{color:var(--muted);font-size:.72rem;text-align:right;}
+.var-table tr.changed td{background:var(--highlight);}
+.var-empty{color:var(--muted);font-size:.8rem;font-style:italic;}
+
+/* Console */
+.console{background:#111;border-radius:8px;padding:.6rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#d4d4d4;min-height:70px;max-height:220px;overflow-y:auto;line-height:1.6;}
+.console .out-line{white-space:pre-wrap;}
+.console .out-line.new{color:#2ecc71;}
+.console .in-line{color:#f39c12;}
+.console .err-line{color:#e74c3c;}
+
+/* Expression stepper */
+.expr-view{background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.6rem 1rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.5rem;letter-spacing:.05em;min-height:90px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.2rem;}
+.expr-view .hl{background:var(--highlight);border:2px solid #f39c12;border-radius:6px;padding:0 .35rem;color:#b9770e;}
+.expr-view .result{color:var(--accent3);font-weight:700;}
+
+/* Object/tag visualization (variables) */
+.obj-canvas{position:relative;background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.2rem;min-height:150px;display:flex;align-items:center;justify-content:center;gap:2.2rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.obj-box{border:2px solid var(--accent2);border-radius:10px;padding:.6rem 1.1rem;background:#fff;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600;color:var(--ink);position:relative;transition:all .3s;box-shadow:0 3px 10px rgba(0,0,0,.06);}
+.obj-box .obj-type{position:absolute;top:-10px;right:-8px;font-size:.62rem;background:var(--accent2);color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;}
+.obj-box.faded{opacity:.3;border-style:dashed;}
+.obj-box.faded::after{content:'（被遺忘 → 資源回收）';position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:.62rem;color:var(--muted);white-space:nowrap;}
+.obj-box .tag{position:absolute;top:-34px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:12px;white-space:nowrap;transition:all .3s;}
+.obj-box .tag::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--accent);}
+
+/* Sandbox */
+.sandbox{background:var(--card);border:2px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.sandbox .sandbox-label{position:absolute;top:-11px;left:14px;background:var(--accent3);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.input-row{display:flex;gap:.5rem;align-items:center;margin:.5rem 0;flex-wrap:wrap;}
+.input-row label{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent2);font-weight:600;}
+.input-row input[type="text"]{font-family:'JetBrains Mono',monospace;font-size:.9rem;padding:.45rem .7rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;flex:1;min-width:160px;}
+.sandbox-result{margin-top:.6rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.9rem;min-height:46px;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.sandbox-result .ok{color:#2ecc71;font-weight:700;}
+.sandbox-result .bad{color:#e67e22;font-weight:700;}
+.sandbox-result .type-badge{background:#50fa7b;color:#1a1a2e;font-weight:700;padding:1px 10px;border-radius:4px;font-size:.82rem;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+.quiz-box .quiz-label .multi-badge{background:#8e44ad;color:#fff;font-size:.68rem;padding:1px 8px;border-radius:3px;}
+.quiz-box .quiz-q{font-weight:600;margin-bottom:.6rem;}
+.quiz-box .quiz-code{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:.6rem .9rem;font-family:'JetBrains Mono',monospace;font-size:.84rem;margin-bottom:.8rem;white-space:pre-wrap;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0 0;}
+.quiz-opt{display:flex;flex-direction:column;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:.9rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-head{display:flex;align-items:baseline;gap:.6rem;}
+.quiz-opt .opt-letter{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt .opt-fb{display:none;font-size:.82rem;margin-top:.4rem;padding-top:.4rem;border-top:1px dashed var(--card-border);color:#555;}
+.quiz-opt.revealed .opt-fb{display:block;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.correct .opt-fb{color:#14532d;}
+.quiz-opt.wrong{background:#fef5e7;border-color:#d68910;}
+.quiz-opt.wrong .opt-letter{color:#d68910;}
+.quiz-progress{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;margin:.8rem 0;}
+
+/* Flashcards */
+.card-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.flashcard{perspective:900px;height:150px;cursor:pointer;}
+.flashcard .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .fc-inner{transform:rotateY(180deg);}
+.flashcard .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.flashcard .fc-front{background:linear-gradient(150deg,#2c3e7a,#1a1a2e);color:#fff;font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;letter-spacing:.05em;flex-direction:column;gap:.4rem;}
+.flashcard .fc-front .fc-hint{font-size:.66rem;color:rgba(255,255,255,.45);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.flashcard .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.8rem;line-height:1.6;transform:rotateY(180deg);overflow-y:auto;}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:34px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+/* Chapter nav */
+.chapter-nav{display:flex;justify-content:space-between;gap:1rem;margin:2rem 0 0;flex-wrap:wrap;}
+.chapter-nav a{flex:1;min-width:220px;background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1rem 1.3rem;text-decoration:none;color:var(--ink);transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.chapter-nav a:hover{border-color:var(--accent2);transform:translateY(-2px);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.1em;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+footer a{color:var(--accent2);}
+
+/* ============================================================
+   CH05 新增樣式（少量，僅供本章沙盒使用，不覆寫既有規則）
+   ============================================================ */
+.sandbox-compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.8rem;}
+@media(max-width:700px){.sandbox-compare{grid-template-columns:1fr;}}
+.sandbox-compare .compare-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--accent2);font-weight:700;letter-spacing:.05em;margin-bottom:.4rem;}
+.quiz-opt .opt-head span:last-child{white-space:pre-wrap;}
+
+/* 🎮 Game box */
+.game-box{background:linear-gradient(150deg,#1a1a2e 0%,#232345 100%);border-radius:14px;padding:1.5rem 1.7rem;margin:1.5rem 0;color:#fff;position:relative;overflow:hidden;}
+.game-box::before{content:'🎮';position:absolute;top:-14px;right:6px;font-size:5.2rem;opacity:.08;}
+.game-box .gb-tag{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#f39c12;letter-spacing:.2em;margin-bottom:.4rem;}
+.game-box h3{color:#fff;margin-top:0;}
+.game-box p{color:rgba(255,255,255,.82);}
+.game-console{background:#111;border-radius:8px;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#d4d4d4;min-height:120px;max-height:260px;overflow-y:auto;line-height:1.7;margin:.8rem 0;}
+.game-console .g-sys{color:#5dade2;}
+.game-console .g-win{color:#2ecc71;font-weight:700;}
+.game-console .g-lose{color:#e74c3c;font-weight:700;}
+.game-console .g-me{color:#f39c12;}
+.game-input-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.game-input-row input{font-family:'JetBrains Mono',monospace;font-size:.95rem;padding:.5rem .8rem;border:none;border-radius:8px;width:130px;}
+.game-note{font-size:.8rem;color:rgba(255,255,255,.72);margin-top:.7rem;}
+.game-note a{color:#2ecc71;}
+
+/* 🤖 Ask-AI exercise box */
+.ai-box{background:var(--card);border:2px dashed #8e44ad;border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.ai-box .ai-label{position:absolute;top:-11px;left:14px;background:#8e44ad;color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.ai-box p:last-child{margin-bottom:0;}
+.ai-box .ai-prompt{font-family:'JetBrains Mono',monospace;font-size:.85rem;background:rgba(142,68,173,.08);border-radius:6px;padding:.4rem .8rem;display:block;margin:.4rem 0;color:#6c3485;}
+
+/* 🎓 Chapter-end bridge */
+.bridge-box{background:#eafaf1;border:2px solid var(--accent3);border-radius:12px;padding:1.3rem 1.5rem;margin:2rem 0 0;}
+.bridge-box .bb-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent3);font-weight:700;letter-spacing:.12em;margin-bottom:.5rem;}
+.bridge-box ul{margin:.3rem 0 .8rem 1.3rem;font-size:.92rem;}
+.bridge-box .bb-next{font-size:.9rem;color:var(--accent2);border-top:1px dashed var(--accent3);padding-top:.6rem;margin-bottom:0;}
+
+/* 深色容器內的可讀性修正（code/summary/pill 在深色背景上原樣式太深） */
+.game-box code,.cta-box code{background:rgba(255,255,255,.14);color:#8be9fd;}
+.game-box details summary{cursor:pointer;color:#5dade2;font-size:.85rem;}
+.game-box .pill{background:rgba(255,255,255,.14);color:#f1fa8c;border-color:rgba(255,255,255,.28);}
+.game-box a{color:#2ecc71;}
+.cta-box a{color:#2ecc71;}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+
+/* ===== 題庫自測區 ===== */
+.sq-item{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.sq-item .sq-q{font-weight:700;margin-bottom:.7rem;}
+.sq-item .sq-q .sq-num{font-family:'JetBrains Mono',monospace;color:var(--accent);margin-right:.4rem;}
+.sq-opts{display:flex;flex-direction:column;gap:.45rem;}
+.sq-opt{text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;line-height:1.6;padding:.55rem .9rem;border-radius:8px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;}
+.sq-opt:hover{border-color:var(--accent2);}
+.sq-opt.correct{border-color:var(--accent3);background:rgba(26,107,74,.10);}
+.sq-opt.wrong{border-color:var(--accent);background:rgba(192,57,43,.08);}
+.sq-fb{display:none;margin-top:.7rem;font-size:.86rem;line-height:1.7;border-left:4px solid var(--accent2);padding:.5rem .9rem;background:var(--paper);border-radius:0 8px 8px 0;}
+.sq-fb.show{display:block;}
+.sq-fb.good{border-left-color:var(--accent3);}
+.sq-fb.bad{border-left-color:var(--accent);}
+
+.sq-code{background:var(--code-bg);color:var(--code-fg);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;padding:.7rem .9rem;border-radius:8px;margin:.2rem 0 .8rem;overflow-x:auto;white-space:pre;}
+</style>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<!-- Floating navigation sidebar -->
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#intro" data-target="intro"><span class="fn-num">P01</span><span class="fn-name">建立字串、索引與切片</span></a>
+  <a href="#escape" data-target="escape"><span class="fn-num">P02</span><span class="fn-name">跳脫字元與原始字串</span></a>
+  <a href="#format" data-target="format"><span class="fn-num">P03</span><span class="fn-name">格式化與插值</span></a>
+  <a href="#methods" data-target="methods"><span class="fn-num">P04</span><span class="fn-name">字串方法</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">速查表</span></a>
+  <a href="#bankquiz" data-target="bankquiz"><span class="fn-num">QUIZ</span><span class="fn-name">自我檢測</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="chapter-tag">PREREQ P6</div>
+    <h1><span class="blue">字串</span>操作：不可變的字元序列</h1>
+    <div class="subtitle">先備知識複習 · 選讀，不列入作業與考試範圍</div>
+    <div class="big-formula">索引｜切片｜跳脫字元｜f-string｜字串方法</div>
+    <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（先備複習 · 選讀，不列入評分）</div>
+  <p>① 這頁複習資料結構課程<strong>預設你已經會</strong>的 Python。已經熟的可以直接跳過。
+  ② 每節都附一個<strong>「這在資料結構課哪裡會用到」</strong>的小方框——那才是你該記住的部分。
+  ③ 讀完做 <a href="#bankquiz">自我檢測</a>，再翻 <a href="#cards">關鍵詞彙卡</a>。
+  <br><strong>本頁屬補充先備知識，不列入作業與考試範圍。</strong></p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#intro"><span class="toc-num">P01</span>建立字串、索引與切片</a>
+    <a href="#escape"><span class="toc-num">P02</span>跳脫字元與原始字串</a>
+    <a href="#format"><span class="toc-num">P03</span>格式化與插值（%、f-string）</a>
+    <a href="#methods"><span class="toc-num">P04</span>字串方法</a>
+    <a href="#reference"><span class="toc-num">REF</span>本章速查表</a>
+    <a href="#bankquiz"><span class="toc-num">QUIZ</span>自我檢測</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<section id="intro">
+  <div class="section-number">PART 01 · 建立字串、索引與切片</div>
+  <h2>字串（string）：文字資料的序列</h2>
+  <p>先想一下：你每天傳的訊息、遊戲裡的對白、成績單上的名字——在程式眼裡，這些<strong>全部都是字串</strong>。文字是程式中最常見的資料，這一章就是要學會「加工」它們：切出你要的部分、排成你要的樣子，章末還會幫「神秘島嶼」的兩位玩家排出一張漂亮的狀態表。</p>
+  <p>你已經知道可以用 <code>+</code> 把兩個字串串接在一起，但能做的遠不止如此！建立字串最簡單的方式，是把文字放在<strong>單引號</strong> <code>'...'</code> 或<strong>雙引號</strong> <code>"..."</code> 中——兩者效果完全相同：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line"><span class="fn">type</span>(<span class="str">''</span>), <span class="fn">type</span>(<span class="str">""</span>)  <span class="com"># 都是 &lt;class 'str'&gt;</span></span></div>
+
+  <p>好消息：字串其實就是<strong>一排字元組成的序列</strong>——把它想成「每個字元都有座號」，跟上一章的 list 是同一家人。所以你在 CH04 練過的招式（索引、切片、<code>len()</code>、<code>in</code>、走訪……）幾乎都能直接用在字串上。用中括號就能取出某個位置的<strong>字元</strong>：</p>
+
+  <table class="cmp-table">
+    <tr><th>運算式</th><th>結果</th><th>說明</th></tr>
+    <tr><td>fruit = 'banana'</td><td>—</td><td>建立字串物件</td></tr>
+    <tr><td>fruit[1]</td><td class="best">'a'</td><td>索引從 0 開始，第 2 個字元</td></tr>
+    <tr><td>len(fruit)</td><td class="best">6</td><td>字串的字元數量</td></tr>
+    <tr><td>fruit[-1]</td><td class="best">'a'</td><td>負索引從尾端往前數，-1 是最後一個字元</td></tr>
+    <tr><td>fruit[-2]</td><td class="best">'n'</td><td>倒數第二個字元</td></tr>
+  </table>
+
+  <h3>切片（slicing）</h3>
+  <p>切片可以從原始字串中擷取<strong>子字串</strong>，語法是 <code>[start:stop:step]</code>：從起始位置的字元到停止位置的字元，<strong>包含 start、不包含 stop</strong>，預設間隔 <code>step=1</code>。若省略 start，切片從開頭開始；若省略 stop，切片延伸到結尾。</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;"><span class="line">s = <span class="str">'Cool-Python'</span></span></div>
+  <table class="cmp-table">
+    <tr><th>運算式</th><th>結果</th><th>說明</th></tr>
+    <tr><td>s[:5]</td><td>'Cool-'</td><td>同 s[0:5]</td></tr>
+    <tr><td>s[5:]</td><td>'Python'</td><td>同 s[5:len(s)]</td></tr>
+    <tr><td>s[::2]</td><td>'Co-yhn'</td><td>同 s[0:len(s):2]，每隔一個字元取一個</td></tr>
+    <tr><td>s[::]</td><td>'Cool-Python'</td><td>同 s[:]，複製整個字串</td></tr>
+    <tr><td>s[::-1]</td><td class="best">'nohtyP-looC'</td><td>step 為負 → 反轉字串！</td></tr>
+  </table>
+
+  <h3>字串是不可變（immutable）的</h3>
+  <p>字串是<strong>不可修改</strong>的物件：你不能像串列一樣用索引直接改寫其中的字元。</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line">s = <span class="str">"hello"</span>   <span class="com"># Strings 是不可修改的物件</span></span>
+<span class="line">s[<span class="num">0</span>] = <span class="str">'y'</span>   <span class="com"># TypeError: 'str' object does not support item assignment</span></span></div>
+  <p>能做的是<strong>建立一個新字串</strong>，它是原字串的變體：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line"><span class="fn">print</span>(<span class="fn">id</span>(s))   <span class="com"># 例如 132473677310704</span></span>
+<span class="line">s = <span class="str">'y'</span> + s[<span class="num">1</span>:<span class="fn">len</span>(s)]  <span class="com"># 建立全新的字串物件</span></span>
+<span class="line"><span class="fn">print</span>(<span class="fn">id</span>(s))   <span class="com"># 例如 132473677315936 —— 是不同的物件！</span></span>
+<span class="line"><span class="fn">print</span>(s)      <span class="com"># yello</span></span></div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 字串不可變（immutable）</div>
+    <p style="margin-bottom:0;"><code>s[0] = 'x'</code> 這種寫法一定會產生 <code>TypeError</code>！字串的任何「修改」，本質上都是<strong>建立一個新的字串物件</strong>，再把變數這個標籤重新貼到新物件上——原本的字串完全沒有被改變。串列（list）則不同，是可變（mutable）的。</p>
+  </div>
+
+  <h3>走訪與 in / not in</h3>
+  <p>字串的走訪跟串列一樣，用 <code>for</code> 迴圈依序取出每個字元：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line"><span class="com"># 測試字串是否含有 'o'</span></span>
+<span class="line"><span class="kw">for</span> char <span class="kw">in</span> s:   <span class="com"># 從字串中取出每一個字元</span></span>
+<span class="line">    <span class="kw">if</span> char == <span class="str">'o'</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"有 o"</span>)</span>
+<span class="line">        <span class="kw">break</span></span></div>
+  <p><code>in</code> 和 <code>not in</code> 運算子也能像用在串列上一樣用在字串，判斷一個子字串是否存在，回傳布林值：</p>
+  <div class="pseudo-code">
+<span class="line"><span class="fn">print</span>(<span class="str">'Hello'</span> <span class="kw">in</span> <span class="str">'Hello, World'</span>)      <span class="com"># True</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">'cats'</span> <span class="kw">not in</span> <span class="str">'cats and dogs'</span>)  <span class="com"># False</span></span></div>
+</section>
+
+<!-- ============================================================ -->
+<section id="escape">
+  <div class="section-number">PART 02 · 跳脫字元與原始字串</div>
+  <h2>跳脫字元（escape character）</h2>
+  <p><strong>跳脫字元</strong>讓你可以在字串中使用那些原本無法直接放入的字元。跳脫字元由<strong>反斜線 <code>\</code></strong> 加上想要加入的字元組成。例如單引號字串內要放單引號，就要用 <code>\'</code>：Python 知道 <code>Bob\'s</code> 裡的單引號因為前面有反斜線，所以不是用來結束字串的引號。</p>
+
+  <table class="cmp-table">
+    <tr><th>跳脫字元</th><th>輸出為</th></tr>
+    <tr><td>\'</td><td>單引號</td></tr>
+    <tr><td>\"</td><td>雙引號</td></tr>
+    <tr><td>\\</td><td>反斜線</td></tr>
+    <tr><td>\t</td><td>Tab 鍵</td></tr>
+    <tr><td>\n</td><td>換行（換行符號）</td></tr>
+  </table>
+
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line">spam = <span class="str">'Say hi to Bob\'s mother.'</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">"Hello there!\nHow are you?\n\tI'm doing fine."</span>)</span>
+<span class="line"><span class="com"># 輸出：</span></span>
+<span class="line"><span class="com"># Hello there!</span></span>
+<span class="line"><span class="com"># How are you?</span></span>
+<span class="line"><span class="com">#     I'm doing fine.</span></span></div>
+
+  <h3>🧪 互動：跳脫字元預覽器</h3>
+  <p>輸入字串內容（用課本例句當起點也可以），左邊看到「程式碼中的寫法」，右邊看到 <code>print()</code> 實際印出的結果。也可以按下方按鈕切換<strong>原始字串 <code>r'...'</code></strong>，比較兩者差異：</p>
+  <div class="sandbox">
+    <div class="sandbox-label">🧪 SANDBOX · 跳脫字元預覽器</div>
+    <div class="input-row">
+      <label>字串內容：</label>
+      <input type="text" id="escInput" value="Say hi to Bob\'s mother.">
+    </div>
+    <div class="preset-row" id="escPresets"></div>
+    <div class="preset-row">
+      <button class="preset-btn" id="rawToggle">原始字串 r'...'：關閉</button>
+    </div>
+    <div class="sandbox-compare">
+      <div>
+        <div class="compare-label">程式碼中的寫法</div>
+        <div class="pseudo-code" id="escCode"></div>
+      </div>
+      <div>
+        <div class="compare-label">print() 的輸出</div>
+        <div class="sandbox-result" id="escOutput"></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>原始字串（raw string）</h3>
+  <p>在字串起始引號前加上 <code>r</code>，就成為<strong>原始字串</strong>——它會完全忽略所有跳脫字元，字串中的反斜線一律照字面印出：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line"><span class="fn">print</span>(r<span class="str">'That is Alice\'s cat.'</span>)  <span class="com"># That is Alice\'s cat.（反斜線被照印出來）</span></span></div>
+  <p>原始字串在需要輸入<strong>大量反斜線</strong>的字串時非常有用，例如 Windows 檔案路徑：</p>
+  <div class="pseudo-code">
+<span class="line">path = r<span class="str">'C:\Users\Al\Desktop'</span>   <span class="com"># 若不加 r，\U 甚至會被當成非法的萬國碼跳脫字元！</span></span></div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 忘記 r 的常見地雷</div>
+    <p style="margin-bottom:0;">如果忘了加 <code>r</code>，<code>'C:\new_folder\test.txt'</code> 中的 <code>\n</code> 會被當成換行、<code>\t</code> 會被當成 Tab，整個路徑就亂掉了！這正是上面沙盒最後一個 preset 想示範的地雷，切換 raw 開關比較看看。</p>
+  </div>
+
+  <div class="ai-box">
+    <div class="ai-label">🤖 動手問 AI（課本練習 1）</div>
+    <p>課本的練習 1：詢問 LLM（ChatGPT / Gemini / Copilot 都可以）什麼是跳脫字元，並請它列出一些範例。先自己在上面的沙盒玩過一輪、心中有自己的答案之後再問，比較 AI 的說法跟你的理解有沒有出入：</p>
+    <span class="ai-prompt">「什麼是跳脫字元？請給我 5 個例子，並說明每個例子 print 出來會長什麼樣子。」</span>
+    <span class="ai-prompt">「'C:\new_folder' 和 r'C:\new_folder' 印出來為什麼不一樣？」</span>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="format">
+  <div class="section-number">PART 03 · 格式化與插值</div>
+  <h2>把字串放進其他字串：從 % 到 f-string</h2>
+  <p>把字串放進其他字串是很常見的操作。到目前為止我們都用 <code>+</code> 做字串串接，但這樣寫很繁瑣：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line">name = <span class="str">'Al'</span>; age = <span class="num">33</span>; language = <span class="str">'Python'</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">"\nHey! I'm "</span> + name + <span class="str">", "</span> + <span class="fn">str</span>(age) + <span class="str">" old and I love "</span> + language + <span class="str">" Programing"</span>)</span></div>
+
+  <h3>舊寫法：% 格式化運算子</h3>
+  <p>你在 CH01 認識的 <code>%</code> 是取餘數——但它其實會「變身」：<strong>只要第一個運算元是字串，<code>%</code> 就變成格式化運算子</strong>，像填空一樣把值塞進字串裡的洞。洞的樣子由<strong>格式說明符號</strong>決定：<code>%d</code> 挖給整數、<code>%s</code> 挖給字串、<code>%f</code> 挖給浮點數。結果仍然是字串，而且不必再呼叫 <code>str()</code>：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line"><span class="fn">print</span>(<span class="str">"\nHey! I'm %s, %d years old and I love %s Programing"</span>%(name,age,language))  <span class="com"># 類似 C 的 printf</span></span></div>
+  <p>也可以更精確地指定寬度與小數位數：<code>%</code> 後的數字代表<strong>總欄位寬度</strong>，用 <code>.</code> 分隔的第二個數字是小數部分寬度。預設數字靠右對齊，字串靠左對齊；不足寬度的部分用空格補齊：</p>
+  <div class="pseudo-code">
+<span class="line">a = <span class="num">32</span>; b = <span class="num">32.145</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">'a=%4d, b=%6.2f'</span> % (a,b))   <span class="com"># a=  32, b= 32.15（b 被四捨五入！）</span></span></div>
+
+  <h3>新寫法：f-string（推薦！）</h3>
+  <p>Python 3.6 引入的 <strong>f-string</strong>（f 代表 formatted）功能類似字串插值，但用大括號 <code>{}</code> 取代 <code>%s</code>，並把運算式直接寫在大括號內。像原始字串一樣，f-string 在起始引號前有 <code>f</code> 前綴：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line"><span class="fn">print</span>(f<span class="str">'{a:4d},{b:6.2f}'</span>)   <span class="com"># 效果同上，但更直覺！大括號內甚至可以放運算式，如 {age+2}</span></span></div>
+  <p>對齊方式：用 <code>&lt;</code>、<code>&gt;</code>、<code>^</code> 分別指定<strong>靠左、靠右、置中</strong>對齊，格式規範放在變數後面，用冒號分隔：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line"><span class="fn">print</span>(f<span class="str">'[{a:&lt;15d}]'</span>)   <span class="com"># [32             ]  靠左，補到寬度 15</span></span>
+<span class="line"><span class="fn">print</span>(f<span class="str">'[{b:^9.2f}]'</span>)  <span class="com"># [  32.15  ]  置中，補到寬度 9</span></span></div>
+  <p>也可以在寬度前加 <code>+</code> 讓正數顯示 <code>+</code> 號（負數本來就會顯示 <code>-</code>），或加 <code>0</code> 讓補齊用 <code>0</code> 而不是空格（<code>+</code> 的話 <code>0</code> 要放在 <code>+</code> 後面）：</p>
+  <div class="pseudo-code">
+<span class="line"><span class="fn">print</span>(f<span class="str">'[{a:+10d}]'</span>)   <span class="com"># [       +32]</span></span>
+<span class="line"><span class="fn">print</span>(f<span class="str">'[{a:+010d}]'</span>)  <span class="com"># [+000000032]</span></span></div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ % 是舊寫法</div>
+    <p style="margin-bottom:0;"><code>%</code> 格式化運算子仍然合法、也還看得到（類似 C 語言的 <code>printf</code>），但現代 Python 建議一律改用 <strong>f-string</strong>：可讀性更好、能直接寫運算式，也不需要額外呼叫 <code>str()</code>。</p>
+  </div>
+
+  <h3>🧪 互動：f-string Playground</h3>
+  <p>選一個變數，調整格式規格（寬度、小數位數、對齊、千分位），即時看到 f-string 的寫法與輸出結果：</p>
+  <div class="sandbox">
+    <div class="sandbox-label">🧪 SANDBOX · f-string Playground</div>
+    <div class="input-row">
+      <label>變數：</label>
+      <select id="fmtVar">
+        <option value="name">name = '小明'（str）</option>
+        <option value="score">score = 87.5（float）</option>
+        <option value="pi" selected>pi = 3.14159（float）</option>
+        <option value="big">big = 12345678（int）</option>
+      </select>
+      <label>寬度：</label>
+      <input type="text" id="fmtWidth" placeholder="例如 10" style="max-width:80px;flex:none;">
+      <label>小數位數：</label>
+      <input type="text" id="fmtPrecision" placeholder="例如 2" style="max-width:80px;flex:none;">
+      <label>對齊：</label>
+      <select id="fmtAlign">
+        <option value="">預設</option>
+        <option value="<">&lt; 靠左</option>
+        <option value=">">&gt; 靠右</option>
+        <option value="^">^ 置中</option>
+      </select>
+      <label><input type="checkbox" id="fmtComma"> 千分位 ,</label>
+    </div>
+    <div class="sandbox-compare">
+      <div>
+        <div class="compare-label">f-string 寫法</div>
+        <div class="pseudo-code" id="fmtCode"></div>
+      </div>
+      <div>
+        <div class="compare-label">print() 的輸出</div>
+        <div class="sandbox-result" id="fmtOutput"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-box">
+    <div class="gb-tag">GAME · 取自課本練習 2</div>
+    <h3>神秘島嶼：幫玩家排出漂亮的狀態表</h3>
+    <p>你正在做一款叫「神秘島嶼」的文字冒險遊戲，每次開場都要顯示玩家狀態。試著調整下面兩位玩家的名字與數值，看 f-string 的 <code>{值:&gt;8}</code> 右對齊怎麼讓每一欄乖乖排好——不管數字是 0 還是 100，小數點永遠對齊！</p>
+    <div class="game-input-row" style="margin-bottom:.4rem;">
+      <input type="text" id="miP1Name" value="玩家1" maxlength="6" style="width:90px;">
+      <label style="color:rgba(255,255,255,.7);font-size:.8rem;">生命</label><input type="number" id="miP1Hp" value="100" min="0" max="100" style="width:70px;">
+      <label style="color:rgba(255,255,255,.7);font-size:.8rem;">經驗</label><input type="number" id="miP1Exp" value="0" min="0" max="150" style="width:70px;">
+      <label style="color:rgba(255,255,255,.7);font-size:.8rem;">金幣</label><input type="number" id="miP1Gold" value="50" min="0" max="60" step="0.5" style="width:80px;">
+    </div>
+    <div class="game-input-row">
+      <input type="text" id="miP2Name" value="玩家2" maxlength="6" style="width:90px;">
+      <label style="color:rgba(255,255,255,.7);font-size:.8rem;">生命</label><input type="number" id="miP2Hp" value="60" min="0" max="100" style="width:70px;">
+      <label style="color:rgba(255,255,255,.7);font-size:.8rem;">經驗</label><input type="number" id="miP2Exp" value="120" min="0" max="150" style="width:70px;">
+      <label style="color:rgba(255,255,255,.7);font-size:.8rem;">金幣</label><input type="number" id="miP2Gold" value="40" min="0" max="60" step="0.5" style="width:80px;">
+    </div>
+    <div class="game-console" id="miConsole" style="white-space:pre;"></div>
+    <details>
+      <summary style="cursor:pointer;color:#5dade2;font-size:.85rem;">📜 這張狀態表的 Python 程式碼（課本練習的參考解答之一）</summary>
+      <div class="pseudo-code" style="margin-top:.6rem;">
+<span class="line"><span class="kw">def</span> <span class="fn">print_stats</span>(player_name, health, experience, gold):</span>
+<span class="line">    <span class="fn">print</span>(f<span class="str">"{player_name}狀態："</span>)</span>
+<span class="line">    <span class="fn">print</span>(f<span class="str">"生命值：{health:&gt;8}/100"</span>)</span>
+<span class="line">    <span class="fn">print</span>(f<span class="str">"經驗值：{experience:&gt;8}/150"</span>)</span>
+<span class="line">    <span class="fn">print</span>(f<span class="str">"金幣：{gold:&gt;8.2f}/60.00"</span>)</span>
+<span class="line"></span>
+<span class="line">game_title = <span class="str">"神秘島嶼"</span></span>
+<span class="line"><span class="fn">print</span>(f<span class="str">'歡迎來到 "{game_title}" 冒險遊戲！\n'</span>)</span>
+<span class="line"><span class="fn">print_stats</span>(<span class="str">"玩家1"</span>, <span class="num">100</span>, <span class="num">0</span>, <span class="num">50.0</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"\n"</span>)</span>
+<span class="line"><span class="fn">print_stats</span>(<span class="str">"玩家2"</span>, <span class="num">60</span>, <span class="num">120</span>, <span class="num">40.0</span>)</span></div>
+    </details>
+    <div class="game-note">課本的練習 2 是把 <code>print_stats</code> 裡的格式規格留白讓你填——打開 <code>05_Manipulating_string.ipynb</code> 練習 2，先自己填填看再對答案，這是你的「這是我做出來的」時刻。</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="methods">
+  <div class="section-number">PART 04 · 字串方法</div>
+  <h2>常用字串方法：strip / upper / split…… <span class="pill pill-purple">📎 講義外補充</span></h2>
+  <p>除了索引、切片，字串還內建了許多實用的<strong>方法（method）</strong>，可以增加或移除空白、轉換英文大小寫，或檢查字串格式是否正確。課本只在引言提到字串有這些方法、沒有逐一展開，這一節幫你把常用的整理成工具箱——不用背，需要時回來查就好：</p>
+
+  <table class="cmp-table">
+    <tr><th>方法</th><th>說明</th><th>範例</th><th>結果</th></tr>
+    <tr><td>upper()</td><td>轉成全大寫</td><td>'Hello World'.upper()</td><td>'HELLO WORLD'</td></tr>
+    <tr><td>lower()</td><td>轉成全小寫</td><td>'Hello World'.lower()</td><td>'hello world'</td></tr>
+    <tr><td>isupper() / islower()</td><td>檢查是否全大寫／全小寫</td><td>'HELLO'.isupper()</td><td class="best">True</td></tr>
+    <tr><td>startswith() / endswith()</td><td>檢查開頭／結尾是否符合</td><td>'Hello World'.startswith('Hello')</td><td class="best">True</td></tr>
+    <tr><td>strip() / lstrip() / rstrip()</td><td>去除頭尾／左／右空白</td><td>'  hi  '.strip()</td><td>'hi'</td></tr>
+    <tr><td>split(sep)</td><td>依分隔符切成串列</td><td>'a,b,c'.split(',')</td><td>['a', 'b', 'c']</td></tr>
+    <tr><td>join(list)</td><td>用字串把串列黏合起來</td><td>'-'.join(['a','b','c'])</td><td>'a-b-c'</td></tr>
+    <tr><td>rjust(w) / ljust(w)</td><td>靠右／靠左補齊到寬度 w</td><td>'7'.rjust(3,'0')</td><td>'007'</td></tr>
+    <tr><td>center(w)</td><td>置中補齊到寬度 w</td><td>'hi'.center(6,'*')</td><td>'**hi**'</td></tr>
+    <tr><td>isdigit() / isalpha() / isspace()</td><td>檢查是否全為數字／字母／空白</td><td>'123'.isdigit()</td><td class="best">True</td></tr>
+  </table>
+
+  <h3>🎬 互動：strip → upper → split 逐步動畫</h3>
+  <p>字串方法呼叫後永遠是<strong>回傳一個新字串（或新串列）</strong>，原本的字串完全不會被改變。逐步執行下面這段串接三個方法的小程式，觀察每一步變數表如何變化：</p>
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="pseudo-code" id="methodsCode">
+<span class="line">raw = <span class="str">'  hello world python  '</span></span>
+<span class="line">step1 = raw.strip()</span>
+<span class="line">step2 = step1.upper()</span>
+<span class="line">step3 = step2.split()</span>
+<span class="line"><span class="fn">print</span>(step3)</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="methodsStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="methodsPlay">▶ 播放</button>
+        <button class="btn btn-step" id="methodsStep">單步 ▸</button>
+        <button class="btn btn-reset" id="methodsReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">變數狀態</div><div id="methodsVars"><div class="var-empty">尚未執行</div></div></div>
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="methodsOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">重點提醒</div>
+        <p style="font-size:.82rem;margin:0;">每一步都是<strong>新的物件</strong>：<code>raw</code> 從頭到尾維持原樣，<code>step1</code>、<code>step2</code> 也都沒有被後面的方法改變。這就是字串「不可變」的具體展現。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 再次提醒：字串不可變</div>
+    <p style="margin-bottom:0;">呼叫 <code>s.strip()</code>、<code>s.upper()</code> 這類方法時，<strong>永遠是回傳一個新字串</strong>，絕不會就地修改 <code>s</code> 本身。想保留結果，一定要用變數接住，例如 <code>s = s.strip()</code>。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<section id="reference">
+  <div class="section-number">REFERENCE · 速查表</div>
+  <h2>本章速查表</h2>
+
+  <h3>索引與切片</h3>
+  <table class="cmp-table">
+    <tr><th>語法</th><th>意義</th></tr>
+    <tr><td>s[i]</td><td>取出索引 i 的字元（從 0 開始）</td></tr>
+    <tr><td>s[-i]</td><td>從尾端往前數第 i 個字元</td></tr>
+    <tr><td>s[a:b]</td><td>切出索引 a 到 b-1 的子字串（不含 b）</td></tr>
+    <tr><td>s[a:b:c]</td><td>每隔 c 個字元切一次，c 為負則反向</td></tr>
+    <tr><td>s[::-1]</td><td>反轉整個字串的常用寫法</td></tr>
+  </table>
+
+  <h3>跳脫字元</h3>
+  <table class="cmp-table">
+    <tr><th>寫法</th><th>意義</th></tr>
+    <tr><td>\n / \t</td><td>換行／Tab 鍵</td></tr>
+    <tr><td>\' / \"</td><td>單引號／雙引號</td></tr>
+    <tr><td>\\</td><td>反斜線本身</td></tr>
+    <tr><td>r'...'</td><td>原始字串，忽略所有跳脫字元</td></tr>
+  </table>
+
+  <h3>字串格式化</h3>
+  <table class="cmp-table">
+    <tr><th>寫法</th><th>意義</th><th>提醒</th></tr>
+    <tr><td>%d %s %f</td><td>舊式 % 格式化的整數／字串／浮點數說明符</td><td class="worst">建議改用 f-string</td></tr>
+    <tr><td>f'{x}'</td><td>f-string，大括號內可直接放運算式</td><td class="best">推薦寫法</td></tr>
+    <tr><td>f'{x:.2f}'</td><td>浮點數取 2 位小數</td><td>會四捨五入</td></tr>
+    <tr><td>f'{x:&gt;10}'</td><td>靠右對齊，寬度 10</td><td>數字預設靠右</td></tr>
+    <tr><td>f'{x:^10}'</td><td>置中對齊，寬度 10</td><td></td></tr>
+    <tr><td>f'{x:,}'</td><td>加上千分位逗號</td><td></td></tr>
+  </table>
+
+  <h3>本章常用字串方法</h3>
+  <table class="cmp-table">
+    <tr><th>方法</th><th>功能</th></tr>
+    <tr><td>upper() / lower()</td><td>轉大寫／小寫</td></tr>
+    <tr><td>strip() / lstrip() / rstrip()</td><td>去除頭尾／左／右空白</td></tr>
+    <tr><td>split() / join()</td><td>切開成串列／把串列黏合成字串</td></tr>
+    <tr><td>startswith() / endswith()</td><td>檢查開頭／結尾</td></tr>
+    <tr><td>rjust() / ljust() / center()</td><td>靠右／左／置中補齊寬度</td></tr>
+    <tr><td>isdigit() / isalpha() / isupper() / islower() / isspace()</td><td>檢查字串內容格式</td></tr>
+  </table>
+
+  <div class="bridge-box">
+    <div class="bb-title">🎓 學完這章，你已經能……</div>
+    <ul>
+      <li>看懂並駕馭跳脫字元與原始字串——不再被 <code>\n</code> 突然換行嚇到</li>
+      <li>用 f-string 的寬度、精度、對齊規格，把輸出排得整整齊齊</li>
+      <li>幫「神秘島嶼」的玩家排出對齊的狀態表——這就是文字遊戲介面的核心技術</li>
+    </ul>
+    <p class="bb-next">NEXT ▸ 下一章是最後一關「字典」：學會用「鍵→值」查表，指揮一支 30 隻外星人的艦隊，最後見證查表讓費波那契快上百倍的瞬間。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這一頁在資料結構課哪裡會用到</div><p><b>第 02 章</b>用 anagram 比較四種解法的成本；<b>第 05 章</b>用 Deque 做回文判斷；<b>第 06 章</b>的 <code>to_str</code> 把整數轉成任意進位的字串；<b>第 08 章</b>的字梯問題整章都在操作五個字母的單字。</p></div>
+
+</section>
+
+<section id="bankquiz">
+  <div class="section-number">QUIZ · 自我檢測</div>
+  <h2>自我檢測：字串操作 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
+  <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下語句會輸出什麼？</div>
+    <pre class="sq-code">print&#40;&quot;Hello\nWorld!\tWelcome to \&quot;Python\&quot; programming.\\&quot;)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！跳脫字元 \n 會產生換行，\t 會產生 Tab 鍵，\&quot; 會顯示雙引號，而 \\ 會顯示反斜線。">Hello
+World!	Welcome to &quot;Python&quot; programming.\</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。\n 跳脫字元會處理為換行，而不是字面顯示。">Hello\nWorld!	Welcome to &quot;Python&quot; programming.\</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。\t 跳脫字元應該會產生 Tab 鍵，而不是顯示字面上的 \t。">Hello
+World!\tWelcome to &quot;Python&quot; programming.\</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。這個答案顯示的是帶有跳脫字元的字面字串，而不是處理後的輸出。">Hello\nWorld!\tWelcome to \&quot;Python\&quot; programming.\\</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q2.</span>以下程式碼會輸出什麼結果？</div>
+    <pre class="sq-code">s = &quot;python rocks&quot;
+print&#40;s[2] + s[-4])</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="很接近了，t 在位置 2，從左到右從 0 開始計算；但 r 在 -5，從右到左從 -1 開始計算。">tr</button>
+      <button class="sq-opt" data-c="1" data-fb="對於 -4，從右到左計算，從 -1 開始。">to</button>
+      <button class="sq-opt" data-c="0" data-fb="p 在位置 0，而不是 2。">ps</button>
+      <button class="sq-opt" data-c="0" data-fb="[ ] 運算子回傳一個字串，可以與另一個字串進行串聯。">錯誤，不能將 [ ] 運算子與 + 運算子一起使用。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q3.</span>下列程式碼會印出什麼？</div>
+    <pre class="sq-code">name = &quot;Alice&quot;
+age = 30
+balance = 1234.5678
+print&#40;f&quot;{name} 是 {age} 歲，餘額為 {balance:.2f}&quot;)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！f-string 會將變數值代入並將餘額格式化為兩位小數。">Alice 是 30 歲，餘額為 1234.57</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。餘額已格式化為兩位小數，因此會四捨五入為 1234.57。">Alice 是 30 歲，餘額為 1234.5678</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。大括號內的表達式會被計算，而不是字面印出。">Alice 是 {age} 歲，餘額為 {balance:.2f}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。變數 'name' 應該被其值 'Alice' 取代。">name 是 30 歲，餘額為 1234.57</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q4.</span>&lt;span class=&quot;pill pill-orange&quot;&gt;補充題&lt;/span&gt; 執行下列程式碼會印出什麼？</div>
+    <pre class="sq-code">x = 7.2
+print&#40;f'{x:06.2f}')</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="06 表示總欄寬要補到 6 個字元，'7.20' 只有 4 個字元，還缺 2 個字元沒有補齊。">7.20</button>
+      <button class="sq-opt" data-c="1" data-fb="正確！:06.2f 先把 x 取到小數點後 2 位得到 7.20，再把總寬度補齊到 6 個字元，不足的部分因為前面的 0 而在左側補零，所以是 007.20。">007.20</button>
+      <button class="sq-opt" data-c="0" data-fb="06.2f 中的 2 是小數位數，不是總寬度，小數只會到第 2 位，不會補到 4 位。">7.2000</button>
+      <button class="sq-opt" data-c="0" data-fb="06 的 0 表示補零而不是補空格，所以左側補的是 0，不是空格。"> 7.20</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q5.</span>&lt;span class=&quot;pill pill-orange&quot;&gt;補充題&lt;/span&gt; 執行下列程式碼後，最後 print&#40;s) 會輸出什麼？</div>
+    <pre class="sq-code">s = '  Data Science  '
+r = s.strip().upper()
+print&#40;s)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="這是變數 r 的值。strip() 和 upper() 都會回傳新字串並指派給 r，不會修改變數 s 本身。">DATA SCIENCE</button>
+      <button class="sq-opt" data-c="1" data-fb="正確！字串是不可變（immutable）的，s.strip().upper() 只是回傳一個新字串指派給 r，原本的 s 完全沒有被改變，仍保留前後空白。">  Data Science  </button>
+      <button class="sq-opt" data-c="0" data-fb="這只是「假設」只呼叫 strip() 之後的結果，但程式中呼叫方法的結果被指派給 r，s 本身完全沒變。">Data Science</button>
+      <button class="sq-opt" data-c="0" data-fb="字串不可變指的是無法用索引賦值修改（如 s[0]='x'），呼叫方法本身不會出錯，只是會回傳新字串。">程式會出現錯誤，因為字串是不可變的。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q6.</span>&lt;span class=&quot;pill pill-orange&quot;&gt;補充題&lt;/span&gt; 執行下列程式碼會印出什麼？</div>
+    <pre class="sq-code">s = 'Hello, World!'
+print&#40;s[7:-1])</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！索引 7 是 'W'，-1 代表倒數第一個字元 '!' 的位置且切片不包含它，所以切出來的是 'World'。">World</button>
+      <button class="sq-opt" data-c="0" data-fb="這是 s[7:]（不加 -1）的結果，會包含最後的驚嘆號；但 -1 會排除最後一個字元。">World!</button>
+      <button class="sq-opt" data-c="0" data-fb="索引 7 對應到的字元是 'W'，不是空白，起始位置沒有多算一個空格。"> World</button>
+      <button class="sq-opt" data-c="0" data-fb="這是 s[8:-1] 的結果，比題目起始位置多跳過了一個字元 'W'。">orld</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+</section>
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="p5_dicts_sets.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">字典與集合</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="p7_files_exceptions.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">檔案與例外</div></a></div>
+</div><!-- /container -->
+
+<footer>
+  先備知識 P6 · 字串操作 · 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============================================================
+   共用引擎：StepRunner / Quiz / Flashcards（與 CH01 完全相同）
+   ============================================================ */
+
+/** 逐步執行引擎：steps = [{line, vars, out, note, custom}] */
+function StepRunner(prefix, steps, opts) {
+  opts = opts || {};
+  const codeEl  = document.getElementById(prefix + 'Code');
+  const statusEl= document.getElementById(prefix + 'Status');
+  const varsEl  = document.getElementById(prefix + 'Vars');
+  const outEl   = document.getElementById(prefix + 'Out');
+  const playBtn = document.getElementById(prefix + 'Play');
+  const stepBtn = document.getElementById(prefix + 'Step');
+  const resetBtn= document.getElementById(prefix + 'Reset');
+  let idx = -1, timer = null;
+
+  function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
+
+  function render() {
+    lines().forEach((l,i)=>{
+      l.classList.toggle('active', idx>=0 && steps[idx].line===i);
+    });
+    if (idx < 0) {
+      if (statusEl) statusEl.textContent = '按「單步 ▸」開始';
+      if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
+      if (outEl) outEl.innerHTML = '';
+      if (opts.onReset) opts.onReset();
+      return;
+    }
+    const s = steps[idx];
+    if (statusEl) statusEl.textContent = s.note || '';
+    if (varsEl) {
+      if (s.vars && s.vars.length) {
+        varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
+          `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
+        ).join('') + '</table>';
+      } else {
+        varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+      }
+    }
+    if (outEl) {
+      outEl.innerHTML = (s.out||[]).map((o,i)=>{
+        const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
+        return `<div class="${cls}">${o}</div>`;
+      }).join('');
+      outEl.scrollTop = outEl.scrollHeight;
+    }
+    if (opts.onStep) opts.onStep(s, idx);
+  }
+
+  function step() {
+    if (idx < steps.length - 1) { idx++; render(); }
+    if (idx >= steps.length - 1) stopPlay();
+  }
+  function stopPlay(){
+    if (timer) { clearInterval(timer); timer = null; }
+    if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
+  }
+  function play(){
+    if (timer) { stopPlay(); return; }
+    if (idx >= steps.length - 1) { idx = -1; render(); }
+    playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
+    timer = setInterval(()=>{
+      if (idx >= steps.length - 1) stopPlay(); else step();
+    }, opts.interval || 1600);
+  }
+  function reset(){ stopPlay(); idx = -1; render(); }
+
+  if (playBtn) playBtn.addEventListener('click', play);
+  if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (resetBtn) resetBtn.addEventListener('click', reset);
+  render();
+  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+}
+
+/** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
+
+/** Flashcards：data = [{front, back}] */
+
+/* ============================================================
+   P02 跳脫字元預覽器
+   ============================================================ */
+(function initEscapeSandbox(){
+  const input = document.getElementById('escInput');
+  const codeEl = document.getElementById('escCode');
+  const outEl = document.getElementById('escOutput');
+  const rawBtn = document.getElementById('rawToggle');
+  const presetRow = document.getElementById('escPresets');
+  let raw = false;
+
+  const ESC_PRESETS = [
+    { label: 'Bob 的媽媽', value: String.raw`Say hi to Bob\'s mother.` },
+    { label: '多行問候', value: String.raw`Hello there!\nHow are you?\n\tI\'m doing fine.` },
+    { label: '測驗例句', value: String.raw`Hello\nWorld!\tWelcome to \"Python\" programming.\\` },
+    { label: "Alice 的貓（試試 raw 開關）", value: String.raw`That is Alice\'s cat.` },
+    { label: 'Windows 路徑（試試 raw 開關）', value: String.raw`C:\new_folder\test.txt` },
+  ];
+
+  function parseEscapes(str){
+    let out = '';
+    for (let i=0;i<str.length;i++){
+      const c = str[i];
+      if (c === '\\' && i+1 < str.length){
+        const n = str[i+1];
+        if (n === 'n'){ out += '\n'; i++; continue; }
+        if (n === 't'){ out += '\t'; i++; continue; }
+        if (n === "'"){ out += "'"; i++; continue; }
+        if (n === '"'){ out += '"'; i++; continue; }
+        if (n === '\\'){ out += '\\'; i++; continue; }
+        out += c; continue;
+      }
+      out += c;
+    }
+    return out;
+  }
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render(){
+    const val = input.value;
+    const quote = raw ? "r'" : "'";
+    codeEl.innerHTML = `<span class="line">${esc(quote + val + "'")}</span>`;
+    const outVal = raw ? val : parseEscapes(val);
+    outEl.innerHTML = `<span style="white-space:pre-wrap;">${esc(outVal)}</span>`;
+  }
+
+  rawBtn.addEventListener('click', ()=>{
+    raw = !raw;
+    rawBtn.classList.toggle('active', raw);
+    rawBtn.textContent = "原始字串 r'...'：" + (raw ? '開啟 ✓' : '關閉');
+    render();
+  });
+
+  ESC_PRESETS.forEach(p=>{
+    const b = document.createElement('button');
+    b.className = 'preset-btn';
+    b.textContent = p.label;
+    b.addEventListener('click', ()=>{ input.value = p.value; render(); });
+    presetRow.appendChild(b);
+  });
+
+  input.addEventListener('input', render);
+  render();
+})();
+
+/* ============================================================
+   P03 f-string Playground
+   ============================================================ */
+(function initFstringPlayground(){
+  const VARS = {
+    name: { value: '小明', type: 'str' },
+    score:{ value: 87.5,  type: 'float' },
+    pi:   { value: 3.14159, type: 'float' },
+    big:  { value: 12345678, type: 'int' },
+  };
+  const varSel  = document.getElementById('fmtVar');
+  const widthIn = document.getElementById('fmtWidth');
+  const precIn  = document.getElementById('fmtPrecision');
+  const alignSel= document.getElementById('fmtAlign');
+  const commaCk = document.getElementById('fmtComma');
+  const codeEl  = document.getElementById('fmtCode');
+  const outEl   = document.getElementById('fmtOutput');
+
+  function addComma(intPart){
+    const neg = intPart.startsWith('-');
+    let digits = neg ? intPart.slice(1) : intPart;
+    digits = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (neg ? '-' : '') + digits;
+  }
+  function pad(str, width, align, defaultAlign){
+    if (!width) return str;
+    const w = parseInt(width, 10);
+    if (!w || isNaN(w) || str.length >= w) return str;
+    const a = align || defaultAlign;
+    const padLen = w - str.length;
+    if (a === '<') return str + ' '.repeat(padLen);
+    if (a === '^') { const l = Math.floor(padLen/2), r = padLen - l; return ' '.repeat(l) + str + ' '.repeat(r); }
+    return ' '.repeat(padLen) + str; // 預設 '>'
+  }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render(){
+    const key = varSel.value;
+    const v = VARS[key];
+    const width = widthIn.value.trim();
+    const prec  = precIn.value.trim();
+    const align = alignSel.value;
+    const comma = commaCk.checked;
+
+    let specStr = '';
+    if (align) specStr += align;
+    if (width) specStr += width;
+    if (v.type !== 'str' && comma) specStr += ',';
+    if (prec !== '') specStr += '.' + prec + (v.type === 'str' ? '' : 'f');
+
+    let result;
+    if (v.type === 'str') {
+      let s = v.value;
+      if (prec !== '') s = s.slice(0, parseInt(prec, 10));
+      result = pad(s, width, align, '<');
+    } else {
+      let numStr;
+      if (prec !== '') numStr = Number(v.value).toFixed(parseInt(prec, 10));
+      else numStr = String(v.value);
+      if (comma) {
+        const parts = numStr.split('.');
+        parts[0] = addComma(parts[0]);
+        numStr = parts.join('.');
+      }
+      result = pad(numStr, width, align, '>');
+    }
+
+    const specPart = specStr ? ':' + specStr : '';
+    const literal = `f'{${key}${specPart}}'`;
+    codeEl.innerHTML = `<span class="line">${esc('print(' + literal + ')')}</span>`;
+    outEl.innerHTML = `<span style="white-space:pre-wrap;">${esc(result)}</span>`;
+  }
+
+  [varSel, widthIn, precIn, alignSel, commaCk].forEach(el => el.addEventListener('input', render));
+  varSel.addEventListener('change', render);
+  alignSel.addEventListener('change', render);
+  render();
+})();
+
+/* ============================================================
+   P04 strip → upper → split 逐步動畫
+   ============================================================ */
+StepRunner('methods', [
+  { line:0, vars:[['raw',"'  hello world python  '",'str',1]], out:[], note:"建立原始字串 raw（前後刻意留有空白）" },
+  { line:1, vars:[['raw',"'  hello world python  '",'str'],['step1',"'hello world python'",'str',1]], out:[], note:'strip() 回傳「去除頭尾空白」的新字串；raw 本身完全沒被改變' },
+  { line:2, vars:[['raw',"'  hello world python  '",'str'],['step1',"'hello world python'",'str'],['step2',"'HELLO WORLD PYTHON'",'str',1]], out:[], note:'upper() 回傳「全部大寫」的新字串；step1 也沒被改變' },
+  { line:3, vars:[['raw',"'  hello world python  '",'str'],['step1',"'hello world python'",'str'],['step2',"'HELLO WORLD PYTHON'",'str'],['step3',"['HELLO', 'WORLD', 'PYTHON']",'list',1]], out:[], note:'split() 依空白切開字串，回傳一個新的串列（list）' },
+  { line:4, vars:[['raw',"'  hello world python  '",'str'],['step1',"'hello world python'",'str'],['step2',"'HELLO WORLD PYTHON'",'str'],['step3',"['HELLO', 'WORLD', 'PYTHON']",'list']], out:["['HELLO', 'WORLD', 'PYTHON']"], newOut:true, note:'✔ 完成！印出最終的串列，raw 從頭到尾維持原樣' },
+]);
+
+/* ============================================================
+   QUIZ 資料（前 3 題取自課程題庫 questions-TW/ch5，含原題 feedback；
+   後 3 題為本頁補充題，答案已用 python3 驗證）
+   ============================================================ */
+
+/* ============================================================
+   FLASHCARDS 資料（取自課程字卡 flashcards-TW/ch5.json）
+   ============================================================ */
+
+/* ============================================================
+   GAME · 神秘島嶼狀態表（課本練習 2）
+   Python 對照：print(f"生命值：{health:>8}/100") 等，
+   輸出已與 python3 實跑結果逐字元比對。
+   ============================================================ */
+(function initMysteryIsland(){
+  const console_ = document.getElementById('miConsole');
+  if (!console_) return;
+  const ids = ['miP1Name','miP1Hp','miP1Exp','miP1Gold','miP2Name','miP2Hp','miP2Exp','miP2Gold'];
+  const el = {};
+  ids.forEach(id => el[id] = document.getElementById(id));
+
+  function padStart(s, w){ s = String(s); return s.length >= w ? s : ' '.repeat(w - s.length) + s; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function stats(name, hp, exp, gold){
+    return esc(name) + '狀態：\n' +
+      '生命值：' + padStart(hp, 8) + '/100\n' +
+      '經驗值：' + padStart(exp, 8) + '/150\n' +
+      '金幣：' + padStart(Number(gold).toFixed(2), 8) + '/60.00';
+  }
+  function clamp(v, lo, hi, fallback){
+    const n = Number(v);
+    if (isNaN(n)) return fallback;
+    return Math.min(hi, Math.max(lo, n));
+  }
+  function render(){
+    const p1 = stats(el.miP1Name.value || '玩家1', clamp(el.miP1Hp.value,0,100,100), clamp(el.miP1Exp.value,0,150,0), clamp(el.miP1Gold.value,0,60,50));
+    const p2 = stats(el.miP2Name.value || '玩家2', clamp(el.miP2Hp.value,0,100,60), clamp(el.miP2Exp.value,0,150,120), clamp(el.miP2Gold.value,0,60,40));
+    console_.innerHTML = '<span class="g-sys">歡迎來到 "神秘島嶼" 冒險遊戲！</span>\n\n' + p1 + '\n\n' + p2;
+  }
+  ids.forEach(id => el[id].addEventListener('input', render));
+  render();
+})();
+
+/* ============================================================
+   Floating nav active highlight
+   ============================================================ */
+(function initFloatNav(){
+  const links = document.querySelectorAll('.float-nav a[data-target]');
+  const sections = [...links].map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update(){
+    let active = sections[0] && sections[0].id;
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.35) active = s.id;
+    }
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  update();
+})();
+</script>
+<script>
+const FLASHCARDS = [{"front": "字串（String）", "back": "一系列用來表示文字資料的字元。"}, {"front": "跳脫字元（Escape Character）", "back": "用來在字串中引入特殊字符序列的反斜線。"}, {"front": "原始字串（Raw String）", "back": "以'r'為前綴的字串，將反斜線視為字面上的字符，而不是轉義序列。"}, {"front": "字串插值（String Interpolation）", "back": "將變數值或表達式插入到字串佔位符中的過程。"}, {"front": "格式化字串（Formatted String）", "back": "包含佔位符的字串，這些佔位符可以使用變數值來替換，通常使用 % 符號。"}, {"front": "格式說明子（Format Specifier）", "back": "格式字串中的特殊語法，用來定義如何格式化一個值（例如，.2f表示保留兩位小數）。"}, {"front": "f 字串（f-string）", "back": "以'f'為前綴的字串文字，允許在字串內直接進行表達式計算和格式化。"}, {"front": "不可變性（Immutability）", "back": "字串一旦建立就不能修改，所有「修改」方法其實都回傳一份新字串。因此在迴圈裡反覆用 + 串接字串是 O(n²)，正確做法是先收集到串列再用 join。"}, {"front": "字串連接（join）", "back": "把一串字串用指定的分隔符接起來的方法，寫成 '分隔符'.join(串列)。它只配置一次記憶體，比在迴圈裡反覆用 + 快得多。"}, {"front": "切片（Slice）", "back": "用 s[start:stop:step] 取出子字串，會產生一份新的字串。s[::-1] 是反轉字串的慣用寫法，第 05 章的回文判斷會用到。"}, {"front": "字串分割（split）", "back": "依分隔符把字串切成串列的方法。讀檔做資料前處理時幾乎一定會用到，通常搭配 strip() 去掉頭尾空白與換行。"}, {"front": "字元編碼（Encoding）", "back": "字元與位元組之間的轉換規則。Python 3 的字串是 Unicode，寫入檔案時要指定 encoding='utf-8'，否則處理中文容易變成亂碼。"}, {"front": "字母重排詞（Anagram）", "back": "字母組成相同、順序不同的兩個字串。第 02 章用它比較四種解法的成本差異，從 O(n²) 一路到 O(n)，是演算法分析最好的入門例子。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+
+(function(){
+  document.querySelectorAll('.sq-item').forEach(item => {
+    const fb = item.querySelector('.sq-fb');
+    item.querySelectorAll('.sq-opt').forEach(btn => btn.addEventListener('click', () => {
+      const good = btn.dataset.c === '1';
+      item.querySelectorAll('.sq-opt').forEach(b => b.classList.remove('correct','wrong'));
+      btn.classList.add(good ? 'correct' : 'wrong');
+      fb.textContent = btn.dataset.fb;
+      fb.classList.add('show');
+      fb.classList.toggle('good', good);
+      fb.classList.toggle('bad', !good);
+    }));
+  });
+})();
+</script>
+</body>
+</html>

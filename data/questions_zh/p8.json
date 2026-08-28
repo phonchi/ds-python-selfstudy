@@ -1,0 +1,61 @@
+[
+ {
+  "question": "以下程式印出什麼？",
+  "code": "class Node:\n    def __init__(self, node_data):\n        self._data = node_data\n        self._next = None\n\n    def get_data(self):\n        return self._data\n\nn = Node(93)\nprint(n.get_data(), n._next)",
+  "answers": [
+   {"answer": "93 None", "correct": true, "feedback": "正確。建立實例時 __init__ 自動執行，把 93 存進 _data、把 _next 設成 None（代表後面還沒接節點）。這就是第 04 章鏈結串列的基本磚塊。"},
+   {"answer": "93 93", "correct": false, "feedback": "不對。_next 在 __init__ 裡被設成 None，跟 _data 無關。"},
+   {"answer": "Node 93", "correct": false, "feedback": "不對。get_data() 回傳的是屬性 _data 的值，不是類別名稱。"},
+   {"answer": "TypeError：缺少參數", "correct": false, "feedback": "不對。__init__ 除了 self 只需要一個參數，Node(93) 剛好給了一個。"}
+  ]
+ },
+ {
+  "question": "以下程式印出什麼？",
+  "code": "class Counter:\n    total = 0\n\n    def __init__(self, name):\n        self.name = name\n        Counter.total += 1\n\na = Counter('a')\nb = Counter('b')\na.total = 99\nprint(Counter.total, a.total, b.total)",
+  "answers": [
+   {"answer": "2 99 2", "correct": true, "feedback": "正確。a.total = 99 沒有改到類別屬性，而是在 a 身上新建了一個同名的實例屬性，把類別屬性遮住。Counter.total 與 b.total 仍然是 2。要改共用的那一份必須寫 Counter.total = 99。"},
+   {"answer": "99 99 99", "correct": false, "feedback": "不對。透過實例賦值只會建立實例屬性，不會影響類別屬性，更不會影響其他實例。"},
+   {"answer": "2 2 2", "correct": false, "feedback": "不對。a.total 已經被實例屬性遮住，讀到的是 99。"},
+   {"answer": "AttributeError", "correct": false, "feedback": "不對。對實例賦值一個新屬性在 Python 是合法的，不會報錯。"}
+  ]
+ },
+ {
+  "question": "以下程式印出什麼？",
+  "code": "class Fraction:\n    def __init__(self, top, bottom):\n        self.num = top\n        self.den = bottom\n\n    def __str__(self):\n        return f'{self.num}/{self.den}'\n\n    def __repr__(self):\n        return f'Fraction({self.num}, {self.den})'\n\nf = Fraction(3, 4)\nprint(f)\nprint([f])",
+  "answers": [
+   {"answer": "3/4 然後 [Fraction(3, 4)]", "correct": true, "feedback": "正確。print(物件) 走 __str__；但印一個裝著物件的容器時，容器對每個元素呼叫的是 __repr__。這就是「我明明寫了 __str__ 為什麼 list 印出來還是怪怪的」的原因。"},
+   {"answer": "3/4 然後 [3/4]", "correct": false, "feedback": "不對。list 內的元素一律走 __repr__，不是 __str__。"},
+   {"answer": "Fraction(3, 4) 然後 [Fraction(3, 4)]", "correct": false, "feedback": "不對。直接 print 一個物件時優先使用 __str__。"},
+   {"answer": "兩行都是物件的記憶體位址", "correct": false, "feedback": "不對。只有在 __str__ 與 __repr__ 都沒定義時，才會印出預設的物件位址字串。"}
+  ]
+ },
+ {
+  "question": "以下程式會發生什麼事？",
+  "code": "class Stack:\n    def __init__(self):\n        self._items = []\n\n    def push(item):\n        self._items.append(item)\n\ns = Stack()\ns.push(42)",
+  "answers": [
+   {"answer": "TypeError：push() 宣告成不吃參數，卻收到一個", "correct": true, "feedback": "正確。push 漏了 self。呼叫 s.push(42) 時 Python 會自動把 s 當第一個參數傳入，所以實際上傳了兩個，而 push 只宣告了一個。看到 takes 1 positional argument but 2 were given，先檢查 self。"},
+   {"answer": "正常執行，42 被放進堆疊", "correct": false, "feedback": "不對。方法的第一個參數必須是 self（名稱可換，但一定要有），否則呼叫時參數數量對不上。"},
+   {"answer": "NameError：找不到 self", "correct": false, "feedback": "不對。錯誤發生在參數綁定階段，還沒進到函式主體，所以是 TypeError 不是 NameError。"},
+   {"answer": "只有在存取 self._items 時才會出錯", "correct": false, "feedback": "不對。呼叫的當下參數就對不上了，函式主體根本沒被執行到。"}
+  ]
+ },
+ {
+  "question": "以下程式印出什麼？",
+  "code": "class Node:\n    def __init__(self, node_data):\n        self._data = node_data\n\n    @property\n    def data(self):\n        return self._data\n\n    @data.setter\n    def data(self, new_data):\n        self._data = new_data\n\nn = Node(93)\nn.data = 26\nprint(n.data, n._data)",
+  "answers": [
+   {"answer": "26 26", "correct": true, "feedback": "正確。n.data = 26 觸發了 setter，setter 把值寫進 _data；讀 n.data 又觸發 getter 回傳 _data。外面用起來像屬性，內部其實跑了方法——這就是封裝的實際好處：之後想加檢查，呼叫端一行都不用改。"},
+   {"answer": "93 26", "correct": false, "feedback": "不對。getter 回傳的就是 _data，兩者一定一致。"},
+   {"answer": "26 93", "correct": false, "feedback": "不對。setter 已經把 _data 改成 26 了。"},
+   {"answer": "AttributeError：data 是唯讀的", "correct": false, "feedback": "不對。有寫 @data.setter 就可以賦值；只有在沒定義 setter 時才會是唯讀。"}
+  ]
+ },
+ {
+  "question": "把 Stack 內部從「用 list 尾端當頂端」改成「用 list 開頭當頂端」（insert(0, x) 與 pop(0)），會發生什麼？",
+  "answers": [
+   {"answer": "結果一樣正確，但 push 與 pop 從 O(1) 變成 O(n)", "correct": true, "feedback": "正確。在 list 開頭插入或刪除，要把後面所有元素整批往後（前）搬移。ADT 的行為沒變、測試也會過，但成本差一個數量級——這正是第 02 章與第 05 章要你分辨的東西。"},
+   {"answer": "完全一樣，只是寫法不同", "correct": false, "feedback": "不對。行為一樣，成本不一樣。這種「安靜的效能問題」不會噴錯，只會在資料變大時才浮現。"},
+   {"answer": "會出錯，list 不支援從開頭刪除", "correct": false, "feedback": "不對。list 兩端都能插入與刪除，問題不在能不能，在多貴。"},
+   {"answer": "堆疊會變成佇列", "correct": false, "feedback": "不對。只要 push 與 pop 用同一端，就仍然是後進先出。改用不同端才會變成佇列。"}
+  ]
+ }
+]

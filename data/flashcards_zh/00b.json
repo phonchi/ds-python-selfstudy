@@ -1,0 +1,42 @@
+[
+{
+"front": "直譯器（Interpreter）",
+"back": "逐行讀取並執行程式碼的程式。你電腦上的 python 指令就是直譯器；Colab 則是把直譯器放在 Google 的機器上，你透過瀏覽器操作它。"
+},
+{
+"front": "Jupyter 筆記本（Jupyter Notebook）",
+"back": "把說明文字、程式碼與執行結果放在同一份 .ipynb 檔案裡的互動式格式。以「儲存格（cell）」為單位執行，適合邊讀邊試，本課程全程使用。"
+},
+{
+"front": "儲存格（Cell）",
+"back": "Notebook 的最小執行單位，分成程式碼與文字兩種。按 Shift + Enter 執行目前的儲存格並跳到下一格。"
+},
+{
+"front": "執行階段（Runtime）",
+"back": "實際跑你程式的那個行程與它的記憶體狀態。Colab 的 runtime 閒置太久會被回收，屆時已安裝的套件與變數都會消失，需要重跑安裝與初始化的儲存格。"
+},
+{
+"front": "套件管理工具（Package Manager, pip / conda）",
+"back": "負責下載、安裝與升級第三方套件的工具。本課程用它安裝 pythonds3、jupyterquiz 與 jupytercards。在 notebook 裡要在指令前加驚嘆號，例如 !pip install。"
+},
+{
+"front": "虛擬環境（Virtual Environment）",
+"back": "一個彼此隔離的套件安裝空間，例如 conda create -n ds 或 python -m venv。用意是讓不同專案各自持有自己的套件版本，不會互相破壞。"
+},
+{
+"front": "核心（Kernel）",
+"back": "Notebook 背後負責執行程式碼的直譯器行程。VS Code 或 Jupyter 裡「明明裝了套件卻說找不到」，最常見的原因就是選到了另一個環境的 kernel。"
+},
+{
+"front": "pythonds3",
+"back": "教科書 Problem Solving with Algorithms and Data Structures using Python 的配套套件，提供 Stack、Queue、Deque、BinaryTree、Graph、PriorityQueue 等現成實作，本課程全程使用。"
+},
+{
+"front": "海龜繪圖（Turtle Graphics）",
+"back": "Python 標準函式庫的繪圖模組，第 06 章用它畫螺旋與碎形樹。它需要本機視窗，因此在 Colab 這類雲端環境無法使用。"
+},
+{
+"front": "學習模式（Learn Mode）",
+"back": "Colab 內建 Gemini 的一種對話模式：改成一步步引導與反問，而不是直接給出完整解答。目的是加速學習迴圈而不是繞過它。"
+}
+]

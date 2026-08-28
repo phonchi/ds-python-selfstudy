@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>函數 — 先備 P3（Python）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f39c12;letter-spacing:.3em;margin-bottom:.8rem;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{font-family:'JetBrains Mono',monospace;color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.0rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:40px;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box p:last-child{margin-bottom:0;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.65;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid #f39c12;padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .str{color:#f1fa8c;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+
+/* Preset buttons */
+.preset-row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 1rem;}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:.4rem .85rem;border-radius:6px;border:2px solid var(--card-border);background:var(--card);cursor:pointer;transition:all .2s;color:var(--ink);}
+.preset-btn:hover{border-color:var(--accent2);}
+.preset-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+
+/* Variable state table */
+.var-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+.var-table td{padding:.25rem .4rem;border-bottom:1px dashed var(--card-border);}
+.var-table td.vname{color:var(--accent2);font-weight:600;}
+.var-table td.vval{color:var(--ink);}
+.var-table td.vtype{color:var(--muted);font-size:.72rem;text-align:right;}
+.var-table tr.changed td{background:var(--highlight);}
+.var-empty{color:var(--muted);font-size:.8rem;font-style:italic;}
+
+/* Console */
+.console{background:#111;border-radius:8px;padding:.6rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#d4d4d4;min-height:70px;max-height:220px;overflow-y:auto;line-height:1.6;}
+.console .out-line{white-space:pre-wrap;}
+.console .out-line.new{color:#2ecc71;}
+.console .in-line{color:#f39c12;}
+.console .err-line{color:#e74c3c;}
+
+/* Expression stepper */
+.expr-view{background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.6rem 1rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.5rem;letter-spacing:.05em;min-height:90px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.2rem;}
+.expr-view .hl{background:var(--highlight);border:2px solid #f39c12;border-radius:6px;padding:0 .35rem;color:#b9770e;}
+.expr-view .result{color:var(--accent3);font-weight:700;}
+
+/* Object/tag visualization (variables) */
+.obj-canvas{position:relative;background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.2rem;min-height:150px;display:flex;align-items:center;justify-content:center;gap:2.2rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.obj-box{border:2px solid var(--accent2);border-radius:10px;padding:.6rem 1.1rem;background:#fff;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600;color:var(--ink);position:relative;transition:all .3s;box-shadow:0 3px 10px rgba(0,0,0,.06);}
+.obj-box .obj-type{position:absolute;top:-10px;right:-8px;font-size:.62rem;background:var(--accent2);color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;}
+.obj-box.faded{opacity:.3;border-style:dashed;}
+.obj-box.faded::after{content:'（被遺忘 → 資源回收）';position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:.62rem;color:var(--muted);white-space:nowrap;}
+.obj-box .tag{position:absolute;top:-34px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:12px;white-space:nowrap;transition:all .3s;}
+.obj-box .tag::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--accent);}
+
+/* Sandbox */
+.sandbox{background:var(--card);border:2px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.sandbox .sandbox-label{position:absolute;top:-11px;left:14px;background:var(--accent3);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.input-row{display:flex;gap:.5rem;align-items:center;margin:.5rem 0;flex-wrap:wrap;}
+.input-row label{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent2);font-weight:600;}
+.input-row input[type="text"]{font-family:'JetBrains Mono',monospace;font-size:.9rem;padding:.45rem .7rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;flex:1;min-width:160px;}
+.sandbox-result{margin-top:.6rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.9rem;min-height:46px;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.sandbox-result .ok{color:#2ecc71;font-weight:700;}
+.sandbox-result .bad{color:#e67e22;font-weight:700;}
+.sandbox-result .type-badge{background:#50fa7b;color:#1a1a2e;font-weight:700;padding:1px 10px;border-radius:4px;font-size:.82rem;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+.quiz-box .quiz-label .multi-badge{background:#8e44ad;color:#fff;font-size:.68rem;padding:1px 8px;border-radius:3px;}
+.quiz-box .quiz-q{font-weight:600;margin-bottom:.6rem;}
+.quiz-box .quiz-code{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:.6rem .9rem;font-family:'JetBrains Mono',monospace;font-size:.84rem;margin-bottom:.8rem;white-space:pre-wrap;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0 0;}
+.quiz-opt{display:flex;flex-direction:column;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:.9rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-head{display:flex;align-items:baseline;gap:.6rem;}
+.quiz-opt .opt-letter{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt .opt-fb{display:none;font-size:.82rem;margin-top:.4rem;padding-top:.4rem;border-top:1px dashed var(--card-border);color:#555;}
+.quiz-opt.revealed .opt-fb{display:block;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.correct .opt-fb{color:#14532d;}
+.quiz-opt.wrong{background:#fef5e7;border-color:#d68910;}
+.quiz-opt.wrong .opt-letter{color:#d68910;}
+.quiz-progress{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;margin:.8rem 0;}
+
+/* Flashcards */
+.card-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.flashcard{perspective:900px;height:150px;cursor:pointer;}
+.flashcard .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .fc-inner{transform:rotateY(180deg);}
+.flashcard .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.flashcard .fc-front{background:linear-gradient(150deg,#2c3e7a,#1a1a2e);color:#fff;font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;letter-spacing:.05em;flex-direction:column;gap:.4rem;}
+.flashcard .fc-front .fc-hint{font-size:.66rem;color:rgba(255,255,255,.45);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.flashcard .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.8rem;line-height:1.6;transform:rotateY(180deg);overflow-y:auto;}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:34px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+/* Chapter nav */
+.chapter-nav{display:flex;justify-content:space-between;gap:1rem;margin:2rem 0 0;flex-wrap:wrap;}
+.chapter-nav a{flex:1;min-width:220px;background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1rem 1.3rem;text-decoration:none;color:var(--ink);transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.chapter-nav a:hover{border-color:var(--accent2);transform:translateY(-2px);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.1em;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+footer a{color:var(--accent2);}
+
+/* ===== CH03 additions: call-stack visualization ===== */
+.stack-canvas{position:relative;background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1rem;min-height:190px;display:flex;flex-direction:column-reverse;gap:.6rem;margin-bottom:.8rem;align-items:stretch;justify-content:flex-end;}
+.stack-frame{border:2px solid var(--accent2);border-radius:10px;padding:.55rem .9rem;background:#fff;font-family:'JetBrains Mono',monospace;font-size:.82rem;box-shadow:0 3px 10px rgba(0,0,0,.06);animation:framePop .35s ease;}
+.stack-frame.global-frame{border-color:var(--accent3);background:#eafaf1;}
+.stack-frame .frame-title{font-weight:700;color:var(--accent2);font-size:.76rem;margin-bottom:.35rem;letter-spacing:.03em;}
+.stack-frame.global-frame .frame-title{color:var(--accent3);}
+.stack-frame .frame-vars{display:flex;flex-wrap:wrap;gap:.4rem;}
+.stack-frame .frame-var{background:var(--highlight);border-radius:4px;padding:1px 8px;font-size:.76rem;}
+.return-fly{text-align:center;color:var(--accent);font-weight:700;font-size:.82rem;animation:flyDown .6s ease;padding:.2rem 0;}
+@keyframes framePop{from{opacity:0;transform:translateY(-10px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes flyDown{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
+
+/* --- New rules for this page only --- */
+/* 🎮 Game box */
+.game-box{background:linear-gradient(150deg,#1a1a2e 0%,#232345 100%);border-radius:14px;padding:1.5rem 1.7rem;margin:1.5rem 0;color:#fff;position:relative;overflow:hidden;}
+.game-box::before{content:'🎮';position:absolute;top:-14px;right:6px;font-size:5.2rem;opacity:.08;}
+.game-box .gb-tag{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#f39c12;letter-spacing:.2em;margin-bottom:.4rem;}
+.game-box h3{color:#fff;margin-top:0;}
+.game-box p{color:rgba(255,255,255,.82);}
+.game-console{background:#111;border-radius:8px;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#d4d4d4;min-height:120px;max-height:260px;overflow-y:auto;line-height:1.7;margin:.8rem 0;}
+.game-console .g-sys{color:#5dade2;}
+.game-console .g-win{color:#2ecc71;font-weight:700;}
+.game-console .g-lose{color:#e74c3c;font-weight:700;}
+.game-console .g-me{color:#f39c12;}
+.game-input-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.game-input-row input{font-family:'JetBrains Mono',monospace;font-size:.95rem;padding:.5rem .8rem;border:none;border-radius:8px;width:130px;}
+.game-note{font-size:.8rem;color:rgba(255,255,255,.72);margin-top:.7rem;}
+.game-note a{color:#2ecc71;}
+
+/* 🤖 Ask-AI exercise box */
+.ai-box{background:var(--card);border:2px dashed #8e44ad;border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.ai-box .ai-label{position:absolute;top:-11px;left:14px;background:#8e44ad;color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.ai-box p:last-child{margin-bottom:0;}
+.ai-box .ai-prompt{font-family:'JetBrains Mono',monospace;font-size:.85rem;background:rgba(142,68,173,.08);border-radius:6px;padding:.4rem .8rem;display:block;margin:.4rem 0;color:#6c3485;}
+
+/* 🎓 Chapter-end bridge */
+.bridge-box{background:#eafaf1;border:2px solid var(--accent3);border-radius:12px;padding:1.3rem 1.5rem;margin:2rem 0 0;}
+.bridge-box .bb-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent3);font-weight:700;letter-spacing:.12em;margin-bottom:.5rem;}
+.bridge-box ul{margin:.3rem 0 .8rem 1.3rem;font-size:.92rem;}
+.bridge-box .bb-next{font-size:.9rem;color:var(--accent2);border-top:1px dashed var(--accent3);padding-top:.6rem;margin-bottom:0;}
+
+/* 深色容器內的可讀性修正（code/summary/pill 在深色背景上原樣式太深） */
+.game-box code,.cta-box code{background:rgba(255,255,255,.14);color:#8be9fd;}
+.game-box details summary{cursor:pointer;color:#5dade2;font-size:.85rem;}
+.game-box .pill{background:rgba(255,255,255,.14);color:#f1fa8c;border-color:rgba(255,255,255,.28);}
+.game-box a{color:#2ecc71;}
+.cta-box a{color:#2ecc71;}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+
+/* ===== 題庫自測區 ===== */
+.sq-item{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.sq-item .sq-q{font-weight:700;margin-bottom:.7rem;}
+.sq-item .sq-q .sq-num{font-family:'JetBrains Mono',monospace;color:var(--accent);margin-right:.4rem;}
+.sq-opts{display:flex;flex-direction:column;gap:.45rem;}
+.sq-opt{text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;line-height:1.6;padding:.55rem .9rem;border-radius:8px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;}
+.sq-opt:hover{border-color:var(--accent2);}
+.sq-opt.correct{border-color:var(--accent3);background:rgba(26,107,74,.10);}
+.sq-opt.wrong{border-color:var(--accent);background:rgba(192,57,43,.08);}
+.sq-fb{display:none;margin-top:.7rem;font-size:.86rem;line-height:1.7;border-left:4px solid var(--accent2);padding:.5rem .9rem;background:var(--paper);border-radius:0 8px 8px 0;}
+.sq-fb.show{display:block;}
+.sq-fb.good{border-left-color:var(--accent3);}
+.sq-fb.bad{border-left-color:var(--accent);}
+
+.sq-code{background:var(--code-bg);color:var(--code-fg);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;padding:.7rem .9rem;border-radius:8px;margin:.2rem 0 .8rem;overflow-x:auto;white-space:pre;}
+</style>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<!-- Floating navigation sidebar -->
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#intro" data-target="intro"><span class="fn-num">P01</span><span class="fn-name">函數簡介</span></a>
+  <a href="#define" data-target="define"><span class="fn-num">P02</span><span class="fn-name">定義與呼叫</span></a>
+  <a href="#arguments" data-target="arguments"><span class="fn-num">P03</span><span class="fn-name">引數進階用法</span></a>
+  <a href="#return" data-target="return"><span class="fn-num">P04</span><span class="fn-name">回傳值與 None</span></a>
+  <a href="#scope" data-target="scope"><span class="fn-num">P05</span><span class="fn-name">區域與全域範圍</span></a>
+  <a href="#module" data-target="module"><span class="fn-num">P06</span><span class="fn-name">存成模組</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">速查表</span></a>
+  <a href="#bankquiz" data-target="bankquiz"><span class="fn-num">QUIZ</span><span class="fn-name">自我檢測</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="chapter-tag">PREREQ P3</div>
+    <h1><span class="blue">函數</span>：把一段邏輯包起來重複使用</h1>
+    <div class="subtitle">先備知識複習 · 選讀，不列入作業與考試範圍</div>
+    <div class="big-formula">def｜引數/參數｜return｜None｜scope｜import</div>
+    <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（先備複習 · 選讀，不列入評分）</div>
+  <p>① 這頁複習資料結構課程<strong>預設你已經會</strong>的 Python。已經熟的可以直接跳過。
+  ② 每節都附一個<strong>「這在資料結構課哪裡會用到」</strong>的小方框——那才是你該記住的部分。
+  ③ 讀完做 <a href="#bankquiz">自我檢測</a>，再翻 <a href="#cards">關鍵詞彙卡</a>。
+  <br><strong>本頁屬補充先備知識，不列入作業與考試範圍。</strong></p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#intro"><span class="toc-num">P01</span>函數簡介</a>
+    <a href="#define"><span class="toc-num">P02</span>函數的定義與呼叫</a>
+    <a href="#arguments"><span class="toc-num">P03</span>引數的進階用法</a>
+    <a href="#return"><span class="toc-num">P04</span>回傳值與 None</a>
+    <a href="#scope"><span class="toc-num">P05</span>區域變數與全域變數</a>
+    <a href="#module"><span class="toc-num">P06</span>把函式存進模組</a>
+    <a href="#reference"><span class="toc-num">REF</span>本章速查表</a>
+    <a href="#bankquiz"><span class="toc-num">QUIZ</span>自我檢測</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<section id="intro">
+  <div class="section-number">PART 01 · 函數簡介</div>
+  <h2>為什麼需要函數？抽象化與分治法</h2>
+  <p>開發與維護大型程式最好的方法，是把它拆解成較小的部分——這個技巧叫<strong>分治法（divide and conquer）</strong>。而在程式設計中，<strong>抽象化（abstraction）</strong>指的是把演算法中子步驟的複雜性隱藏在一個<strong>函數（function）</strong>裡的做法。</p>
+  <p>寫函數，其實就是幫某一段程式碼的邏輯<strong>取一個名字</strong>：之後我們只要看函數名稱就知道它的用途，不必每次都重新讀懂實作細節。我們早就用過內建函數了，例如 <code>print()</code>、<code>str()</code>、<code>len()</code>——括號內放的值稱為<strong>引數（argument）</strong>。當函數出現在運算式或敘述中，就稱為一次<strong>函數呼叫（function call）</strong>。</p>
+
+  <p>換個生活中的例子：想像你走進一間手搖飲店，店員照著牆上貼的配方單做飲料——五分糖、去冰、加珍珠——不用每接一張單就重新發明一次泡茶的方法。這張配方單就是函數：用 <code>def</code> 把泡茶的步驟寫一次，之後想喝的時候，只要「點單」呼叫它就好，不必再把每個步驟想一遍。</p>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 用函數的兩大好處</div>
+    <p>① 可以在程式的各個位置<strong>重複呼叫</strong>同一段程式碼，不必複製貼上。<br>
+       ② 讓程式<strong>更容易修改</strong>：只要改函數內部的程式碼，所有呼叫它的地方都會自動套用新版本。</p>
+    <p style="margin-bottom:0;">簡單說：函數就像一個<strong>黑盒子</strong>——有輸入（參數）、有輸出（回傳值），使用者不需要知道盒子裡面怎麼運作。</p>
+  </div>
+
+  <p>先劇透一下：這一章結束前，你會親手玩到（而且看懂程式碼的每一行）兩個小遊戲——「猜數字」和「龍與洞穴」。它們都是用今天要學的 <code>def</code>、引數、<code>return</code> 和模組寫成的，把函數學完，你就能自己看懂它們是怎麼運作的。</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="define">
+  <div class="section-number">PART 02 · 函數的定義與呼叫</div>
+  <h2>def 敘述：定義並呼叫你自己的函數</h2>
+  <p>用 <code>def</code> 敘述定義函數，緊接在 <code>def 函數名稱():</code> 後方、有縮排的程式碼就是<strong>函數主體</strong>。呼叫函數時傳入的值稱為<strong>引數</strong>，函數定義中負責接住這些值的變數則稱為<strong>參數（parameter）</strong>。</p>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">hello</span>(name):</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'Hello,'</span>, name)</span>
+<span class="line"></span>
+<span class="line"><span class="fn">hello</span>(<span class="str">'Alice'</span>)</span>
+<span class="line"><span class="fn">hello</span>(<span class="str">'Bob'</span>)</span></div>
+  <p>第一次呼叫 <code>hello('Alice')</code> 時，Python 會把參數 <code>name</code> 自動設定為 <code>'Alice'</code>，執行函數主體、印出 <code>Hello, Alice</code>；接著才換 <code>hello('Bob')</code>。</p>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 函數執行結束後，參數就被遺忘了</div>
+    <p style="margin-bottom:0;">如果在 <code>hello('Bob')</code> 之後加一行 <code>print(name)</code>，會產生 <code>NameError</code>！因為 <code>name</code> 只存在於呼叫 <code>hello()</code> 時建立的區域範圍中，函數一返回，這個區域範圍就被銷毀，<code>name</code> 也跟著消失。（這正是下面 P05「區域 vs 全域範圍」要探討的主題。）</p>
+  </div>
+
+  <h3>位置引數：依照順序配對</h3>
+  <p>最簡單的引數配對方式，是依照<strong>呼叫時的順序</strong>對應到參數，這種方式稱為<strong>位置引數（positional argument）</strong>：</p>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">describe_pet</span>(animal_type, pet_name):</span>
+<span class="line">    <span class="str">"""</span></span>
+<span class="line"><span class="str">    顯示寵物的資訊。</span></span>
+<span class="line"><span class="str">    你可以在這裡撰寫多行說明！</span></span>
+<span class="line">    <span class="str">"""</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"\n我有一隻"</span>, animal_type + <span class="str">"。"</span>)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"我那隻"</span>, animal_type + <span class="str">" 的名字是"</span>, pet_name.title() + <span class="str">"。"</span>)</span>
+<span class="line"></span>
+<span class="line"><span class="fn">describe_pet</span>(<span class="str">'Pokemon'</span>, <span class="str">'Harry'</span>)</span></div>
+  <p>呼叫時 <code>'Pokemon'</code> 依序對應到 <code>animal_type</code>、<code>'Harry'</code> 對應到 <code>pet_name</code>。函數主體第二行的三引號字串是<strong>文件字串（docstring）</strong>，用來描述函數的功能——如果你用 <code>help(describe_pet)</code> 查詢，這段說明也會一併顯示出來。</p>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 初學者常犯的兩個小錯</div>
+    <p style="margin-bottom:0;">① 呼叫函數時忘記加括號 <code>()</code>——當函數不需要參數時特別容易忘記。<br>
+       ② 忽略縮排，沒有把函數主體的程式碼與外面呼叫函數的程式碼區分清楚。</p>
+  </div>
+
+  <h3>🎬 互動：拆開一次函數呼叫——呼叫堆疊動畫</h3>
+  <p>每次呼叫函數，Python 都會在<strong>呼叫堆疊（call stack）</strong>最上方建立一個新的「函數 frame」，存放這次呼叫的參數與區域變數；函數執行到 <code>return</code> 時，這個 frame 就會被丟棄，回傳值連同控制權一起送回呼叫處。用下面這個有回傳值的小函數逐步看看：</p>
+
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="stack-canvas" id="stackCanvas"><span class="var-empty">按「單步 ▸」開始執行</span></div>
+      <div class="pseudo-code" id="stackCode">
+<span class="line"><span class="kw">def</span> <span class="fn">add_em</span>(x, y, z):</span>
+<span class="line">    <span class="kw">return</span> x + y + z</span>
+<span class="line">total = <span class="fn">add_em</span>(<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>)</span>
+<span class="line"><span class="fn">print</span>(total)</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="stackStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="stackPlay">▶ 播放</button>
+        <button class="btn btn-step" id="stackStep">單步 ▸</button>
+        <button class="btn btn-reset" id="stackReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="stackOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">呼叫堆疊是什麼？</div>
+        <p style="font-size:.82rem;margin:0;">全域範圍只有一個，程式一開始就建立；每呼叫一次函數，就在堆疊上疊一個新的區域 frame。frame 之間互不干擾，函數返回時最上面的 frame 會被銷毀。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>help() 與關鍵字引數小預告</h3>
+  <p>使用 <code>help(print)</code> 可以看到 <code>print()</code> 其實還有其他參數，例如 <code>sep</code>：預設分隔符號是空白，但可以改變它。</p>
+  <div class="pseudo-code">
+<span class="line"><span class="fn">print</span>(<span class="str">"8"</span>, <span class="str">"9"</span>, sep=<span class="str">"*"</span>)</span>
+<span class="line"><span class="com"># 輸出：8*9</span></span></div>
+  <p>像 <code>sep="*"</code> 這樣「用名稱指定引數」的寫法，就是下一節要介紹的<strong>關鍵字引數</strong>。</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="arguments">
+  <div class="section-number">PART 03 · 引數的進階用法</div>
+  <h2>關鍵字引數與預設參數值</h2>
+  <p><strong>關鍵字引數（keyword argument）</strong>是以「名稱－值」配對的方式傳入引數，不需要擔心呼叫時的順序，也讓每個引數的用途更清楚：</p>
+  <div class="pseudo-code">
+<span class="line"><span class="fn">describe_pet</span>(animal_type=<span class="str">'Pokemon'</span>, pet_name=<span class="str">'Harry'</span>)</span></div>
+  <p>函數本身沒有改變，但 Python 讀到這行時，會直接依名稱把 <code>'Pokemon'</code> 指派給 <code>animal_type</code>、<code>'Harry'</code> 指派給 <code>pet_name</code>——順序完全不影響結果。</p>
+
+  <h3>預設參數值</h3>
+  <p>撰寫函式時可以定義<strong>預設參數值</strong>：呼叫時有提供對應引數就用引數的值，沒提供就用預設值。</p>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">describe_pet</span>(pet_name, animal_type=<span class="str">'dog'</span>):</span>
+<span class="line">    <span class="str">"""</span></span>
+<span class="line"><span class="str">    顯示寵物的相關資訊。</span></span>
+<span class="line"><span class="str">    這裡為 animal_type 參數設定了預設值。</span></span>
+<span class="line">    <span class="str">"""</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"\n我有一隻 "</span> + animal_type + <span class="str">"。"</span>)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"我那隻 "</span> + animal_type + <span class="str">" 的名字叫做 "</span> + pet_name.title() + <span class="str">"。"</span>)</span>
+<span class="line"></span>
+<span class="line"><span class="fn">describe_pet</span>(<span class="str">'willie'</span>)  <span class="com"># 沒給 animal_type → 使用預設值 'dog'</span></span></div>
+  <p>注意函式定義中<strong>參數順序做了調整</strong>：沒有預設值的 <code>pet_name</code> 放在前面，有預設值的 <code>animal_type</code> 放在後面。這不是巧合——Python 規定<strong>有預設值的參數必須排在沒有預設值的參數之後</strong>，否則會發生語法錯誤，因為 Python 需要先確定哪些是「必填」的位置引數。</p>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 參數順序寫反了會怎樣？</div>
+    <p style="margin-bottom:0;"><code>def describe_pet(animal_type='dog', pet_name):</code> 這樣的定義會直接產生 <code>SyntaxError: parameter without a default follows parameter with a default</code>——因為沒有預設值的 <code>pet_name</code> 排在有預設值的 <code>animal_type</code> 後面，Python 無法判斷位置引數該怎麼配對。</p>
+  </div>
+
+  <h3>🧪 互動：引數傳遞沙盒 —— def power(base, exp=2)</h3>
+  <p>下面這個函數 <code>power(base, exp=2)</code> 會計算 <code>base ** exp</code>。試試看：只給 <code>base</code>（讓 <code>exp</code> 使用預設值 2）、或兩個都給——比較幾種等價的呼叫寫法與各自的回傳值：</p>
+  <div class="sandbox">
+    <div class="sandbox-label">🧪 SANDBOX</div>
+    <div class="input-row">
+      <label>base =</label>
+      <input type="text" id="baseInput" placeholder="例如 3" value="3">
+      <label>exp =</label>
+      <input type="text" id="expInput" placeholder="留空 = 使用預設值 2" value="">
+    </div>
+    <div class="preset-row">
+      <button class="preset-btn" data-base="3" data-exp="">power(3)</button>
+      <button class="preset-btn" data-base="2" data-exp="10">power(2, 10)</button>
+      <button class="preset-btn" data-base="5" data-exp="0">power(5, 0)</button>
+      <button class="preset-btn" data-base="2" data-exp="0.5">power(2, 0.5)</button>
+      <button class="preset-btn" data-base="-2" data-exp="3">power(-2, 3)</button>
+      <button class="preset-btn" data-base="-2" data-exp="0.5">power(-2, 0.5)</button>
+    </div>
+    <div class="sandbox-result" id="powerResult"></div>
+  </div>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 小提醒</div>
+    <p style="margin-bottom:0;">位置引數、關鍵字引數、依賴預設值——這三種寫法在 Python 眼中<strong>完全等價</strong>，只是可讀性與彈性不同。實務上常見的搭配是：必要的引數用位置方式傳，選填、容易混淆的引數用關鍵字方式傳。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="return">
+  <div class="section-number">PART 04 · 回傳值與 None</div>
+  <h2>return 敘述：函數呼叫也是一個值</h2>
+  <p>呼叫 <code>len('Hello')</code> 會得到一個整數——這個函數呼叫所計算出的值，稱為<strong>傳回值（return value）</strong>。自訂函數時，用 <strong><code>return</code> 敘述</strong>來指定要回傳什麼：</p>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">import</span> random</span>
+<span class="line"></span>
+<span class="line"><span class="kw">def</span> <span class="fn">getAnswer</span>(answerNumber):</span>
+<span class="line">    <span class="kw">if</span> answerNumber == <span class="num">1</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">'結果是肯定的'</span></span>
+<span class="line">    <span class="kw">elif</span> answerNumber == <span class="num">2</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">'毫無疑問'</span></span>
+<span class="line">    <span class="kw">elif</span> answerNumber == <span class="num">3</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">'是的'</span></span>
+<span class="line">    <span class="kw">elif</span> answerNumber == <span class="num">4</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">'回覆不明，再試一次'</span></span>
+<span class="line">    <span class="kw">elif</span> answerNumber == <span class="num">5</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">'請稍後再問'</span></span>
+<span class="line">    <span class="kw">elif</span> answerNumber == <span class="num">6</span>:</span>
+<span class="line">        <span class="kw">return</span> <span class="str">'請更加專心並再問一次'</span></span>
+<span class="line"></span>
+<span class="line">r = random.randint(<span class="num">1</span>, <span class="num">6</span>)</span>
+<span class="line">fortune = <span class="fn">getAnswer</span>(r)</span>
+<span class="line"><span class="fn">print</span>(fortune)</span></div>
+  <p>程式執行到 <code>getAnswer(r)</code> 時，會跳到函數開頭，把 <code>r</code> 的值存入參數 <code>answerNumber</code>，依條件回傳其中一個字串；呼叫結束後，程式回到原本呼叫的那一行，把回傳的字串指派給 <code>fortune</code>。像這種<strong>會回傳值的函數</strong>有時被稱為 <strong>fruitful function（有回傳值的函數）</strong>。</p>
+
+  <h3>None：代表「沒有值」的值</h3>
+  <p>Python 中有一個特殊值 <code>None</code>，代表「沒有值」，它是 <code>NoneType</code> 型別中唯一的值。<code>None</code> 最常見的用途，就是作為<strong>沒有 return 敘述的函數</strong>的傳回值：</p>
+  <div class="pseudo-code">
+<span class="line">spam = <span class="fn">print</span>(<span class="str">'Hello!'</span>)</span>
+<span class="line"><span class="fn">print</span>(spam)</span>
+<span class="line"><span class="fn">type</span>(spam)</span>
+<span class="line"><span class="com"># 輸出：Hello!</span></span>
+<span class="line"><span class="com"># 接著：None</span></span>
+<span class="line"><span class="com"># 接著：&lt;class 'NoneType'&gt;</span></span></div>
+  <p><code>print()</code> 負責在螢幕上顯示文字，本身不需要回傳任何資料——但因為<strong>所有函數呼叫都必須有傳回值</strong>，所以 <code>print()</code> 就回傳 <code>None</code>。像這樣<strong>沒有回傳值的函數</strong>稱為 <strong>void function（無回傳值的函數）</strong>。Python 會自動在任何沒有 <code>return</code> 敘述的函數結尾補上 <code>return None</code>；就算你寫了 <code>return</code> 但沒接任何值，也一樣回傳 <code>None</code>。</p>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 常見誤區：忘了 return，只用了 print</div>
+    <p style="margin-bottom:0;">下面這個函式想把加總結果「傳回去」給呼叫者使用，卻誤用了 <code>print</code>：<br>
+    <code>def add_em(x, y, z): print(x + y + z)</code><br>
+    執行時看起來「有印出結果」，很容易誤以為函式運作正常——但它的<strong>傳回值其實是 None</strong>！如果之後寫 <code>total = add_em(2, 3, 4)</code>，<code>total</code> 拿到的會是 <code>None</code> 而不是 9。要讓函式真正「傳回」一個值，必須用 <code>return</code>，而不是 <code>print</code>。</p>
+  </div>
+
+  <p>另外要特別注意：<code>return</code> 敘述會<strong>立即結束函數</strong>，執行權馬上回到呼叫處，寫在 <code>return</code> 之後的程式碼永遠不會被執行到：</p>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">add_em</span>(x, y, z):</span>
+<span class="line">    <span class="kw">return</span> x + y + z</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"the answer is"</span>, x + y + z)  <span class="com"># ← 這行永遠不會執行！</span></span></div>
+
+  <h3>🎮 遊戲時間：猜數字（notebook 練習 1）</h3>
+  <p>還記得上面 <code>getAnswer()</code> 用 <code>return</code> 回傳一個字串嗎？下面這個「猜數字」遊戲用的是同一招：<code>guess_number()</code> 猜中時 <code>return True</code>，次數用完就 <code>return False</code>，呼叫端再依照回傳值印出「你贏了！」或「你輸了！」。點「開始遊戲」試試看：</p>
+
+  <div class="game-box">
+    <div class="gb-tag">GAME · 取自課本練習 1</div>
+    <h3>🔢 猜數字</h3>
+    <p>電腦會偷偷抽一個 1～10 之間的數字，你有 5 次機會猜中它。</p>
+    <div class="game-console" id="guessConsole"></div>
+    <div class="game-input-row">
+      <button class="btn btn-play" id="guessStart">開始遊戲</button>
+      <input type="text" id="guessInput" placeholder="輸入 1～10" disabled>
+      <button class="btn btn-step" id="guessSubmit" disabled>猜！</button>
+    </div>
+    <details>
+      <summary style="cursor:pointer;color:#f39c12;font-family:'JetBrains Mono',monospace;font-size:.8rem;margin-top:.8rem;">▸ 這個遊戲的 Python 程式碼</summary>
+      <div class="pseudo-code" style="margin-top:.6rem;">
+<span class="line"><span class="kw">import</span> random</span>
+<span class="line"></span>
+<span class="line"><span class="kw">def</span> <span class="fn">guess_number</span>(max_tries, max_number=<span class="num">10</span>):</span>
+<span class="line">    <span class="str">"""</span></span>
+<span class="line"><span class="str">    此函數讓玩家猜一個介於 1 到 max_number 之間的數字</span></span>
+<span class="line"><span class="str">    如果玩家能在 max_tries 次內猜中正確數字，回傳 True</span></span>
+<span class="line"><span class="str">    否則，回傳 False</span></span>
+<span class="line">    <span class="str">"""</span></span>
+<span class="line">    <span class="com"># 產生一個介於 1 和 max_number 之間的隨機數字</span></span>
+<span class="line">    number = random.randint(<span class="num">1</span>, max_number)</span>
+<span class="line"></span>
+<span class="line">    <span class="com"># 讓玩家最多猜 max_tries 次</span></span>
+<span class="line">    <span class="kw">for</span> i <span class="kw">in</span> range(max_tries):</span>
+<span class="line">        <span class="com"># 提示玩家猜數字</span></span>
+<span class="line">        guess = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"請猜一個數字（介於 1 和 "</span> + <span class="fn">str</span>(max_number) + <span class="str">" 之間）："</span>))</span>
+<span class="line"></span>
+<span class="line">        <span class="com"># 檢查猜測是否正確</span></span>
+<span class="line">        <span class="kw">if</span> guess == number:</span>
+<span class="line">            <span class="fn">print</span>(<span class="str">"恭喜你，猜中了！"</span>)</span>
+<span class="line">            <span class="kw">return</span> <span class="kw">True</span></span>
+<span class="line">        <span class="kw">elif</span> guess &lt; number:</span>
+<span class="line">            <span class="fn">print</span>(<span class="str">"答案比你猜的數字大。"</span>)</span>
+<span class="line">        <span class="kw">else</span>:</span>
+<span class="line">            <span class="fn">print</span>(<span class="str">"答案比你猜的數字小。"</span>)</span>
+<span class="line"></span>
+<span class="line">    <span class="com"># 如果玩家在 max_tries 次內沒猜中，顯示正確答案</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"很抱歉，你沒有猜中。正確答案是 "</span> + <span class="fn">str</span>(number) + <span class="str">"。"</span>)</span>
+<span class="line">    <span class="kw">return</span> <span class="kw">False</span></span>
+<span class="line"></span>
+<span class="line"><span class="com"># 呼叫函式開始遊戲，最多可猜 5 次</span></span>
+<span class="line">game_result = <span class="fn">guess_number</span>(<span class="num">5</span>)</span>
+<span class="line"></span>
+<span class="line"><span class="com"># 印出遊戲結果</span></span>
+<span class="line"><span class="kw">if</span> game_result:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"你贏了！"</span>)</span>
+<span class="line"><span class="kw">else</span>:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"你輸了！"</span>)</span></div>
+    </details>
+    <p class="game-note">玩上癮了？打開 <code>03_Function.ipynb</code> 練習 1，自己把它做出來——這是你的「這是我做出來的」時刻。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="scope">
+  <div class="section-number">PART 05 · 區域變數與全域變數</div>
+  <h2>範圍（Scope）：變數活多久、誰看得到</h2>
+  <p>函式被呼叫時建立的<strong>參數</strong>，以及在函式內被賦值的變數，都住在這個函式自己的<strong>區域範圍（local scope）</strong>。在所有函式之外被賦值的變數，則住在<strong>全域範圍（global scope）</strong>。一個變數只能屬於其中一種範圍，不能又是區域變數、又是全域變數。</p>
+  <p>換個白話的說法：函式就像一間房間，裡面的變數是寫在房間自己的白板上；房間門一關（函式執行結束、返回），白板就被擦掉——房間外的人看不到、也拿不到裡面白板上的內容。</p>
+  <p>把「範圍」想像成變數的容器：範圍被銷毀時，裡面所有的變數也會被遺忘。一個模組<strong>只有一個全域範圍</strong>，程式開始執行時就建立；而<strong>每呼叫一次函式，就會產生一個新的區域範圍</strong>，函式執行完畢返回後，該區域範圍就被銷毀。也就是說，下次再呼叫同一個函式，區域變數並不會記得上一次呼叫時的值。</p>
+
+  <h3>情境一：區域變數無法在全域範圍中使用</h3>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">spam</span>():</span>
+<span class="line">    eggs = <span class="num">31337</span></span>
+<span class="line"></span>
+<span class="line"><span class="fn">spam</span>()</span>
+<span class="line"><span class="fn">print</span>(eggs)</span></div>
+  <div class="console"><div class="err-line out-line">Traceback (most recent call last):
+NameError: name 'eggs' is not defined</div></div>
+  <p style="margin-top:.6rem;">變數 <code>eggs</code> 只存在於呼叫 <code>spam()</code> 時建立的區域範圍中；函式返回後，該區域範圍就被銷毀，<code>eggs</code> 也不再存在。</p>
+
+  <h3>情境二：不同的區域範圍互不相通</h3>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">spam</span>():</span>
+<span class="line">    eggs = <span class="num">99</span></span>
+<span class="line">    <span class="fn">bacon</span>()</span>
+<span class="line">    <span class="fn">print</span>(eggs)</span>
+<span class="line"></span>
+<span class="line"><span class="kw">def</span> <span class="fn">bacon</span>():</span>
+<span class="line">    ham = <span class="num">101</span></span>
+<span class="line">    eggs = <span class="num">0</span></span>
+<span class="line"></span>
+<span class="line"><span class="fn">spam</span>()</span></div>
+  <p><code>bacon()</code> 裡的 <code>eggs</code>，跟 <code>spam()</code> 裡的 <code>eggs</code> 是完全不同的兩個變數——它們分別存在於各自呼叫所建立的區域範圍中。<code>bacon()</code> 執行完畢返回後，它的區域範圍（含 <code>ham</code> 與那個 <code>eggs</code>）就被銷毀；回到 <code>spam()</code> 後印出的 <code>eggs</code>，仍然是 <code>spam()</code> 自己的 99。</p>
+
+  <h3>情境三：全域變數可以在區域範圍中被讀取</h3>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">spam</span>():</span>
+<span class="line">    <span class="fn">print</span>(eggs)</span>
+<span class="line"></span>
+<span class="line">eggs = <span class="num">42</span></span>
+<span class="line"><span class="fn">spam</span>()</span>
+<span class="line"><span class="fn">print</span>(eggs)</span>
+<span class="line"><span class="com"># 輸出：42</span></span>
+<span class="line"><span class="com">#      42</span></span></div>
+  <p>因為 <code>spam()</code> 裡沒有名為 <code>eggs</code> 的參數，也沒有任何指派給 <code>eggs</code> 的敘述，所以 Python 會把它當成<strong>全域變數</strong> <code>eggs</code> 來讀取——這正是「讀取全域變數」與下面「情境四：指派會建立區域變數」之間關鍵的不同之處。</p>
+
+  <h3>🎬 情境四（互動）：函數內指派 → 建立區域變數，不影響全域同名變數</h3>
+  <p>只要在函式內對某個名稱做<strong>指派（=）</strong>，Python 就會把它視為區域變數——就算全域範圍已經有同名變數也一樣！這種現象叫做<strong>遮蔽（shadowing）</strong>。逐步執行下面的程式，觀察「全域」與「區域」兩欄裡的 <code>eggs</code> 如何互不干擾：</p>
+
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="pseudo-code" id="scopeCode">
+<span class="line"><span class="kw">def</span> <span class="fn">spam</span>():</span>
+<span class="line">    eggs = <span class="str">'spam local'</span></span>
+<span class="line">    <span class="fn">print</span>(eggs)    <span class="com"># 'spam local'</span></span>
+<span class="line"><span class="kw">def</span> <span class="fn">bacon</span>():</span>
+<span class="line">    eggs = <span class="str">'bacon local'</span></span>
+<span class="line">    <span class="fn">print</span>(eggs)    <span class="com"># 'bacon local'</span></span>
+<span class="line">    <span class="fn">spam</span>()</span>
+<span class="line">    <span class="fn">print</span>(eggs)    <span class="com"># 仍是 'bacon local'</span></span>
+<span class="line">eggs = <span class="str">'global'</span></span>
+<span class="line"><span class="fn">bacon</span>()</span>
+<span class="line"><span class="fn">print</span>(eggs)        <span class="com"># 'global'</span></span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="scopeStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="scopePlay">▶ 播放</button>
+        <button class="btn btn-step" id="scopeStep">單步 ▸</button>
+        <button class="btn btn-reset" id="scopeReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">全域 GLOBAL<span class="ic-badge">module</span></div><div id="scopeGlobal"><div class="var-empty">尚未執行</div></div></div>
+      <div class="info-card"><div class="ic-title">區域 LOCAL<span class="ic-badge">目前函式</span></div><div id="scopeLocal"><div class="var-empty">尚未進入函式</div></div></div>
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="scopeOut"></div></div>
+    </div>
+  </div>
+
+  <h3>如果真的想修改全域變數：global 關鍵字</h3>
+  <div class="pseudo-code">
+<span class="line"><span class="kw">def</span> <span class="fn">spam</span>():</span>
+<span class="line">    <span class="kw">global</span> eggs    <span class="com"># 如果想修改全域變數 eggs，必須使用 global 關鍵字</span></span>
+<span class="line">    eggs = <span class="str">'spam local'</span></span>
+<span class="line">    <span class="fn">print</span>(eggs)    <span class="com"># 輸出 'spam local'</span></span>
+<span class="line"></span>
+<span class="line">eggs = <span class="str">'global'</span></span>
+<span class="line"><span class="fn">spam</span>()</span>
+<span class="line"><span class="fn">print</span>(eggs)        <span class="com"># 輸出 'spam local'</span></span></div>
+  <p>加上 <code>global eggs</code> 後，函式內的 <code>eggs = 'spam local'</code> 就不再建立區域變數，而是直接修改全域變數本身，所以最後 <code>print(eggs)</code> 印出的是 <code>'spam local'</code>。</p>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 常見誤區：讀全域可以，但「指派」會變成區域變數</div>
+    <p style="margin-bottom:0;">在函式內<strong>單純讀取</strong>一個名稱（例如 <code>print(eggs)</code>）沒有問題，Python 會沿用全域變數；但只要函式內有任何一行對這個名稱<strong>做了指派</strong>（例如 <code>eggs = eggs + 1</code>），Python 在編譯這個函式時就會把它整個視為區域變數——即使指派發生在讀取之後，也會導致「在指派前就使用了區域變數」的 <code>UnboundLocalError</code>！這是初學者非常容易踩到的陷阱（下方測驗會考到這一題）。</p>
+  </div>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 除非有非常充分的理由，否則不要用全域變數</div>
+    <p style="margin-bottom:0;">全域變數的問題在於，它們很容易在整個程式中造成無意間的改動：在某個函式裡修改全域變數也許合理，卻可能干擾到其他所有函式的執行流程。函式的價值正在於它們的區域範圍——一個函式內的程式碼不會直接影響其他函式的變數，這讓除錯變得容易許多。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="module">
+  <div class="section-number">PART 06 · 把函式存進模組</div>
+  <h2>模組（Module）：把函式存成獨立檔案並重複使用</h2>
+  <p>把函式儲存在一個獨立的 <code>.py</code> 檔案中，這個檔案就稱為<strong>模組</strong>，之後可以用 <code>import</code> 陳述式把模組中的程式碼載入到目前的程式裡。這樣做能隱藏實作細節、讓你專注於高層邏輯，也方便在不同程式間重複使用同一批函式，甚至分享給其他程式設計師。假設我們建立了一個 <code>pizza.py</code>：</p>
+  <div class="pseudo-code">
+<span class="line"><span class="com"># pizza.py</span></span>
+<span class="line"><span class="kw">def</span> <span class="fn">make_pizza</span>(size, toppings):</span>
+<span class="line">    <span class="str">"""概述我們即將製作的披薩。"""</span></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"\n正在製作一個 "</span> + <span class="fn">str</span>(size) + <span class="str">" 吋的披薩，配料有："</span>)</span>
+<span class="line">    <span class="fn">print</span>(toppings)</span></div>
+
+  <table class="cmp-table">
+    <tr><th>匯入語法</th><th>呼叫方式</th><th>範例</th><th>備註</th></tr>
+    <tr><td>import 模組名</td><td>模組名.函式()</td><td>import pizza<br>pizza.make_pizza(16, '義式臘腸')</td><td>最安全，不會有名稱衝突</td></tr>
+    <tr><td>from 模組 import 函式</td><td>函式()</td><td>from pizza import make_pizza<br>make_pizza(16, '義式臘腸')</td><td>呼叫時不需要點記號</td></tr>
+    <tr><td>from 模組 import *</td><td>函式()</td><td>from pizza import *<br>make_pizza(16, '義式臘腸')</td><td class="worst">大型模組不建議，可能覆蓋同名函式</td></tr>
+    <tr><td>from 模組 import 函式 as 別名</td><td>別名()</td><td>from pizza import make_pizza as mp<br>mp(16, '義式臘腸')</td><td>函式名稱太長或會衝突時使用</td></tr>
+    <tr><td>import 模組 as 別名</td><td>別名.函式()</td><td>import pizza as p<br>p.make_pizza(16, '義式臘腸')</td><td>常見於 import numpy as np 這類慣例</td></tr>
+  </table>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 為什麼要學會匯入？</div>
+    <p style="margin-bottom:0;">函式讓你的程式碼分成邏輯區塊，而模組讓你把這些區塊分享到不同專案。學會 <code>import</code>，你不只能整理自己的程式，也能開始使用別人寫好的函式庫——這是後續章節（例如資料科學常用的 <code>numpy</code>、<code>pandas</code>）的基礎。</p>
+  </div>
+
+  <h3>🎮 遊戲時間：龍與洞穴（notebook 練習 2）</h3>
+  <p>練習 2 要你完成一支會匯入自訂模組 <code>game</code> 的主程式：用 <code>import game</code> 載入模組，再呼叫模組裡的 <code>game.displayIntro()</code>、<code>game.chooseCave()</code>、<code>game.checkCave()</code>——正是上表「import 模組」那一列的實際案例。故事開場文字照著遊戲模組的 <code>displayIntro()</code>：土地上充滿了龍，兩個洞穴裡，一個住著友善的龍，另一個住著貪婪飢餓的龍。選一個洞穴，賭賭看：</p>
+
+  <div class="game-box">
+    <div class="gb-tag">GAME · 取自課本練習 2</div>
+    <h3>🐉 龍與洞穴</h3>
+    <p>選一個洞穴，賭賭看裡面是願意分享寶藏的友善龍，還是會把你吃掉的餓龍。</p>
+    <div class="game-console" id="dragonConsole"></div>
+    <div class="game-input-row">
+      <button class="btn btn-play" id="cave1Btn">洞穴 1</button>
+      <button class="btn btn-play" id="cave2Btn">洞穴 2</button>
+      <button class="btn btn-reset" id="dragonReplay" style="display:none;">再玩一次？</button>
+    </div>
+    <details>
+      <summary style="cursor:pointer;color:#f39c12;font-family:'JetBrains Mono',monospace;font-size:.8rem;margin-top:.8rem;">▸ 這個遊戲的 Python 程式碼</summary>
+      <div class="pseudo-code" style="margin-top:.6rem;">
+<span class="line"><span class="com"># game.py（遊戲模組）</span></span>
+<span class="line"><span class="kw">import</span> random</span>
+<span class="line"><span class="kw">import</span> time</span>
+<span class="line"></span>
+<span class="line"><span class="kw">def</span> <span class="fn">displayIntro</span>():</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'''你來到了一個充滿龍的國度。你面前有兩個洞穴。</span></span>
+<span class="line"><span class="str">在其中一個洞穴中，住著一隻友善的龍，牠願意與你分享牠的財寶。</span></span>
+<span class="line"><span class="str">另一個洞穴中，住著一隻貪婪又飢餓的龍，牠會一見到你就把你吃掉。'''</span>)</span>
+<span class="line">    <span class="fn">print</span>()</span>
+<span class="line"></span>
+<span class="line"><span class="kw">def</span> <span class="fn">chooseCave</span>():</span>
+<span class="line">    cave = <span class="str">''</span></span>
+<span class="line">    <span class="kw">while</span> cave != <span class="str">'1'</span> <span class="kw">and</span> cave != <span class="str">'2'</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">'你想進入哪個洞穴？（1 或 2）'</span>)</span>
+<span class="line">        cave = <span class="fn">input</span>()</span>
+<span class="line">    <span class="kw">return</span> cave</span>
+<span class="line"></span>
+<span class="line"><span class="kw">def</span> <span class="fn">checkCave</span>(chosenCave):</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'你慢慢地走向洞穴...'</span>)</span>
+<span class="line">    time.sleep(<span class="num">2</span>)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'裡面又黑又陰森...'</span>)</span>
+<span class="line">    time.sleep(<span class="num">2</span>)</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'一隻巨大的龍突然跳了出來！牠張開大嘴，然後...'</span>)</span>
+<span class="line">    <span class="fn">print</span>()</span>
+<span class="line">    time.sleep(<span class="num">2</span>)</span>
+<span class="line"></span>
+<span class="line">    friendlyCave = random.randint(<span class="num">1</span>, <span class="num">2</span>)</span>
+<span class="line">    <span class="kw">if</span> chosenCave == <span class="fn">str</span>(friendlyCave):</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">'牠把財寶送給了你！'</span>)</span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">'牠一口就把你吞下去了！'</span>)</span>
+<span class="line"></span>
+<span class="line"><span class="com"># word_game.py（主程式）</span></span>
+<span class="line"><span class="kw">import</span> random</span>
+<span class="line"><span class="kw">import</span> time</span>
+<span class="line"><span class="kw">import</span> game  <span class="com"># 載入遊戲模組</span></span>
+<span class="line"></span>
+<span class="line">playAgain = <span class="str">'yes'</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">while</span> playAgain == <span class="str">'yes'</span>:</span>
+<span class="line">    <span class="com"># 使用遊戲模組中的 displayIntro() 顯示遊戲資訊</span></span>
+<span class="line">    game.displayIntro()</span>
+<span class="line">    <span class="com"># 讀取使用者輸入並通過調用遊戲模組中的 chooseCave() 函數返回洞穴號碼</span></span>
+<span class="line">    caveNumber = game.chooseCave()</span>
+<span class="line">    <span class="com"># 通過調用遊戲模組中的 checkCave() 函數並提供適當的引數檢查洞穴是否安全</span></span>
+<span class="line">    game.checkCave(caveNumber)</span>
+<span class="line"></span>
+<span class="line">    <span class="fn">print</span>(<span class="str">'你想再玩一次嗎？（是或否）'</span>)</span>
+<span class="line">    playAgain = <span class="fn">input</span>()</span></div>
+    </details>
+    <p class="game-note">玩上癮了？打開 <code>03_Function.ipynb</code> 練習 2，自己把它做出來——這是你的「這是我做出來的」時刻。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<section id="reference">
+  <div class="section-number">REFERENCE · 速查表</div>
+  <h2>本章速查表</h2>
+
+  <h3>函數定義與呼叫</h3>
+  <table class="cmp-table">
+    <tr><th>語法</th><th>意義</th><th>範例</th></tr>
+    <tr><td>def 名稱(參數):</td><td>定義函數</td><td>def hello(name):</td></tr>
+    <tr><td>位置引數</td><td>依呼叫順序配對參數</td><td>describe_pet('Pokemon', 'Harry')</td></tr>
+    <tr><td>關鍵字引數</td><td>用「名稱=值」配對，順序不重要</td><td>describe_pet(pet_name='Harry', animal_type='Pokemon')</td></tr>
+    <tr><td>預設參數值</td><td>呼叫時可省略、改用預設值</td><td>def power(base, exp=2):</td></tr>
+    <tr><td>return 值</td><td>結束函數並回傳值</td><td>return x + y</td></tr>
+  </table>
+
+  <h3>回傳值與 None</h3>
+  <table class="cmp-table">
+    <tr><th>情況</th><th>傳回值</th><th>備註</th></tr>
+    <tr><td>有 return 值 的函數</td><td class="best">該值</td><td>fruitful function（有回傳值的函數）</td></tr>
+    <tr><td>沒有 return 敘述</td><td class="worst">None</td><td>void function（無回傳值的函數）</td></tr>
+    <tr><td>只寫 return（無值）</td><td class="worst">None</td><td>等同沒有 return</td></tr>
+    <tr><td>只用 print 忘了 return</td><td class="worst">None</td><td>最常見的誤區！</td></tr>
+  </table>
+
+  <h3>範圍（Scope）</h3>
+  <table class="cmp-table">
+    <tr><th>行為</th><th>結果</th></tr>
+    <tr><td>函式內讀取全域變數（未指派）</td><td class="best">可以，取得全域的值</td></tr>
+    <tr><td>函式內指派同名變數</td><td class="worst">建立新的區域變數（遮蔽全域）</td></tr>
+    <tr><td>函式外讀取函式內的區域變數</td><td class="worst">NameError</td></tr>
+    <tr><td>想在函式內修改全域變數</td><td class="best">先用 global 變數名 宣告</td></tr>
+  </table>
+
+  <h3>匯入模組</h3>
+  <table class="cmp-table">
+    <tr><th>語法</th><th>範例</th></tr>
+    <tr><td>import 模組</td><td>import pizza</td></tr>
+    <tr><td>from 模組 import 函式</td><td>from pizza import make_pizza</td></tr>
+    <tr><td>from 模組 import *</td><td>from pizza import *</td></tr>
+    <tr><td>as 別名</td><td>import pizza as p　／　from pizza import make_pizza as mp</td></tr>
+  </table>
+
+  <div class="bridge-box">
+    <div class="bb-title">🎓 章末回顧</div>
+    <p>學完這章，你已經能：</p>
+    <ul>
+      <li>用 <code>def</code>／引數／<code>return</code>，把重複的邏輯包成一個函數，並讓它「回傳」一個值而不只是印出來。</li>
+      <li>分辨區域變數與全域變數，知道函式裡的白板什麼時候會被擦掉，也知道什麼時候需要 <code>global</code>。</li>
+      <li>把函式存成模組，用 <code>import</code> 在別的程式裡重複使用——而且你已經親手玩過、也看懂了「猜數字」與「龍與洞穴」兩個遊戲的完整程式碼。</li>
+    </ul>
+    <p class="bb-next">NEXT ▸ CH04 串列與元組：一個變數裝進整個清單，還能寫出「1A2B」猜數字遊戲的進階版。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這一頁在資料結構課哪裡會用到</div><p>函數呼叫會在<strong>呼叫堆疊</strong>上開一個堆疊框——這正是 <b>第 06 章</b>遞迴的核心機制。而「函數」加上綁定的物件就成了「方法」，那是 <a href='p8_oop_basics.html'>P8</a> 與 <b>第 04 章</b>之後每個類別的組成單位。</p></div>
+
+</section>
+
+<section id="bankquiz">
+  <div class="section-number">QUIZ · 自我檢測</div>
+  <h2>自我檢測：函數 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
+  <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q1.</span>在 Python 中，什麼是函數？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！函數是一個具名稱的程式區塊。">一個具名稱的程式區塊。</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然函數包含一連串的指令，但不是所有的一連串的指令都被視為函數。">任何一連串的指令。</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然有些函數會計算出數值，但 Python 中的函數概念與數學中的函數略有不同，並非所有函數都用來計算數值。例如，print&#40;) 函數就沒有計算數值。">一個計算數值的數學表達式。</button>
+      <button class="sq-opt" data-c="0" data-fb="這樣的敘述被稱為指派（賦值）敘述，而不是函數。">像 x = 5 + 4 這樣的敘述。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q2.</span>執行以下程式碼會輸出幾行？</div>
+    <pre class="sq-code">de&#102; hello():
+    print&#40;&quot;Hello&quot;)
+    print&#40;&quot;NSYSU&quot;)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="這段程式碼只是定義了函數，並沒有呼叫該函數，所以什麼都不會輸出。">0 行</button>
+      <button class="sq-opt" data-c="0" data-fb="當函數被呼叫時，會輸出兩行，但這段程式碼只是定義了函數，尚未呼叫它。">2 行</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然有三行程式碼，但目前只有定義函數，未執行呼叫，因此不會輸出任何內容。">3 行</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q3.</span>以下函數定義有什麼問題：</div>
+    <pre class="sq-code">de&#102; add_em(x, y, z):
+    return x + y + z
+    print&#40;&quot;the answer is&quot;, x + y + z)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="你可以在函數中加入 print 敘述，這是允許的。">函數定義中不應該使用 print 敘述。</button>
+      <button class="sq-opt" data-c="1" data-fb="這是一個非常常見的錯誤，撰寫程式時務必要特別留意！">在 return 敘述之後不應該有其他敘述。一旦執行到 return，函數會立即停止執行。</button>
+      <button class="sq-opt" data-c="0" data-fb="Python 會自動計算 x + y + z 並直接在 return 敘述中傳回這個值，不需要額外計算。">你必須在 return 前先計算 x + y + z 的值。</button>
+      <button class="sq-opt" data-c="0" data-fb="函數可以傳回任何合法的資料型別，包括（但不限於）數值、字串、布林值等等。">函數不能傳回數值。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q4.</span>如果我們希望從這個函數取得加總結果，下面的函數定義有什麼問題？</div>
+    <pre class="sq-code">de&#102; add_em(x, y, z):
+    print&#40;x + y + z)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="我們不小心使用了 print，而其實應該使用 return。這樣的話，函數預設會傳回 &#78;one。這個錯誤特別難發現，因為執行函數時，輸出的結果看起來一樣。">傳回值是 &#78;one</button>
+      <button class="sq-opt" data-c="0" data-fb="要小心！這是很常見的錯誤。我們這裡只是印出了 x+y+z 的結果，但並沒有傳回它。要傳回值，必須使用 return 關鍵字。">傳回值是 x+y+z 的結果</button>
+      <button class="sq-opt" data-c="0" data-fb="這裡的 x+y+z 是計算數值，代表 x、y 和 z 的總和，並不是字串。">傳回字串 'x+y+z'</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q5.</span>執行下列程式碼後，結果會是什麼？</div>
+    <pre class="sq-code">x = 3 * 2 
+y = 1
+de&#102; subtract(z):
+    y = 10
+    return y - z
+print&#40;subtract(x))</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！subtract 函式接收來自全域變數 x 的值作為參數 z，然後使用區域變數 y 來計算回傳值。結果為 10 - 6 = 4。">4</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤，請再看看 subtract 函式內部是如何計算的。">6</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤，subtract 函式內使用的是區域變數 y 並減去 z，不是直接回傳 y 的值。">10</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤，雖然有兩個 y，但它們分別存在於全域範圍與區域範圍，不會造成錯誤。">程式碼會報錯，因為有兩個不同的 y 值。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q6.</span>執行以下程式碼會得到什麼結果？</div>
+    <pre class="sq-code">x = 9
+de&#102; adding():
+    x+=1
+    print&#40;x)
+adding()</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="0" data-fb="錯誤，請注意函式中的區域變數範圍 (local scope)。">1</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤，請注意函式中的區域變數範圍 (local scope)。">9</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤，請注意函式中的區域變數範圍 (local scope)。">10</button>
+      <button class="sq-opt" data-c="1" data-fb="這段程式碼會產生錯誤，因為區域變數 'x' 在賦值之前就被引用了。">錯誤，區域變數 'x' 在賦值前被引用。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+</section>
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="p2_flow_control.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">流程控制</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="p4_lists_tuples.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">串列與元組</div></a></div>
+</div><!-- /container -->
+
+<footer>
+  先備知識 P3 · 函數 · 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============================================================
+   共用引擎：StepRunner / Quiz / Flashcards
+   ============================================================ */
+
+/** 逐步執行引擎：steps = [{line, vars, out, note, custom}] */
+function StepRunner(prefix, steps, opts) {
+  opts = opts || {};
+  const codeEl  = document.getElementById(prefix + 'Code');
+  const statusEl= document.getElementById(prefix + 'Status');
+  const varsEl  = document.getElementById(prefix + 'Vars');
+  const outEl   = document.getElementById(prefix + 'Out');
+  const playBtn = document.getElementById(prefix + 'Play');
+  const stepBtn = document.getElementById(prefix + 'Step');
+  const resetBtn= document.getElementById(prefix + 'Reset');
+  let idx = -1, timer = null;
+
+  function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
+
+  function render() {
+    lines().forEach((l,i)=>{
+      l.classList.toggle('active', idx>=0 && steps[idx].line===i);
+    });
+    if (idx < 0) {
+      if (statusEl) statusEl.textContent = '按「單步 ▸」開始';
+      if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
+      if (outEl) outEl.innerHTML = '';
+      if (opts.onReset) opts.onReset();
+      return;
+    }
+    const s = steps[idx];
+    if (statusEl) statusEl.textContent = s.note || '';
+    if (varsEl) {
+      if (s.vars && s.vars.length) {
+        varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
+          `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
+        ).join('') + '</table>';
+      } else {
+        varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+      }
+    }
+    if (outEl) {
+      outEl.innerHTML = (s.out||[]).map((o,i)=>{
+        const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
+        return `<div class="${cls}">${o}</div>`;
+      }).join('');
+      outEl.scrollTop = outEl.scrollHeight;
+    }
+    if (opts.onStep) opts.onStep(s, idx);
+  }
+
+  function step() {
+    if (idx < steps.length - 1) { idx++; render(); }
+    if (idx >= steps.length - 1) stopPlay();
+  }
+  function stopPlay(){
+    if (timer) { clearInterval(timer); timer = null; }
+    if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
+  }
+  function play(){
+    if (timer) { stopPlay(); return; }
+    if (idx >= steps.length - 1) { idx = -1; render(); }
+    playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
+    timer = setInterval(()=>{
+      if (idx >= steps.length - 1) stopPlay(); else step();
+    }, opts.interval || 1600);
+  }
+  function reset(){ stopPlay(); idx = -1; render(); }
+
+  if (playBtn) playBtn.addEventListener('click', play);
+  if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (resetBtn) resetBtn.addEventListener('click', reset);
+  render();
+  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+}
+
+/** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
+
+/** Flashcards：data = [{front, back}] */
+
+/* ============================================================
+   P02 呼叫堆疊動畫：total = add_em(2, 3, 4)
+   ============================================================ */
+function renderStack(state) {
+  const el = document.getElementById('stackCanvas');
+  if (!state) { el.innerHTML = '<span class="var-empty">按「單步 ▸」開始執行</span>'; return; }
+  el.innerHTML = state.frames.map(f =>
+    `<div class="stack-frame${f.global ? ' global-frame' : ''}">
+       <div class="frame-title">${f.global ? 'GLOBAL 全域 frame' : f.name + '() 區域 frame'}</div>
+       <div class="frame-vars">${
+         f.vars.length
+           ? f.vars.map(v => `<span class="frame-var">${v[0]} = ${v[1]}</span>`).join('')
+           : '<span class="var-empty" style="font-size:.72rem;">（無變數）</span>'
+       }</div>
+     </div>`
+  ).join('') + (state.returning !== undefined ? `<div class="return-fly">↩ 回傳值 ${state.returning} 飛回呼叫處</div>` : '');
+}
+StepRunner('stack', [
+  { line:0, out:[], note:'Python 讀到 def，先記住 add_em() 的定義（尚未執行內容）',
+    frames:{ frames:[ {global:true, vars:[]} ] } },
+  { line:2, out:[], note:'呼叫 add_em(2, 3, 4)：建立新的函數 frame，引數依序綁定給參數 x, y, z',
+    frames:{ frames:[ {global:true, vars:[]}, {name:'add_em', vars:[['x','2'],['y','3'],['z','4']]} ] } },
+  { line:1, out:[], note:'執行 return x + y + z → 2 + 3 + 4 = 9，函數準備回傳',
+    frames:{ frames:[ {global:true, vars:[]}, {name:'add_em', vars:[['x','2'],['y','3'],['z','4']]} ], returning:9 } },
+  { line:2, out:[], note:'add_em 執行結束：區域 frame 被銷毀，回傳值 9 傳回並指派給 total',
+    frames:{ frames:[ {global:true, vars:[['total','9']]} ] } },
+  { line:3, out:['9'], newOut:true, note:'print(total) → 印出 9',
+    frames:{ frames:[ {global:true, vars:[['total','9']]} ] } },
+], {
+  onStep: s => renderStack(s.frames),
+  onReset: () => renderStack(null),
+});
+
+/* ============================================================
+   P03 引數傳遞沙盒：def power(base, exp=2)
+   ============================================================ */
+(function initPowerSandbox(){
+  const baseInput = document.getElementById('baseInput');
+  const expInput  = document.getElementById('expInput');
+  const result    = document.getElementById('powerResult');
+
+  function compute(){
+    const baseStr = baseInput.value.trim();
+    const expStr  = expInput.value.trim();
+    if (baseStr === '' || isNaN(Number(baseStr))) {
+      result.innerHTML = '<span class="bad">請輸入合法的 base 數值</span>';
+      return;
+    }
+    const base = Number(baseStr);
+    const usesDefault = expStr === '';
+    if (!usesDefault && isNaN(Number(expStr))) {
+      result.innerHTML = '<span class="bad">請輸入合法的 exp 數值，或留空使用預設值 2</span>';
+      return;
+    }
+    const exp = usesDefault ? 2 : Number(expStr);
+    const val = Math.pow(base, exp);
+    if (Number.isNaN(val)) {
+      result.innerHTML = '<span class="bad">⚠</span> 在 Python 中 (負數) ** (非整數) 會得到「複數」，超出本沙盒示範範圍，請改用整數次方試試';
+      return;
+    }
+    const typeName = Number.isInteger(val) ? 'int' : 'float';
+    const calls = usesDefault
+      ? [ `power(${base})　<span style="color:#9aa5b1;">← 只給位置引數 base，exp 使用預設值 2</span>`,
+          `power(base=${base})　<span style="color:#9aa5b1;">← 關鍵字引數 + 使用預設值</span>` ]
+      : [ `power(${base}, ${exp})　<span style="color:#9aa5b1;">← 位置引數</span>`,
+          `power(base=${base}, exp=${exp})　<span style="color:#9aa5b1;">← 關鍵字引數</span>`,
+          `power(exp=${exp}, base=${base})　<span style="color:#9aa5b1;">← 關鍵字引數可任意順序</span>` ];
+    result.innerHTML = calls.map(c => `<div>${c}</div>`).join('') +
+      `<div style="margin-top:.4rem;">→ 回傳值 = <span class="type-badge">${val}</span> <span style="color:#9aa5b1;font-size:.78rem;">(${typeName})</span></div>`;
+  }
+
+  baseInput.addEventListener('input', compute);
+  expInput.addEventListener('input', compute);
+  document.querySelectorAll('#arguments .preset-btn[data-base]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      baseInput.value = b.dataset.base;
+      expInput.value  = b.dataset.exp;
+      compute();
+    });
+  });
+  compute();
+})();
+
+/* ============================================================
+   P05 區域 vs 全域範圍逐步動畫：spam() / bacon() 的 eggs
+   ============================================================ */
+function renderScope(state) {
+  const g = document.getElementById('scopeGlobal');
+  const l = document.getElementById('scopeLocal');
+  if (!state) {
+    g.innerHTML = '<div class="var-empty">尚未執行</div>';
+    l.innerHTML = '<div class="var-empty">尚未進入函式</div>';
+    return;
+  }
+  g.innerHTML = state.global.length
+    ? '<table class="var-table">' + state.global.map(v =>
+        `<tr${v[2]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td></tr>`
+      ).join('') + '</table>'
+    : '<div class="var-empty">（無）</div>';
+  if (!state.local) {
+    l.innerHTML = '<div class="var-empty">目前在全域範圍</div>';
+  } else {
+    l.innerHTML = `<div style="font-size:.72rem;color:var(--accent2);font-weight:700;margin-bottom:.3rem;">${state.local.name}() 的區域範圍</div>` +
+      (state.local.vars.length
+        ? '<table class="var-table">' + state.local.vars.map(v =>
+            `<tr${v[2]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td></tr>`
+          ).join('') + '</table>'
+        : '<div class="var-empty">（尚無區域變數）</div>');
+  }
+}
+StepRunner('scope', [
+  { line:0, out:[], note:'Python 讀到 def，先記住 spam() 的定義（尚未執行）',
+    scope:{ global:[], local:null } },
+  { line:3, out:[], note:'讀到 def，記住 bacon() 的定義（尚未執行）',
+    scope:{ global:[], local:null } },
+  { line:8, out:[], note:"eggs = 'global' → 在全域範圍建立全域變數 eggs",
+    scope:{ global:[['eggs',"'global'",1]], local:null } },
+  { line:9, out:[], note:'呼叫 bacon()：建立一個新的區域範圍',
+    scope:{ global:[['eggs',"'global'"]], local:{name:'bacon', vars:[]} } },
+  { line:4, out:[], note:"bacon() 內 eggs = 'bacon local' → 建立區域變數 eggs（跟全域 eggs 是不同的變數！）",
+    scope:{ global:[['eggs',"'global'"]], local:{name:'bacon', vars:[['eggs',"'bacon local'",1]]} } },
+  { line:5, out:['bacon local'], newOut:true, note:"print(eggs) 讀取 bacon() 自己的區域變數 → 印出 'bacon local'",
+    scope:{ global:[['eggs',"'global'"]], local:{name:'bacon', vars:[['eggs',"'bacon local'"]]} } },
+  { line:6, out:['bacon local'], note:'呼叫 spam()：bacon() 的區域範圍仍保留，但又建立了另一個新的區域範圍',
+    scope:{ global:[['eggs',"'global'"]], local:{name:'spam', vars:[]} } },
+  { line:1, out:['bacon local'], note:"spam() 內 eggs = 'spam local' → 這是 spam() 自己的區域變數，跟 bacon() 的 eggs 完全無關",
+    scope:{ global:[['eggs',"'global'"]], local:{name:'spam', vars:[['eggs',"'spam local'",1]]} } },
+  { line:2, out:['bacon local','spam local'], newOut:true, note:"print(eggs) 印出 spam() 的區域變數 → 'spam local'",
+    scope:{ global:[['eggs',"'global'"]], local:{name:'spam', vars:[['eggs',"'spam local'"]]} } },
+  { line:7, out:['bacon local','spam local','bacon local'], newOut:true, note:"spam() 執行完畢，區域範圍被銷毀；回到 bacon()，這裡的 eggs 仍是 'bacon local'",
+    scope:{ global:[['eggs',"'global'"]], local:{name:'bacon', vars:[['eggs',"'bacon local'"]]} } },
+  { line:10, out:['bacon local','spam local','bacon local','global'], newOut:true, note:"bacon() 執行完畢，區域範圍被銷毀；回到全域範圍，印出全域 eggs → 'global'",
+    scope:{ global:[['eggs',"'global'"]], local:null } },
+], {
+  onStep: s => renderScope(s.scope),
+  onReset: () => renderScope(null),
+});
+
+/* ============================================================
+   QUIZ 資料（逐字取自課程題庫 questions-TW/ch3/*.json）
+   ============================================================ */
+
+/* ============================================================
+   FLASHCARDS 資料（逐字取自課程字卡 flashcards-TW/ch3.json）
+   ============================================================ */
+
+/* ============================================================
+   GAME 1：猜數字（notebook 練習 1 · guess_number(5)，max_number=10）
+   ============================================================ */
+(function initGuessGame(){
+  const startBtn  = document.getElementById('guessStart');
+  const submitBtn = document.getElementById('guessSubmit');
+  const input     = document.getElementById('guessInput');
+  const out       = document.getElementById('guessConsole');
+  if (!out) return;
+  const MAX_NUMBER = 10, MAX_TRIES = 5;
+  let number = null, tries = 0, over = true;
+
+  function log(text, cls){
+    const div = document.createElement('div');
+    if (cls) div.className = cls;
+    div.textContent = text;
+    out.appendChild(div);
+    out.scrollTop = out.scrollHeight;
+  }
+  function start(){
+    number = Math.floor(Math.random() * MAX_NUMBER) + 1;
+    tries = 0; over = false;
+    out.innerHTML = '';
+    log('🎲 遊戲開始！請猜一個數字（介於 1 和 ' + MAX_NUMBER + ' 之間）：', 'g-sys');
+    input.disabled = false; submitBtn.disabled = false;
+    input.value = ''; input.focus();
+    startBtn.textContent = '重新開始';
+  }
+  function guess(){
+    if (over) return;
+    const v = input.value.trim();
+    if (v === '' || isNaN(Number(v)) || !Number.isInteger(Number(v))) {
+      log('請輸入一個整數。', 'g-sys');
+      return;
+    }
+    const g = Number(v);
+    tries++;
+    log('> ' + g, 'g-me');
+    if (g === number) {
+      log('恭喜你，猜中了！', 'g-win');
+      log('你贏了！', 'g-win');
+      over = true;
+    } else {
+      if (g < number) log('答案比你猜的數字大。', 'g-sys');
+      else log('答案比你猜的數字小。', 'g-sys');
+      if (tries >= MAX_TRIES) {
+        log('很抱歉，你沒有猜中。正確答案是 ' + number + '。', 'g-lose');
+        log('你輸了！', 'g-lose');
+        over = true;
+      }
+    }
+    if (over) { input.disabled = true; submitBtn.disabled = true; }
+    else { input.value = ''; input.focus(); }
+  }
+  startBtn.addEventListener('click', start);
+  submitBtn.addEventListener('click', guess);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') guess(); });
+
+  log('🎯 按「開始遊戲」，電腦會抽一個 1～' + MAX_NUMBER + ' 的數字，你有 ' + MAX_TRIES + ' 次機會猜中它。', 'g-sys');
+})();
+
+/* ============================================================
+   GAME 2：龍與洞穴（notebook 練習 2 · game.py + word_game.py）
+   ============================================================ */
+(function initDragonGame(){
+  const out    = document.getElementById('dragonConsole');
+  const cave1  = document.getElementById('cave1Btn');
+  const cave2  = document.getElementById('cave2Btn');
+  const replay = document.getElementById('dragonReplay');
+  if (!out) return;
+
+  function log(text, cls){
+    const div = document.createElement('div');
+    if (cls) div.className = cls;
+    div.textContent = text;
+    out.appendChild(div);
+    out.scrollTop = out.scrollHeight;
+  }
+  function setChoiceEnabled(on){
+    cave1.disabled = !on; cave2.disabled = !on;
+  }
+  function displayIntro(){
+    out.innerHTML = '';
+    log('你來到了一個充滿龍的國度。你面前有兩個洞穴。', 'g-sys');
+    log('在其中一個洞穴中，住著一隻友善的龍，牠願意與你分享牠的財寶。', 'g-sys');
+    log('另一個洞穴中，住著一隻貪婪又飢餓的龍，牠會一見到你就把你吃掉。', 'g-sys');
+    log('你想進入哪個洞穴？（1 或 2）', 'g-sys');
+  }
+  function checkCave(chosen){
+    setChoiceEnabled(false);
+    log('> 你選擇了洞穴 ' + chosen, 'g-me');
+    const seq = ['你慢慢地走向洞穴...', '裡面又黑又陰森...', '一隻巨大的龍突然跳了出來！牠張開大嘴，然後...'];
+    let i = 0;
+    (function next(){
+      if (i < seq.length) {
+        log(seq[i], 'g-sys');
+        i++;
+        setTimeout(next, 850);
+      } else {
+        const friendlyCave = Math.floor(Math.random() * 2) + 1;
+        if (String(chosen) === String(friendlyCave)) {
+          log('牠把財寶送給了你！', 'g-win');
+        } else {
+          log('牠一口就把你吞下去了！', 'g-lose');
+        }
+        log('你想再玩一次嗎？（是或否）', 'g-sys');
+        replay.style.display = '';
+      }
+    })();
+  }
+  cave1.addEventListener('click', () => checkCave(1));
+  cave2.addEventListener('click', () => checkCave(2));
+  replay.addEventListener('click', () => {
+    replay.style.display = 'none';
+    displayIntro();
+    setChoiceEnabled(true);
+  });
+
+  displayIntro();
+})();
+
+/* ============================================================
+   Floating nav active highlight
+   ============================================================ */
+(function initFloatNav(){
+  const links = document.querySelectorAll('.float-nav a[data-target]');
+  const sections = [...links].map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update(){
+    let active = sections[0] && sections[0].id;
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.35) active = s.id;
+    }
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  update();
+})();
+</script>
+<script>
+const FLASHCARDS = [{"front": "分而治之（Divide and Conquer）", "back": "一種將問題分解為較小且易於處理的子問題，分別解決每個子問題，再將結果合併的策略。"}, {"front": "抽象化（Abstraction）", "back": "隱藏複雜細節並只顯示對象或過程中關鍵特徵的概念。"}, {"front": "函數（Function）", "back": "一個可重用的程式碼塊，當被調用時，執行特定的任務。"}, {"front": "函數呼叫（Function Call）", "back": "執行函數的行為，指定函數名稱並提供必要的參數。"}, {"front": "引數（Argument）", "back": "調用函數時傳遞給函數的實際值或變數。"}, {"front": "參數（Parameter）", "back": "函數定義中的變數，在函數調用時接收參數的值。"}, {"front": "位置參數（Positional Parameter）", "back": "必須按照定義順序傳遞給函數的參數。"}, {"front": "說明字串（Docstring）", "back": "放置於函數或模組開始處的字串，用於描述其目的和使用方式。"}, {"front": "回傳敘述（return Statement）", "back": "結束函數執行並可選擇性地回傳一個值給調用者的語句。"}, {"front": "有回傳值的函數（Fruitful Function）", "back": "執行後回傳值的函數。"}, {"front": "無回傳值的函數（Void Function）", "back": "不回傳任何值的函數。"}, {"front": "關鍵字引數（Keyword Argument）", "back": "通過顯式命名參數傳遞給函數的參數，允許按照任意順序指定參數。"}, {"front": "預設參數（Default Parameter）", "back": "具有預設值的參數，如果在函數調用時未提供參數，則使用此預設值。"}, {"front": "區域範圍（Local Scope）", "back": "程式中（通常在函數內）定義變數的區域，該變數只能在該區塊內訪問。"}, {"front": "全域範圍（Global Scope）", "back": "變數可以在程式的任何部分訪問的區域，通常在函數外部定義。"}, {"front": "區域變數（Local Variable）", "back": "在函數內部定義的變數，僅能在該函數內部使用。"}, {"front": "全域變數（Global Variable）", "back": "在模組的頂層定義的變數，該變數可以在該模組的任何地方訪問。"}, {"front": "模組（Module）", "back": "包含 Python 程式碼的文件，包含函數、類別或變數，能夠被導入並在其他 Python 程式中重複使用。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+
+(function(){
+  document.querySelectorAll('.sq-item').forEach(item => {
+    const fb = item.querySelector('.sq-fb');
+    item.querySelectorAll('.sq-opt').forEach(btn => btn.addEventListener('click', () => {
+      const good = btn.dataset.c === '1';
+      item.querySelectorAll('.sq-opt').forEach(b => b.classList.remove('correct','wrong'));
+      btn.classList.add(good ? 'correct' : 'wrong');
+      fb.textContent = btn.dataset.fb;
+      fb.classList.add('show');
+      fb.classList.toggle('good', good);
+      fb.classList.toggle('bad', !good);
+    }));
+  });
+})();
+</script>
+</body>
+</html>

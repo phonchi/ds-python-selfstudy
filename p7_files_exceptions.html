@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>檔案與例外 — 先備 P7（Python）</title>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+  --node-white:#ffffff;--node-gray:#bdc3c7;--node-black:#34495e;
+  --node-current:#f39c12;--node-found:#16a085;--node-start:#9b59b6;
+  --edge-default:#95a5a6;--edge-tree:#27ae60;--edge-explore:#f39c12;--edge-mst:#1a6b4a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero h1 .purple{color:#bb8fce;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.05rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Hero mini-graph illustration */
+.hero-graph{position:absolute;right:5%;top:50%;transform:translateY(-50%);opacity:.18;pointer-events:none;}
+@media(max-width:900px){.hero-graph{display:none;}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.92em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+strong{color:var(--ink);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:34px;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+
+/* Graph SVG canvas */
+.graph-canvas{position:relative;width:100%;height:380px;background:#fafafa;border-radius:8px;overflow:hidden;border:1px solid #ececec;}
+.graph-canvas svg{width:100%;height:100%;display:block;}
+
+/* SVG elements styles */
+.graph-edge{stroke:var(--edge-default);stroke-width:2;fill:none;transition:stroke .25s, stroke-width .25s;}
+.graph-edge.tree{stroke:var(--edge-tree);stroke-width:3.5;}
+.graph-edge.exploring{stroke:var(--edge-explore);stroke-width:3.5;stroke-dasharray:5 4;animation:dash 1s linear infinite;}
+.graph-edge.mst{stroke:var(--edge-mst);stroke-width:4;}
+.graph-edge.path{stroke:var(--accent);stroke-width:4;}
+.graph-edge.dotted{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 4;}
+@keyframes dash{to{stroke-dashoffset:-18;}}
+
+.edge-label{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);pointer-events:none;}
+.edge-label-bg{fill:#fafafa;stroke:#ececec;stroke-width:1;}
+
+.graph-node{cursor:pointer;}
+.graph-node circle{fill:var(--node-white);stroke:var(--ink);stroke-width:2;transition:fill .25s, stroke .25s, r .2s;}
+.graph-node.gray circle{fill:var(--node-gray);}
+.graph-node.black circle{fill:var(--node-black);stroke:var(--node-black);}
+.graph-node.current circle{fill:var(--node-current);stroke:#d68910;stroke-width:3;}
+.graph-node.start circle{fill:var(--node-start);stroke:#7d3c98;stroke-width:3;}
+.graph-node.found circle{fill:var(--node-found);stroke:#117a65;stroke-width:3;}
+.graph-node.in-mst circle{fill:#82e0aa;stroke:var(--accent3);stroke-width:3;}
+.graph-node text.node-key{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none;}
+.graph-node.black text.node-key{fill:#fff;}
+.graph-node.current text.node-key{fill:#fff;}
+.graph-node.start text.node-key{fill:#fff;}
+.graph-node.found text.node-key{fill:#fff;}
+.graph-node text.node-meta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;fill:var(--accent);text-anchor:middle;pointer-events:none;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+.btn-toggle{background:var(--accent2);color:#fff;}
+.btn-toggle:hover{background:#1f2e5f;}
+.btn-toggle.off{background:#bbb;color:#555;}
+.btn-shuffle{background:#8e44ad;color:#fff;}
+.btn-shuffle:hover{background:#6c3485;}
+
+/* Slider row */
+.slider-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;background:var(--paper);border-radius:8px;margin-bottom:.5rem;}
+.slider-row .slider-label{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent2);font-weight:600;min-width:60px;}
+.slider-row input[type="range"]{flex:1;accent-color:var(--accent3);height:5px;cursor:pointer;}
+.slider-row .slider-val{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent);font-weight:600;min-width:60px;text-align:right;}
+
+/* Side panel */
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+.info-card .ic-row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.83rem;padding:.2rem 0;}
+.info-card .ic-label{color:var(--muted);}
+.info-card .ic-value{color:var(--ink);font-weight:600;}
+.info-card .ic-value.highlight{color:var(--accent);}
+.info-card .ic-value.big{font-size:1.4rem;color:var(--accent2);}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.4rem;}
+.stat-tile{background:var(--paper);border-radius:8px;padding:.5rem .7rem;text-align:center;}
+.stat-tile .stat-label{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+.stat-tile .stat-value{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent2);}
+
+/* Queue / Stack / PQ visualization */
+.ds-display{font-family:'JetBrains Mono',monospace;font-size:.8rem;background:var(--paper);border-radius:6px;padding:.5rem .7rem;min-height:36px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;border:1px dashed var(--card-border);}
+.ds-display .ds-empty{color:var(--muted);font-style:italic;}
+.ds-item{background:var(--accent2);color:#fff;padding:2px 8px;border-radius:4px;font-weight:600;}
+.ds-item.front{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-item.top{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-item.pq{background:var(--accent3);}
+.ds-item.pq.min{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-arrow{color:var(--muted);}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.6;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid var(--node-current);padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+.pseudo-code .str{color:#f1fa8c;}
+
+/* Adjacency table */
+.adj-display{margin:.5rem 0;font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.adj-matrix{border-collapse:collapse;margin:.5rem auto;}
+.adj-matrix td,.adj-matrix th{border:1px solid var(--card-border);padding:6px 10px;text-align:center;min-width:34px;background:#fff;}
+.adj-matrix th{background:var(--accent2);color:#fff;font-weight:700;}
+.adj-matrix td.zero{color:#ccc;}
+.adj-matrix td.nonzero{background:#eafaf1;color:var(--accent3);font-weight:700;}
+.adj-matrix td.highlight{background:#fff3cd;}
+.adj-list{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:.7rem 1rem;}
+.adj-list .adj-row{padding:3px 0;border-bottom:1px dashed var(--card-border);}
+.adj-list .adj-row:last-child{border-bottom:none;}
+.adj-list .adj-key{color:var(--accent);font-weight:700;display:inline-block;min-width:32px;}
+.adj-list .adj-arrow{color:var(--muted);margin:0 6px;}
+.adj-list .adj-neighbor{background:#eef2ff;color:var(--accent2);padding:1px 8px;border-radius:4px;margin:1px 3px;display:inline-block;font-weight:600;}
+
+/* Chess board for Knight's tour */
+.chess-board{display:grid;background:#fff;border:2px solid var(--ink);border-radius:6px;overflow:hidden;margin:.5rem auto;width:fit-content;}
+.chess-cell{display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:700;position:relative;transition:background .2s;}
+.chess-cell.light{background:#f0d9b5;color:#666;}
+.chess-cell.dark{background:#b58863;color:#fff;}
+.chess-cell.visited{background:#27ae60 !important;color:#fff;}
+.chess-cell.current{background:#f39c12 !important;color:#fff;box-shadow:inset 0 0 0 3px #d68910;}
+.chess-cell.start{background:#9b59b6 !important;color:#fff;}
+.chess-cell .knight{font-size:1.4em;line-height:1;}
+.chess-cell .step-num{font-size:.7em;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box.purple{background:#f4ecf7;border-color:#8e44ad;}
+.info-box.purple .info-label{background:#8e44ad;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+.pill-gray{background:rgba(0,0,0,.06);color:var(--muted);border:1px solid rgba(0,0,0,.12);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;margin:.6rem 0;font-family:'JetBrains Mono',monospace;font-size:.75rem;}
+.legend-item{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;background:var(--paper);border-radius:5px;}
+.legend-item .lg-swatch{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink);}
+.legend-item .lg-edge{width:18px;height:3px;border-radius:2px;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0;}
+.quiz-opt{display:flex;align-items:center;gap:.6rem;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;font-size:.86rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-letter{font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.wrong{background:#fef5e7;border-color:var(--accent);}
+.quiz-opt.wrong .opt-letter{color:var(--accent);}
+.quiz-feedback{margin-top:.7rem;padding:.7rem 1rem;border-radius:8px;font-size:.88rem;display:none;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct{background:#eafaf1;color:var(--accent3);border-left:4px solid var(--accent3);}
+.quiz-feedback.wrong{background:#fef5e7;color:var(--accent);border-left:4px solid var(--accent);}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:30px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+
+/* Distance / table inside graph viz */
+.vert-table{margin-top:.6rem;width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.78rem;}
+.vert-table th,.vert-table td{padding:4px 6px;text-align:center;border:1px solid var(--card-border);}
+.vert-table th{background:var(--accent2);color:#fff;font-weight:600;font-size:.74rem;}
+.vert-table td.tcell-current{background:#fff3cd;font-weight:700;color:var(--accent);}
+.vert-table td.tcell-done{background:#eafaf1;color:var(--accent3);}
+.vert-table td.tcell-inf{color:#ccc;}
+.sec-badge{font-size:.6em;color:var(--muted);border:1px solid var(--card-border);background:var(--card);padding:2px 10px;border-radius:999px;vertical-align:middle;margin-left:.6rem;font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.02em;white-space:nowrap;}
+
+/* Phase 8 shared widgets */
+.bs-stack{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;min-height:180px;justify-content:flex-start;padding:.6rem;}
+.bs-item{width:110px;text-align:center;padding:.4rem .6rem;background:#5b7eb8;color:#fff;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;box-shadow:0 2px 5px rgba(0,0,0,.15);}
+.bs-hl{background:#f39c12;}
+.bs-toplabel,.bq-label{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.bq-row{display:flex;align-items:center;gap:6px;min-height:64px;flex-wrap:wrap;padding:.4rem;}
+.bq-item{min-width:52px;text-align:center;padding:.45rem .5rem;background:#5b7eb8;color:#fff;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+.char-strip{display:flex;gap:3px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;padding:.4rem 0;}
+.char-cell{min-width:30px;text-align:center;padding:.35rem .25rem;border:1px solid var(--card-border);border-radius:5px;background:var(--card);}
+.char-cur{background:#f39c12;color:#fff;border-color:#f39c12;}
+.char-done{background:#e8f5ec;color:#1a6b4a;border-color:#bfe3cd;}
+.char-bad{background:#c0392b;color:#fff;border-color:#c0392b;}
+.token-out{display:flex;gap:4px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;min-height:40px;padding:.3rem 0;}
+.tok{padding:.3rem .55rem;border-radius:5px;background:#2c3e7a;color:#fff;font-weight:600;}
+.tok-op{background:#8e44ad;}
+.tok-new{outline:3px solid #f39c12;}
+.mono{font-family:'JetBrains Mono',monospace;}
+</style>
+<style>
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+</style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+
+/* ===== 題庫自測區 ===== */
+.sq-item{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.sq-item .sq-q{font-weight:700;margin-bottom:.7rem;}
+.sq-item .sq-q .sq-num{font-family:'JetBrains Mono',monospace;color:var(--accent);margin-right:.4rem;}
+.sq-opts{display:flex;flex-direction:column;gap:.45rem;}
+.sq-opt{text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;line-height:1.6;padding:.55rem .9rem;border-radius:8px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;}
+.sq-opt:hover{border-color:var(--accent2);}
+.sq-opt.correct{border-color:var(--accent3);background:rgba(26,107,74,.10);}
+.sq-opt.wrong{border-color:var(--accent);background:rgba(192,57,43,.08);}
+.sq-fb{display:none;margin-top:.7rem;font-size:.86rem;line-height:1.7;border-left:4px solid var(--accent2);padding:.5rem .9rem;background:var(--paper);border-radius:0 8px 8px 0;}
+.sq-fb.show{display:block;}
+.sq-fb.good{border-left-color:var(--accent3);}
+.sq-fb.bad{border-left-color:var(--accent);}
+
+.sq-code{background:var(--code-bg);color:var(--code-fg);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;padding:.7rem .9rem;border-radius:8px;margin:.2rem 0 .8rem;overflow-x:auto;white-space:pre;}
+</style>
+</head>
+<body>
+
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#prologue" data-target="prologue"><span class="fn-num">P00</span><span class="fn-name">讓結果活過程式</span></a>
+  <a href="#paths" data-target="paths"><span class="fn-num">P01</span><span class="fn-name">路徑：pathlib</span></a>
+  <a href="#read" data-target="read"><span class="fn-num">P02</span><span class="fn-name">讀檔</span></a>
+  <a href="#write" data-target="write"><span class="fn-num">P03</span><span class="fn-name">寫檔與 JSON</span></a>
+  <a href="#net" data-target="net"><span class="fn-num">P04</span><span class="fn-name">從網路讀資料</span></a>
+  <a href="#errors" data-target="errors"><span class="fn-num">P05</span><span class="fn-name">例外是什麼</span></a>
+  <a href="#raise" data-target="raise"><span class="fn-num">P06</span><span class="fn-name">raise 與自訂例外</span></a>
+  <a href="#exercises" data-target="exercises"><span class="fn-num">EX</span><span class="fn-name">隨堂練習</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">速查表</span></a>
+  <a href="#bankquiz" data-target="bankquiz"><span class="fn-num">QUIZ</span><span class="fn-name">自我檢測</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <svg class="hero-graph" width="300" height="260" viewBox="0 0 300 260">
+  <g stroke="#fff" stroke-width="2.5" fill="none" opacity=".85">
+    <path d="M70 40 h110 l40 40 v140 h-150 z"/>
+    <path d="M180 40 v40 h40"/>
+    <line x1="95" y1="120" x2="200" y2="120"/>
+    <line x1="95" y1="146" x2="200" y2="146"/>
+    <line x1="95" y1="172" x2="160" y2="172"/>
+  </g>
+</svg>
+  <div class="hero-content">
+    <div class="chapter-tag">PREREQ P7</div>
+    <h1><span class="green">檔案</span>與<span class="blue">例外</span>：讓結果活過程式</h1>
+    <div class="subtitle">先備知識複習 · 選讀，不列入作業與考試範圍</div>
+    <div class="big-formula">pathlib｜with open｜json｜urllib｜try / except / else / finally｜raise</div>
+    <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（先備複習 · 選讀，不列入評分）</div>
+  <p>① 這頁複習資料結構課程<strong>預設你已經會</strong>的 Python。已經熟的可以直接跳過。
+  ② 每節都附一個<strong>「這在資料結構課哪裡會用到」</strong>的小方框——那才是你該記住的部分。
+  ③ 讀完做 <a href="#bankquiz">自我檢測</a>，再翻 <a href="#cards">關鍵詞彙卡</a>。
+  <br><strong>本頁屬補充先備知識，不列入作業與考試範圍。</strong></p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#prologue"><span class="toc-num">P00</span>讓結果活過程式</a>
+    <a href="#paths"><span class="toc-num">P01</span>路徑：pathlib</a>
+    <a href="#read"><span class="toc-num">P02</span>讀檔：with open</a>
+    <a href="#write"><span class="toc-num">P03</span>寫檔與 JSON</a>
+    <a href="#net"><span class="toc-num">P04</span>從網路讀資料</a>
+    <a href="#errors"><span class="toc-num">P05</span>例外是什麼</a>
+    <a href="#raise"><span class="toc-num">P06</span>raise 與自訂例外</a>
+    <a href="#exercises"><span class="toc-num">EX</span>隨堂練習</a>
+    <a href="#reference"><span class="toc-num">REF</span>速查表</a>
+    <a href="#bankquiz"><span class="toc-num">QUIZ</span>自我檢測</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<section id="prologue">
+  <div class="section-number">PROLOGUE · 開場</div>
+  <h2>程式結束，變數就消失了</h2>
+  <p>你的變數住在記憶體裡，程式一結束就什麼都沒了。要讓資料活過這一次執行，就得寫進檔案；要讓別人的資料進到你的程式，就得從檔案（或網路）讀進來。</p>
+  <p>而只要牽涉到「外面的世界」——檔案可能不存在、路徑可能打錯、網路可能斷線——程式就有失敗的可能。<strong>例外處理就是在說「失敗的時候該怎麼辦」</strong>。這兩件事天生綁在一起，所以放同一頁。</p>
+  <div class="info-box">
+    <div class="info-label">💡 這一頁在資料結構課的位置</div>
+    <p style="margin-bottom:0;">第 08 章的字梯問題要<strong>從檔案讀進四千多個英文單字</strong>再建圖；第 05 章對空堆疊 <code>pop</code> 會拋例外；第 06 章遞迴沒收斂會拋 <code>RecursionError</code>。這一頁讓你看到那些訊息時知道發生了什麼事。</p>
+  </div>
+  <div class="warn-box">
+    <div class="info-label">📌 本頁定位</div>
+    <p style="margin-bottom:0;">選讀的先備知識複習，不列入作業與考試範圍。第 01 章已經有例外處理的一節，這裡是更完整的版本。</p>
+  </div>
+</section>
+
+<section id="paths">
+  <div class="section-number">PART 01 · 路徑</div>
+  <h2><code>pathlib</code>：不要再自己串字串了</h2>
+  <p>路徑分隔符在 Windows 是反斜線、在 macOS／Linux 是斜線。自己用字串拼會在換平台時壞掉；<code>pathlib.Path</code> 幫你處理掉這件事。</p>
+
+  <div class="deck-extra">
+  <div class="dx-label">Path 的基本操作</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pathlib <span class="kw">import</span> Path</span>
+<span class="line"> </span>
+<span class="line">p = Path(<span class="str">"</span><span class="str">data</span><span class="str">"</span>) / <span class="str">"</span><span class="str">words.txt</span><span class="str">"</span>      <span class="com"># 用 / 串路徑，Windows 與 macOS 都對</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">路徑物件        :</span><span class="str">"</span>, p)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">副檔名          :</span><span class="str">"</span>, p.suffix)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">檔名（不含副檔）:</span><span class="str">"</span>, p.stem)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">父目錄          :</span><span class="str">"</span>, p.parent)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">存在嗎          :</span><span class="str">"</span>, p.exists())</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>路徑物件        : data/words.txt
+副檔名          : .txt
+檔名（不含副檔）: words
+父目錄          : data
+存在嗎          : False</pre></div>
+  <p class="dx-note"><code>Path('data') / 'words.txt'</code> 用除號串路徑，是 <code>__truediv__</code> 這個 dunder 的運算子重載（見 <a href='p9_oop_advanced.html'>P9</a>）。最後一行是 <code>False</code>，因為這個檔案還沒被建立。</p>
+</div>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>寫法</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Path("a") / "b" / "c.txt"</td><td>組出 <code>a/b/c.txt</code>，跨平台正確</td></tr>
+      <tr><td class="mono">p.exists()</td><td>檔案或目錄存在嗎</td></tr>
+      <tr><td class="mono">p.suffix / p.stem / p.name</td><td>副檔名／不含副檔的檔名／完整檔名</td></tr>
+      <tr><td class="mono">p.parent</td><td>上一層目錄</td></tr>
+      <tr><td class="mono">Path("data").mkdir(exist_ok=True)</td><td>建目錄，已存在也不報錯</td></tr>
+      <tr><td class="mono">list(Path(".").glob("*.txt"))</td><td>列出符合樣式的所有檔案</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="info-box green">
+    <div class="info-label">📍 相對路徑是相對於「執行時的工作目錄」</div>
+    <p style="margin-bottom:0;">不是相對於程式檔所在的位置。這是「在我電腦上跑得動，在 Colab 上就找不到檔案」的頭號原因。不確定的時候印一下 <code>Path.cwd()</code> 看看你到底站在哪。</p>
+  </div>
+</section>
+
+<section id="read">
+  <div class="section-number">PART 02 · 讀檔</div>
+  <h2><code>with open(...)</code>：開了一定會關</h2>
+  <p><code>with</code> 區塊結束時會自動關閉檔案，<strong>即使中間拋出例外也一樣</strong>。這是唯一該用的寫法。</p>
+
+  <div class="deck-extra">
+  <div class="dx-label">寫進去再讀回來</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pathlib <span class="kw">import</span> Path</span>
+<span class="line"> </span>
+<span class="line">Path(<span class="str">"</span><span class="str">data</span><span class="str">"</span>).mkdir(exist_ok=<span class="kw">True</span>)             <span class="com"># 沒有就建，有了也不報錯</span></span>
+<span class="line">p = Path(<span class="str">"</span><span class="str">data</span><span class="str">"</span>) / <span class="str">"</span><span class="str">words.txt</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line">words = [<span class="str">"</span><span class="str">FOOL</span><span class="str">"</span>, <span class="str">"</span><span class="str">POOL</span><span class="str">"</span>, <span class="str">"</span><span class="str">POLL</span><span class="str">"</span>, <span class="str">"</span><span class="str">POLE</span><span class="str">"</span>, <span class="str">"</span><span class="str">PALE</span><span class="str">"</span>, <span class="str">"</span><span class="str">SALE</span><span class="str">"</span>, <span class="str">"</span><span class="str">SAGE</span><span class="str">"</span>]</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> <span class="fn">open</span>(p, <span class="str">"</span><span class="str">w</span><span class="str">"</span>, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>) <span class="kw">as</span> f:     <span class="com"># "w" 會清空重寫</span></span>
+<span class="line">    <span class="kw">for</span> w in words:</span>
+<span class="line">        f.write(w + <span class="str">"</span><span class="str">\n</span><span class="str">"</span>)                     <span class="com"># write 不會自動換行</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> <span class="fn">open</span>(p, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>) <span class="kw">as</span> f:          <span class="com"># 不寫模式就是唯讀</span></span>
+<span class="line">    lines = [line.strip() <span class="kw">for</span> line in f]      <span class="com"># 逐行迭代，不必一次讀進記憶體</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">讀回幾行:</span><span class="str">"</span>, <span class="fn">len</span>(lines))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">前三行  :</span><span class="str">"</span>, lines[:<span class="num">3</span>])</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>讀回幾行: 7
+前三行  : [&#x27;FOOL&#x27;, &#x27;POOL&#x27;, &#x27;POLL&#x27;]</pre></div>
+  <p class="dx-note">三個重點：① <code>with</code> 保證關檔。② <code>f.write()</code> <strong>不會</strong>自動換行，要自己加。③ 直接對檔案物件跑 <code>for</code> 迴圈就是逐行讀取——處理大檔時這比 <code>read()</code> 一次吞進記憶體好太多。</p>
+</div>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>模式</th><th>行為</th><th>檔案不存在時</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">"r"（預設）</td><td>唯讀</td><td><code>FileNotFoundError</code></td></tr>
+      <tr><td class="mono">"w"</td><td>寫入，<strong>先清空原內容</strong></td><td>自動建立</td></tr>
+      <tr><td class="mono">"a"</td><td>附加到結尾</td><td>自動建立</td></tr>
+      <tr><td class="mono">"x"</td><td>只在檔案不存在時建立</td><td>自動建立；已存在則報錯</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="warn-box">
+    <div class="info-label">⚠️ <code>"w"</code> 會直接清空整個檔案</div>
+    <p style="margin-bottom:0;">而且不會問你。想接著寫請用 <code>"a"</code>。另外處理文字檔時養成習慣加 <code>encoding="utf-8"</code>，否則在 Windows 上讀中文很容易變亂碼。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 08 章</div>字梯問題（word ladder）要讀一份四千多個五字母單字的檔案，逐行 strip 之後建立 bucket 再建圖。那一整段就是這一節的內容。</div>
+</section>
+
+<section id="write">
+  <div class="section-number">PART 03 · 寫檔與 JSON</div>
+  <h2>把結構化資料存下來</h2>
+  <p>純文字適合一行一筆的資料。如果你要存的是巢狀的字典與串列（例如一張相鄰串列、一份實驗結果），用 <code>json</code> 最省事。</p>
+
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> json</span>
+<span class="line"><span class="kw">from</span> pathlib <span class="kw">import</span> Path</span>
+<span class="line"> </span>
+<span class="line">graph = {<span class="str">"</span><span class="str">FOOL</span><span class="str">"</span>: [<span class="str">"</span><span class="str">POOL</span><span class="str">"</span>, <span class="str">"</span><span class="str">FOIL</span><span class="str">"</span>], <span class="str">"</span><span class="str">POOL</span><span class="str">"</span>: [<span class="str">"</span><span class="str">FOOL</span><span class="str">"</span>, <span class="str">"</span><span class="str">POLL</span><span class="str">"</span>]}</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> <span class="fn">open</span>(<span class="str">"</span><span class="str">graph.json</span><span class="str">"</span>, <span class="str">"</span><span class="str">w</span><span class="str">"</span>, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>) <span class="kw">as</span> f:</span>
+<span class="line">    json.dump(graph, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>)   <span class="com"># 寫出去</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> <span class="fn">open</span>(<span class="str">"</span><span class="str">graph.json</span><span class="str">"</span>, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>) <span class="kw">as</span> f:</span>
+<span class="line">    back = json.load(f)                                  <span class="com"># 讀回來</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(back[<span class="str">"</span><span class="str">FOOL</span><span class="str">"</span>])        <span class="com"># ['POOL', 'FOIL']</span></span>
+<span class="line"><span class="fn">print</span>(back == graph)       <span class="com"># True</span></span>
+<span class="line"> </span></div>
+
+  <div class="info-box">
+    <div class="info-label">💡 四個名字別搞混</div>
+    <p style="margin-bottom:0;"><code>json.dump</code> 寫到<strong>檔案</strong>、<code>json.dumps</code> 轉成<strong>字串</strong>（s = string）；<code>json.load</code> 從檔案讀、<code>json.loads</code> 從字串讀。本站的詞彙卡與題庫母檔（<code>data/</code> 底下那些 <code>.json</code>）就是這樣存的。</p>
+  </div>
+</section>
+
+<section id="net">
+  <div class="section-number">PART 04 · 從網路讀</div>
+  <h2>資料不在你電腦上的時候 <span class="sec-badge">課程真的會用到</span></h2>
+  <p>課程 notebook 用 <code>urllib.request</code> 直接把網路上的字典檔抓下來，這樣在 Colab 上也不用先上傳檔案。</p>
+
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> urllib.request</span>
+<span class="line"> </span>
+<span class="line">URL = <span class="str">"</span><span class="str">https://raw.githubusercontent.com/.../words.txt</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> urllib.request.urlopen(URL) <span class="kw">as</span> resp:</span>
+<span class="line">    text = resp.read().decode(<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>)      <span class="com"># 拿到的是 bytes，要自己解碼</span></span>
+<span class="line"> </span>
+<span class="line">words = [w.strip() <span class="kw">for</span> w in text.splitlines() <span class="kw">if</span> w.strip()]</span>
+<span class="line"><span class="fn">print</span>(<span class="fn">len</span>(words), words[:<span class="num">3</span>])</span>
+<span class="line"> </span></div>
+
+  <div class="info-box green">
+    <div class="info-label">✅ 為什麼不直接 open()</div>
+    <p style="margin-bottom:0;">因為在 Colab 上你的本機檔案不存在。從網址讀讓同一份 notebook 在任何環境都跑得動——這是很值得養成的習慣。缺點是需要網路，而且對方的檔案可能哪天就搬家了。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 08 章</div>圖演算法那一章的第一步就是把單字表抓下來。抓不到檔案，後面的 BFS、字梯、最短路徑全部無從開始。</div>
+</section>
+
+<section id="errors">
+  <div class="section-number">PART 05 · 例外</div>
+  <h2>例外不是「壞掉」，是「這條路走不通，換你決定怎麼辦」</h2>
+
+  <div class="deck-extra">
+  <div class="dx-label">五個你一定會遇到的例外</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">cases = [</span>
+<span class="line">    (<span class="str">"</span><span class="str">開不存在的檔案</span><span class="str">"</span>, <span class="kw">lambda</span>: <span class="fn">open</span>(<span class="str">"</span><span class="str">no_such_file.txt</span><span class="str">"</span>)),</span>
+<span class="line">    (<span class="str">"</span><span class="str">串列索引超界</span><span class="str">"</span>,   <span class="kw">lambda</span>: [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>][<span class="num">10</span>]),</span>
+<span class="line">    (<span class="str">"</span><span class="str">字典查無此鍵</span><span class="str">"</span>,   <span class="kw">lambda</span>: {<span class="str">"</span><span class="str">a</span><span class="str">"</span>: <span class="num">1</span>}[<span class="str">"</span><span class="str">b</span><span class="str">"</span>]),</span>
+<span class="line">    (<span class="str">"</span><span class="str">字串轉整數失敗</span><span class="str">"</span>, <span class="kw">lambda</span>: <span class="fn">int</span>(<span class="str">"</span><span class="str">FOOL</span><span class="str">"</span>)),</span>
+<span class="line">    (<span class="str">"</span><span class="str">除以零</span><span class="str">"</span>,         <span class="kw">lambda</span>: <span class="num">1</span> / <span class="num">0</span>),</span>
+<span class="line">]</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">for</span> label, fn in cases:</span>
+<span class="line">    <span class="kw">try</span>:</span>
+<span class="line">        fn()</span>
+<span class="line">    <span class="kw">except</span> Exception <span class="kw">as</span> e:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">{</span>label<span class="str">:</span><span class="str">8s</span><span class="str">}</span><span class="str"> -&gt; </span><span class="str">{</span><span class="fn">type</span>(e).__name__<span class="str">}</span><span class="str">: </span><span class="str">{</span>e<span class="str">}</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>開不存在的檔案  -&gt; FileNotFoundError: [Errno 2] No such file or directory: &#x27;no_such_file.txt&#x27;
+串列索引超界   -&gt; IndexError: list index out of range
+字典查無此鍵   -&gt; KeyError: &#x27;b&#x27;
+字串轉整數失敗  -&gt; ValueError: invalid literal for int() with base 10: &#x27;FOOL&#x27;
+除以零      -&gt; ZeroDivisionError: division by zero</pre></div>
+  <p class="dx-note">認得例外的<strong>名字</strong>比背細節重要：看到 <code>KeyError</code> 就知道是查了不存在的鍵，看到 <code>IndexError</code> 就知道是索引超出範圍。這是 debug 最快的捷徑。</p>
+</div>
+
+  <div class="viz-layout">
+    <div>
+      <div class="viz-panel">
+        <div id="exStage" style="min-height:170px;"></div>
+        <div class="status-banner" id="exStatus"><span class="status-icon">›</span><span class="status-text">選一種情況，看 try / except / else / finally 各自什麼時候跑。</span></div>
+        <div class="controls-bar">
+          <button class="btn btn-play" onclick="exStart('ok')">▶ 檔案存在</button>
+          <button class="btn btn-play" onclick="exStart('missing')">▶ 檔案不存在</button>
+          <button class="btn btn-step" onclick="exPlayer &amp;&amp; exPlayer.step()">→ 單步</button>
+          <button class="btn btn-reset" onclick="exReset()">⟲ 重設</button>
+        </div>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card">
+        <div class="ic-title">虛擬碼 <span class="ic-badge">CODE</span></div>
+        <div class="pseudo-code" id="exCode" style="font-size:.78rem;"><span class="line"><span class="kw">try</span>:</span>
+<span class="line">    f = <span class="fn">open</span>(path)</span>
+<span class="line"><span class="kw">except</span> FileNotFoundError:</span>
+<span class="line">    <span class="kw">return</span> <span class="num">0</span></span>
+<span class="line"><span class="kw">else</span>:</span>
+<span class="line">    <span class="kw">return</span> <span class="fn">len</span>(f.readlines())</span>
+<span class="line"><span class="kw">finally</span>:</span>
+<span class="line">    close_things()</span>
+<span class="line"> </span></div>
+      </div>
+      <div class="info-card">
+        <div class="ic-title">四個區塊的分工 <span class="ic-badge">RULE</span></div>
+        <p style="font-size:.86rem;margin-bottom:0;"><b>try</b>：可能失敗的那幾行，<strong>只放會失敗的部分</strong>。<br>
+        <b>except</b>：失敗時的處理。<br>
+        <b>else</b>：<strong>沒有失敗</strong>才跑，放「成功之後才有意義」的程式。<br>
+        <b>finally</b>：成功失敗都跑，用來收尾。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck-extra">
+  <div class="dx-label">完整的執行順序（真的跑過的輸出）</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">def</span> <span class="fn">read_count</span>(path):</span>
+<span class="line">    <span class="kw">try</span>:</span>
+<span class="line">        f = <span class="fn">open</span>(path, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>)</span>
+<span class="line">    <span class="kw">except</span> FileNotFoundError:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"</span><span class="str">  except ：檔案不存在，回傳 0</span><span class="str">"</span>)</span>
+<span class="line">        <span class="kw">return</span> <span class="num">0</span></span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"</span><span class="str">  else   ：開檔成功才會跑到這裡</span><span class="str">"</span>)</span>
+<span class="line">        <span class="kw">return</span> <span class="fn">len</span>(f.readlines())</span>
+<span class="line">    <span class="kw">finally</span>:</span>
+<span class="line">        <span class="fn">print</span>(<span class="str">"</span><span class="str">  finally：不管成功失敗都會跑</span><span class="str">"</span>)</span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">存在的檔:</span><span class="str">"</span>, read_count(<span class="str">"</span><span class="str">data/words.txt</span><span class="str">"</span>))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">不存在  :</span><span class="str">"</span>, read_count(<span class="str">"</span><span class="str">data/nope.txt</span><span class="str">"</span>))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>  else   ：開檔成功才會跑到這裡
+  finally：不管成功失敗都會跑
+存在的檔: 7
+  except ：檔案不存在，回傳 0
+  finally：不管成功失敗都會跑
+不存在  : 0</pre></div>
+  <p class="dx-note">注意 <code>finally</code> 的位置：<strong>連 <code>return</code> 都攔不住它</strong>，函式回傳之前一定會先跑完 finally。這就是它用來關檔、釋放資源的原因。</p>
+</div>
+
+  <div class="warn-box">
+    <div class="info-label">⚠️ 不要寫裸的 <code>except:</code></div>
+    <p style="margin-bottom:0;"><code>except:</code> 或 <code>except Exception:</code> 會把<strong>所有</strong>錯誤一起吞掉，包括你自己打錯字造成的 <code>&#78;ameError</code>。結果就是程式默默給出錯的答案，而你完全不知道。<strong>接住你預期會發生的那一種就好。</strong></p>
+  </div>
+</section>
+
+<section id="raise">
+  <div class="section-number">PART 06 · 主動拋出</div>
+  <h2><code>raise</code> 與自訂例外</h2>
+  <p>你自己寫的資料結構也該在被誤用時抗議。<code>raise</code> 就是「這個狀況我處理不了，交給呼叫我的人決定」。</p>
+
+  <div class="deck-extra">
+  <div class="dx-label">Stack 對空的 pop 抗議</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> EmptyStackError(Exception):</span>
+<span class="line">    <span class="str">"""對空堆疊做 pop 時拋出。"""</span></span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line"><span class="kw">class</span> Stack:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="fn">self</span>._items = []</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">pop</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">if</span> not <span class="fn">self</span>._items:</span>
+<span class="line">            <span class="kw">raise</span> EmptyStackError(<span class="str">"</span><span class="str">堆疊是空的，沒有東西可以彈出</span><span class="str">"</span>)</span>
+<span class="line">        <span class="kw">return</span> <span class="fn">self</span>._items.pop()</span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">s = Stack()</span>
+<span class="line"><span class="kw">try</span>:</span>
+<span class="line">    s.pop()</span>
+<span class="line"><span class="kw">except</span> EmptyStackError <span class="kw">as</span> e:</span>
+<span class="line">    <span class="fn">print</span>(<span class="str">"</span><span class="str">接住了:</span><span class="str">"</span>, <span class="fn">type</span>(e).__name__, <span class="str">"</span><span class="str">-</span><span class="str">"</span>, e)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>接住了: EmptyStackError - 堆疊是空的，沒有東西可以彈出</pre></div>
+  <p class="dx-note">自訂例外只要繼承 <code>Exception</code>，連內容都不用寫。好處是呼叫端可以<strong>精準地只接住這一種</strong>，而不是用一個 except 把所有 bug 一起吞掉。這就是 <a href='p9_oop_advanced.html'>P9</a> 繼承的實際應用。</p>
+</div>
+
+  <div class="info-box purple">
+    <div class="info-label">🎯 什麼時候該 raise</div>
+    <p style="margin-bottom:0;">當函式<strong>無法完成它承諾的事</strong>時。空堆疊沒有東西可以彈出、除數是零、參數型別根本不對——這些都不該悄悄回傳 <code>&#78;one</code> 假裝沒事，因為那會讓錯誤在很遠的地方才爆出來，難以追查。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 05、06 章</div>第 05 章的堆疊與佇列在空的時候操作會拋例外；第 06 章遞迴沒有正確收斂時會拋 <code>RecursionError</code>——那不是環境壞掉，是你的基底情況沒寫對。</div>
+</section>
+
+<section id="exercises">
+  <div class="section-number">EX · 隨堂練習</div>
+  <h2>兩題確認觀念</h2>
+
+  <div class="quiz-box">
+    <div class="quiz-label">EXERCISE 1 · 模式選錯的代價</div>
+    <p>你想在既有的紀錄檔後面「再加一行」，結果用了 <code>open(p, "w")</code>。會發生什麼事？</p>
+    <div class="quiz-options" id="q1Options">
+      <div class="quiz-opt" data-correct="false" data-fb="不會報錯，這正是它危險的地方——它安靜地把你原本的資料全部刪掉了。" onclick="quizCheck('q1', this)"><span class="opt-letter">(A)</span> 會報錯，因為檔案已經存在</div>
+      <div class="quiz-opt" data-correct="true" data-fb="正確。&quot;w&quot; 會先清空整個檔案再寫。想附加到結尾要用 &quot;a&quot;。這是不可逆的資料遺失，而且完全不會有警告。" onclick="quizCheck('q1', this)"><span class="opt-letter">(B)</span> 原本的內容全部被清空，只剩新加的那一行</div>
+      <div class="quiz-opt" data-correct="false" data-fb="那是 &quot;a&quot; 模式的行為。&quot;w&quot; 是清空重寫。" onclick="quizCheck('q1', this)"><span class="opt-letter">(C)</span> 新的一行會被加在檔案結尾</div>
+    </div>
+    <div class="quiz-feedback" id="q1Feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-label">EXERCISE 2 · else 存在的理由</div>
+    <p><code>try / except / else</code> 的 <code>else</code> 區塊，跟「直接把那段程式寫在 <code>try</code> 裡面」有什麼差別？</p>
+    <div class="quiz-options" id="q2Options">
+      <div class="quiz-opt" data-correct="false" data-fb="兩者都能執行，差別不在能不能，在「誰被 try 保護著」。" onclick="quizCheck('q2', this)"><span class="opt-letter">(A)</span> 沒有差別，純粹是風格問題</div>
+      <div class="quiz-opt" data-correct="true" data-fb="正確。寫在 try 裡面的話，這段程式自己拋出的同型別例外也會被 except 接住，於是你以為是「開檔失敗」，其實是後面那段出錯。else 讓 try 只保護真正可能失敗的那幾行，錯誤來源才不會被混淆。" onclick="quizCheck('q2', this)"><span class="opt-letter">(B)</span> 寫在 <code>try</code> 裡會讓這段程式的錯誤也被 <code>except</code> 誤接</div>
+      <div class="quiz-opt" data-correct="false" data-fb="不對。else 沒有失敗時就會執行，並不是永遠跳過。永遠會跑的是 finally。" onclick="quizCheck('q2', this)"><span class="opt-letter">(C)</span> <code>else</code> 永遠不會被執行</div>
+    </div>
+    <div class="quiz-feedback" id="q2Feedback"></div>
+  </div>
+</section>
+
+<section id="reference">
+  <div class="section-number">REFERENCE · 速查表</div>
+  <h2>P7 速查表</h2>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.2rem 0 .5rem;color:var(--accent2);">常見例外一覽</h3>
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>例外</th><th>什麼時候發生</th><th>本站哪裡會遇到</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">FileNotFoundError</td><td>開啟不存在的檔案</td><td>第 08 章讀字典檔</td></tr>
+      <tr><td class="mono">IndexError</td><td>串列索引超出範圍</td><td>第 03、05 章</td></tr>
+      <tr><td class="mono">KeyError</td><td>字典查不到那個鍵</td><td>第 07、08 章</td></tr>
+      <tr><td class="mono">ValueError</td><td>型別對但值不合理，如 int("abc")</td><td>資料前處理</td></tr>
+      <tr><td class="mono">TypeError</td><td>型別根本不對，如物件之間比大小</td><td>第 07、09 章（見 <a href="p9_oop_advanced.html#lt">P9</a>）</td></tr>
+      <tr><td class="mono">ZeroDivisionError</td><td>除以零</td><td>平均值、成長率計算</td></tr>
+      <tr><td class="mono">RecursionError</td><td>遞迴太深沒有收斂</td><td>第 06 章</td></tr>
+      <tr><td class="mono">AttributeError</td><td>物件沒有那個屬性或方法</td><td>忘記 <code>super().__init__()</code> 時</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.4rem 0 .5rem;color:var(--accent2);">語法骨架</h3>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pathlib <span class="kw">import</span> Path</span>
+<span class="line"><span class="kw">import</span> json</span>
+<span class="line"> </span>
+<span class="line">p = Path(<span class="str">"</span><span class="str">data</span><span class="str">"</span>) / <span class="str">"</span><span class="str">words.txt</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> <span class="fn">open</span>(p, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>) <span class="kw">as</span> f:       <span class="com"># 讀</span></span>
+<span class="line">    lines = [line.strip() <span class="kw">for</span> line in f]</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> <span class="fn">open</span>(p, <span class="str">"</span><span class="str">a</span><span class="str">"</span>, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>) <span class="kw">as</span> f:  <span class="com"># 附加</span></span>
+<span class="line">    f.write(<span class="str">"</span><span class="str">NEW</span><span class="str">\n</span><span class="str">"</span>)</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">with</span> <span class="fn">open</span>(<span class="str">"</span><span class="str">out.json</span><span class="str">"</span>, <span class="str">"</span><span class="str">w</span><span class="str">"</span>, encoding=<span class="str">"</span><span class="str">utf-8</span><span class="str">"</span>) <span class="kw">as</span> f:</span>
+<span class="line">    json.dump(obj, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>)</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">try</span>:</span>
+<span class="line">    risky()</span>
+<span class="line"><span class="kw">except</span> SpecificError <span class="kw">as</span> e:                 <span class="com"># 只接住你預期的那一種</span></span>
+<span class="line">    handle(e)</span>
+<span class="line"><span class="kw">else</span>:</span>
+<span class="line">    only_when_no_error()</span>
+<span class="line"><span class="kw">finally</span>:</span>
+<span class="line">    always_cleanup()</span>
+<span class="line"> </span></div>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.4rem 0 .5rem;color:var(--accent2);">延伸閱讀</h3>
+  <table class="cmp-table">
+    <thead><tr><th>資源</th><th>看什麼</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://docs.python.org/zh-tw/3/tutorial/errors.html" target="_blank" rel="noopener">Python 官方教學 · 錯誤與例外</a></td><td>完整的例外語法與例外階層。</td></tr>
+      <tr><td><a href="https://docs.python.org/zh-tw/3/library/pathlib.html" target="_blank" rel="noopener">pathlib 官方文件</a></td><td>Path 的所有方法。</td></tr>
+      <tr><td><a href="introduction.html">本站第 01 章</a></td><td>例外處理的互動版簡介。</td></tr>
+      <tr><td><a href="graphs.html">本站第 08 章</a></td><td>看讀檔在字梯問題裡實際怎麼用。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="bankquiz">
+  <div class="section-number">QUIZ · 自我檢測</div>
+  <h2>自我檢測：檔案與例外 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
+  <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下程式印出什麼？</div>
+    <pre class="sq-code">from pathlib import Path
+
+p = Path('data') / 'words.txt'
+print&#40;p.suffix, p.stem, p.parent)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。suffix 是副檔名（含點）、stem 是不含副檔名的檔名、parent 是上一層目錄。用除號串路徑會自動使用當前平台正確的分隔符。">.txt words data</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。suffix 含前面那個點；stem 不含副檔名；parent 不含檔名本身。">txt words.txt data/words.txt</button>
+      <button class="sq-opt" data-c="0" data-fb="不對，三個屬性的順序與意義搞混了。完整檔名是 p.name。">words.txt data words</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。Path('data') / 'words.txt' 產生的是 Path 物件而不是字串，這些屬性都存在。">AttributeError：字串沒有 suffix</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q2.</span>檔案 log.txt 裡原本已經有 100 行資料。執行下面這段之後，檔案裡有幾行？</div>
+    <pre class="sq-code">with open('log.txt', 'w', encoding='utf-8') as f:
+    f.write('新的一行\n')</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。'w' 模式會先清空整個檔案再寫，而且不會有任何警告。想附加到結尾必須用 'a'。這是不可逆的資料遺失，也是最常見的檔案操作事故。">1 行，原本的 100 行全部被清掉了</button>
+      <button class="sq-opt" data-c="0" data-fb="不對，那是 'a'（append）模式的行為。'w' 是清空重寫。">101 行</button>
+      <button class="sq-opt" data-c="0" data-fb="不對，那是 'x' 模式的行為。'w' 對已存在的檔案直接覆寫。">會拋出例外，因為檔案已經存在</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。寫入一定會發生，問題在於它先把舊內容清掉了。">100 行，寫入被忽略</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q3.</span>以下程式印出什麼？</div>
+    <pre class="sq-code">de&#102; f(path):
+    try:
+        return int(open(path).read())
+    except FileNotFoundError:
+        return -1
+    finally:
+        print&#40;'finally 跑了')
+
+print&#40;f('no_such_file.txt'))</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。except 接住例外並準備 return -1，但 finally 一定會在函式真正回傳之前執行完。連 return 都攔不住 finally，這正是它適合用來關檔與收尾的原因。">先印「finally 跑了」，再印 -1</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。函式的回傳值是在 finally 執行完之後才交給呼叫端的，所以 finally 的輸出一定在前面。">先印 -1，再印「finally 跑了」</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。finally 的保證就是「不管怎樣都會跑」，包含 return、break 與例外往外傳的情況。">只印 -1，finally 因為已經 return 而被跳過</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。except FileNotFoundError 正好對應 open() 對不存在檔案拋出的例外。">FileNotFoundError 沒被接住，程式中斷</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q4.</span>為什麼應該避免寫 except Exception: 把所有錯誤一起接住？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。裸的 except 會把真正的 bug 一起藏起來，你會看到程式「正常」跑完卻給出錯的結果——這比直接崩潰難找一百倍。只接住你預期會發生的那一種例外。">它會連你自己打錯字造成的 NameError 一起吞掉，讓程式默默給出錯誤答案</button>
+      <button class="sq-opt" data-c="0" data-fb="不對，語法完全合法。問題是它在語意上太貪心。">因為 Python 語法不允許這樣寫</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。這是正確性與可維護性的問題，不是效能問題。">因為它會讓程式變慢</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。finally 一定會執行，跟 except 接了哪些例外無關。">因為 finally 就不會執行了</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q5.</span>第 08 章要從網路讀進一份四千多字的單字表來建圖。下列哪個寫法在 Colab 與本機都能跑？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。從網址讀讓同一份 notebook 在任何環境都跑得動，不必先上傳檔案。缺點是需要網路，而且來源檔案可能哪天搬家。課程 notebook 就是這樣做的。">用 urllib.request.urlopen(URL) 直接從網址讀，再 decode 成文字</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。那個路徑只存在於你自己的電腦，在 Colab 上一定 FileNotFoundError。">open('C:/Users/me/words.txt') 用絕對路徑</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。相對路徑是相對於執行時的工作目錄，在 Colab 上那個檔案根本不存在，除非你先手動上傳。">open('words.txt') 用相對路徑就好</button>
+      <button class="sq-opt" data-c="0" data-fb="雖然可行，但四千行的字面串列會讓 notebook 難以閱讀與維護。資料應該跟程式分開。">把四千個單字直接寫成程式碼裡的串列</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q6.</span>自己實作的 Stack 在空的時候被呼叫 pop()，下列哪個處理方式比較好？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。當函式無法完成它承諾的事時就該拋例外。自訂例外只要繼承 Exception，好處是呼叫端可以精準地只接住這一種，而不是用一個 except 把所有 bug 一起吞掉。">raise 一個自訂的 EmptyStackError，讓呼叫端決定怎麼辦</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。這會讓錯誤在很遠的地方才爆出來——通常是某個地方對 &#78;one 做運算時，那時你已經很難追回真正的原因。">回傳 &#78;one 讓程式繼續跑</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。print 不會中斷錯誤的資料流，呼叫端也無法用程式判斷發生了什麼；而且 0 可能是合法的資料值。">印出錯誤訊息然後回傳 0</button>
+      <button class="sq-opt" data-c="0" data-fb="可以動，但錯誤訊息會洩漏內部實作（list index out of range），對使用你 Stack 的人來說訊息不精準。自訂例外講得更清楚。">什麼都不做，讓內部的 list 自己拋 IndexError</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+</section>
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="p6_strings.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">字串操作</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="p8_oop_basics.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">物件導向（基礎）</div></a></div>
+</div>
+
+<footer>
+  先備知識 P7 · 檔案與例外 · 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============ shared utilities ============ */
+const $ = id => document.getElementById(id);
+
+function quizCheck(quizId, optEl) {
+  const isCorrect = optEl.dataset.correct === 'true';
+  optEl.parentElement.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('correct','wrong'));
+  optEl.classList.add(isCorrect ? 'correct' : 'wrong');
+  const fb = $(quizId + 'Feedback');
+  fb.classList.remove('correct','wrong');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  fb.innerHTML = (isCorrect ? '<strong>正確 ✓</strong> ' : '<strong>不對 ✗</strong> ') + (optEl.dataset.fb || '');
+}
+
+function hlLine(rootId, n) {
+  const root = $(rootId);
+  if (!root) return;
+  root.querySelectorAll('.line').forEach(l => l.classList.remove('active'));
+  if (n != null) {
+    const line = root.querySelector(`.line[data-l="${n}"]`);
+    if (line) line.classList.add('active');
+  }
+}
+
+/* step player: frames = [{...}], apply(frame) renders */
+class Player {
+  constructor({frames, apply, delayInput, onDone}) {
+    this.frames = frames; this.apply = apply;
+    this.delayInput = delayInput; this.i = -1; this.timer = null;
+    this.onDone = onDone || (()=>{});
+  }
+  step() {
+    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+    this.i += 1; this.apply(this.frames[this.i]);
+  }
+  play() {
+    this.stop();
+    const tick = () => {
+      if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+      this.step();
+      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+    };
+    tick();
+  }
+  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
+  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+}
+
+function setStatus(id, html) {
+  const el = $(id); if (el) el.querySelector('.status-text').innerHTML = html;
+}
+
+/* vertical box stack renderer (DOM) */
+function renderBoxStack(containerId, items, opts={}) {
+  const el = $(containerId); if (!el) return;
+  const hl = opts.highlight ?? -1;   // index from top (0 = top)
+  el.innerHTML = '';
+  const label = document.createElement('div');
+  label.className = 'bs-toplabel';
+  label.textContent = items.length ? 'top ↓' : '(empty)';
+  el.appendChild(label);
+  items.slice().reverse().forEach((v, idx) => {
+    const d = document.createElement('div');
+    d.className = 'bs-item' + (idx === hl ? ' bs-hl' : '');
+    d.textContent = v;
+    el.appendChild(d);
+  });
+}
+
+/* horizontal queue renderer: front at left */
+function renderBoxQueue(containerId, items, opts={}) {
+  const el = $(containerId); if (!el) return;
+  el.innerHTML = '';
+  const front = document.createElement('div');
+  front.className = 'bq-label'; front.textContent = items.length ? 'front →' : '(empty)';
+  el.appendChild(front);
+  items.forEach((v, idx) => {
+    const d = document.createElement('div');
+    d.className = 'bq-item' + (idx === (opts.highlight ?? -1) ? ' bs-hl' : '');
+    d.textContent = v;
+    el.appendChild(d);
+  });
+  const rear = document.createElement('div');
+  rear.className = 'bq-label'; rear.textContent = items.length ? '← rear' : '';
+  el.appendChild(rear);
+}
+
+/* floating nav scroll spy */
+(function setupNav() {
+  const nav = $('floatNav');
+  const links = nav.querySelectorAll('a[data-target]');
+  const sections = Array.from(links).map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update() {
+    const y = window.scrollY + window.innerHeight * 0.3;
+    let active = sections[0]?.id;
+    for (const s of sections) if (s.offsetTop <= y) active = s.id;
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+
+/* ---------- P05 try / except / else / finally 執行路徑 ---------- */
+let exPlayer = null;
+
+function exBox(label, text, tone) {
+  const map = {
+    run:  ['var(--node-current)', 'rgba(243,156,18,.14)'],
+    ok:   ['var(--node-found)',   'rgba(22,160,133,.12)'],
+    bad:  ['var(--accent)',       'rgba(192,57,43,.09)'],
+    skip: ['var(--card-border)',  'var(--card)'],
+  };
+  const [bd, bg] = map[tone] || map.skip;
+  const dim = tone === 'skip' ? 'opacity:.45;' : '';
+  return `<div style="border:2px solid ${bd};background:${bg};border-radius:9px;padding:.45rem .8rem;margin-bottom:.4rem;${dim}">` +
+         `<span class="mono" style="font-size:.78rem;color:var(--accent2);font-weight:700;">${label}</span> ` +
+         `<span style="font-size:.86rem;">${text}</span></div>`;
+}
+
+function exFrames(mode) {
+  const ok = mode === 'ok';
+  const f = [];
+  const T = ok ? '檔案存在' : '檔案不存在';
+  f.push({
+    line: 1, msg: `情境：<strong>${T}</strong>。進入 <code>try</code> 區塊。`,
+    html: exBox('try', 'f = open(path)', 'run') + exBox('except', '…', 'skip') +
+          exBox('else', '…', 'skip') + exBox('finally', '…', 'skip'),
+  });
+  if (ok) {
+    f.push({
+      line: 2, msg: '開檔成功，<code>try</code> 沒有拋出例外 → <code>except</code> 整段跳過。',
+      html: exBox('try', 'f = open(path) ✓ 成功', 'ok') + exBox('except', '跳過（沒有例外）', 'skip') +
+            exBox('else', '…', 'skip') + exBox('finally', '…', 'skip'),
+    });
+    f.push({
+      line: 6, msg: '<code>else</code> 只有在「沒有失敗」時才跑，適合放成功之後才有意義的程式。',
+      html: exBox('try', 'f = open(path) ✓ 成功', 'ok') + exBox('except', '跳過', 'skip') +
+            exBox('else', 'return len(f.readlines()) → 7', 'run') + exBox('finally', '…', 'skip'),
+    });
+  } else {
+    f.push({
+      line: 2, msg: '<code>open()</code> 拋出 <code>FileNotFoundError</code> → 跳到對應的 <code>except</code>。',
+      html: exBox('try', 'f = open(path) ✗ FileNotFoundError', 'bad') + exBox('except', '…', 'skip') +
+            exBox('else', '…', 'skip') + exBox('finally', '…', 'skip'),
+    });
+    f.push({
+      line: 4, msg: '<code>except</code> 接住了，回傳 0。因為有例外發生，<code>else</code> <strong>不會</strong>執行。',
+      html: exBox('try', 'f = open(path) ✗ FileNotFoundError', 'bad') +
+            exBox('except', 'return 0', 'run') + exBox('else', '跳過（有例外發生）', 'skip') +
+            exBox('finally', '…', 'skip'),
+    });
+  }
+  const head = ok
+    ? exBox('try', 'f = open(path) ✓ 成功', 'ok') + exBox('except', '跳過', 'skip') +
+      exBox('else', 'return len(f.readlines()) → 7', 'ok')
+    : exBox('try', 'f = open(path) ✗ FileNotFoundError', 'bad') + exBox('except', 'return 0', 'ok') +
+      exBox('else', '跳過', 'skip');
+  f.push({
+    line: 8, msg: '<code>finally</code> <strong>一定</strong>會跑——連 <code>return</code> 都攔不住它。這就是它用來關檔、收尾的原因。',
+    html: head + exBox('finally', 'close_things()', 'run'),
+  });
+  f.push({
+    line: null, msg: `結束，回傳 <strong>${ok ? 7 : 0}</strong>。記住順序：try → (except 或 else) → finally。`,
+    html: head + exBox('finally', 'close_things() ✓', 'ok'),
+  });
+  return f;
+}
+
+function exStart(mode) {
+  if (exPlayer) exPlayer.stop();
+  exPlayer = new Player({
+    frames: exFrames(mode),
+    apply: fr => {
+      $('exStage').innerHTML = fr.html;
+      hlLine('exCode', fr.line);
+      setStatus('exStatus', fr.msg);
+    },
+  });
+  exPlayer.play();
+}
+
+function exReset() {
+  if (exPlayer) exPlayer.stop();
+  exPlayer = null;
+  $('exStage').innerHTML =
+    exBox('try', 'f = open(path)', 'skip') + exBox('except', 'return 0', 'skip') +
+    exBox('else', 'return len(f.readlines())', 'skip') + exBox('finally', 'close_things()', 'skip');
+  hlLine('exCode', null);
+  setStatus('exStatus', '選一種情況，看四個區塊各自什麼時候跑。');
+}
+
+(function () {
+  if ($('exStage')) exReset();
+})();
+
+</script>
+<script>
+const FLASHCARDS = [{"front": "路徑物件（pathlib.Path）", "back": "表示檔案或目錄位置的物件，用除號串接子路徑，會自動處理不同作業系統的分隔符。提供 exists、suffix、stem、parent、mkdir、glob 等方法。"}, {"front": "相對路徑（Relative Path）", "back": "相對於「執行時的工作目錄」而非程式檔所在位置的路徑。這是「在我電腦跑得動、換到 Colab 就找不到檔案」的頭號原因，不確定時印 Path.cwd() 檢查。"}, {"front": "情境管理器（with 陳述式）", "back": "進入區塊時取得資源、離開時自動釋放的語法。with open(...) 保證檔案一定會被關閉，即使區塊中途拋出例外也一樣。開檔一律用這個寫法。"}, {"front": "檔案模式（File Mode）", "back": "open() 的第二個參數：'r' 唯讀（預設）、'w' 清空重寫、'a' 附加到結尾、'x' 只在不存在時建立。誤用 'w' 會安靜地把原檔案內容全部刪掉。"}, {"front": "逐行迭代（Line Iteration）", "back": "直接對檔案物件跑 for 迴圈，一次只把一行讀進記憶體。處理大檔案時比 read() 一次全部吞進來安全得多。"}, {"front": "字元編碼（Encoding）", "back": "文字與位元組之間的轉換規則。處理中文一律指定 encoding='utf-8'，否則在 Windows 上讀寫很容易變成亂碼。"}, {"front": "JSON 序列化（json.dump / json.load）", "back": "把巢狀的字典與串列存成文字檔再讀回來。dump 寫到檔案、dumps 轉成字串；load 從檔案讀、loads 從字串讀。本站的詞彙卡與題庫母檔就是這個格式。"}, {"front": "例外（Exception）", "back": "程式執行中發生無法繼續的狀況時被拋出的物件。它不代表「壞掉」，而是「這條路走不通，交給呼叫我的人決定怎麼辦」。"}, {"front": "例外處理（try / except）", "back": "把可能失敗的程式放進 try，失敗時跳到對應的 except 處理。try 區塊應該只包含真正可能失敗的那幾行，範圍越小越好找錯。"}, {"front": "else 區塊（try-else）", "back": "只有在 try 沒有拋出例外時才執行。把成功之後才有意義的程式放這裡，可避免它自己的錯誤被 except 誤接，混淆錯誤來源。"}, {"front": "finally 區塊（finally）", "back": "不管成功或失敗都一定會執行的收尾區塊，連 return 都攔不住它。用來關閉檔案、釋放資源。"}, {"front": "裸例外（Bare except）", "back": "寫成 except: 或 except Exception: 把所有錯誤一起接住的反模式。它會連你自己打錯字造成的 NameError 一起吞掉，讓程式默默給出錯誤答案。只接住你預期的那一種。"}, {"front": "主動拋出（raise）", "back": "當函式無法完成它承諾的事時主動拋出例外，例如對空堆疊做 pop。比悄悄回傳 \u004eone 好得多，因為後者會讓錯誤在很遠的地方才爆出來。"}, {"front": "自訂例外（Custom Exception）", "back": "繼承 Exception 而來的錯誤類別，通常連內容都不必寫。好處是呼叫端可以精準地只接住這一種錯誤，例如 EmptyStackError。"}, {"front": "鍵值錯誤（KeyError）", "back": "存取字典中不存在的鍵時拋出。想要「查不到就給預設值」可改用 dict.get(key, default)，這在第 07 章的雜湊表與第 08 章的建圖都很常用。"}, {"front": "遞迴深度錯誤（RecursionError）", "back": "遞迴呼叫層數超過直譯器上限時拋出。它幾乎一定代表基底情況沒寫對、或每次呼叫沒有真的讓問題變小，不是環境壞掉。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+
+(function(){
+  document.querySelectorAll('.sq-item').forEach(item => {
+    const fb = item.querySelector('.sq-fb');
+    item.querySelectorAll('.sq-opt').forEach(btn => btn.addEventListener('click', () => {
+      const good = btn.dataset.c === '1';
+      item.querySelectorAll('.sq-opt').forEach(b => b.classList.remove('correct','wrong'));
+      btn.classList.add(good ? 'correct' : 'wrong');
+      fb.textContent = btn.dataset.fb;
+      fb.classList.add('show');
+      fb.classList.toggle('good', good);
+      fb.classList.toggle('bad', !good);
+    }));
+  });
+})();
+</script>
+</body>
+</html>

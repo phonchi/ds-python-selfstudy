@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>字典與集合 — 先備 P5（Python）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f39c12;letter-spacing:.3em;margin-bottom:.8rem;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{font-family:'JetBrains Mono',monospace;color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.0rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:40px;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box p:last-child{margin-bottom:0;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.65;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid #f39c12;padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .str{color:#f1fa8c;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+
+/* Preset buttons */
+.preset-row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 1rem;}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:.4rem .85rem;border-radius:6px;border:2px solid var(--card-border);background:var(--card);cursor:pointer;transition:all .2s;color:var(--ink);}
+.preset-btn:hover{border-color:var(--accent2);}
+.preset-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+
+/* Variable state table */
+.var-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+.var-table td{padding:.25rem .4rem;border-bottom:1px dashed var(--card-border);}
+.var-table td.vname{color:var(--accent2);font-weight:600;}
+.var-table td.vval{color:var(--ink);}
+.var-table td.vtype{color:var(--muted);font-size:.72rem;text-align:right;}
+.var-table tr.changed td{background:var(--highlight);}
+.var-empty{color:var(--muted);font-size:.8rem;font-style:italic;}
+
+/* Console */
+.console{background:#111;border-radius:8px;padding:.6rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#d4d4d4;min-height:70px;max-height:220px;overflow-y:auto;line-height:1.6;}
+.console .out-line{white-space:pre-wrap;}
+.console .out-line.new{color:#2ecc71;}
+.console .in-line{color:#f39c12;}
+.console .err-line{color:#e74c3c;}
+
+/* Expression stepper */
+.expr-view{background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.6rem 1rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.5rem;letter-spacing:.05em;min-height:90px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.2rem;}
+.expr-view .hl{background:var(--highlight);border:2px solid #f39c12;border-radius:6px;padding:0 .35rem;color:#b9770e;}
+.expr-view .result{color:var(--accent3);font-weight:700;}
+
+/* Object/tag visualization (variables) */
+.obj-canvas{position:relative;background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1.2rem;min-height:150px;display:flex;align-items:center;justify-content:center;gap:2.2rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.obj-box{border:2px solid var(--accent2);border-radius:10px;padding:.6rem 1.1rem;background:#fff;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600;color:var(--ink);position:relative;transition:all .3s;box-shadow:0 3px 10px rgba(0,0,0,.06);}
+.obj-box .obj-type{position:absolute;top:-10px;right:-8px;font-size:.62rem;background:var(--accent2);color:#fff;padding:1px 6px;border-radius:3px;font-weight:700;}
+.obj-box.faded{opacity:.3;border-style:dashed;}
+.obj-box.faded::after{content:'（被遺忘 → 資源回收）';position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:.62rem;color:var(--muted);white-space:nowrap;}
+.obj-box .tag{position:absolute;top:-34px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:12px;white-space:nowrap;transition:all .3s;}
+.obj-box .tag::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--accent);}
+
+/* Sandbox */
+.sandbox{background:var(--card);border:2px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.sandbox .sandbox-label{position:absolute;top:-11px;left:14px;background:var(--accent3);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.input-row{display:flex;gap:.5rem;align-items:center;margin:.5rem 0;flex-wrap:wrap;}
+.input-row label{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent2);font-weight:600;}
+.input-row input[type="text"]{font-family:'JetBrains Mono',monospace;font-size:.9rem;padding:.45rem .7rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;flex:1;min-width:160px;}
+.sandbox-result{margin-top:.6rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.9rem;min-height:46px;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.sandbox-result .ok{color:#2ecc71;font-weight:700;}
+.sandbox-result .bad{color:#e67e22;font-weight:700;}
+.sandbox-result .type-badge{background:#50fa7b;color:#1a1a2e;font-weight:700;padding:1px 10px;border-radius:4px;font-size:.82rem;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+.quiz-box .quiz-label .multi-badge{background:#8e44ad;color:#fff;font-size:.68rem;padding:1px 8px;border-radius:3px;}
+.quiz-box .quiz-q{font-weight:600;margin-bottom:.6rem;}
+.quiz-box .quiz-code{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:.6rem .9rem;font-family:'JetBrains Mono',monospace;font-size:.84rem;margin-bottom:.8rem;white-space:pre-wrap;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0 0;}
+.quiz-opt{display:flex;flex-direction:column;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:.9rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-head{display:flex;align-items:baseline;gap:.6rem;}
+.quiz-opt .opt-letter{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt .opt-fb{display:none;font-size:.82rem;margin-top:.4rem;padding-top:.4rem;border-top:1px dashed var(--card-border);color:#555;}
+.quiz-opt.revealed .opt-fb{display:block;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.correct .opt-fb{color:#14532d;}
+.quiz-opt.wrong{background:#fef5e7;border-color:#d68910;}
+.quiz-opt.wrong .opt-letter{color:#d68910;}
+.quiz-progress{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;margin:.8rem 0;}
+
+/* Flashcards */
+.card-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.flashcard{perspective:900px;height:150px;cursor:pointer;}
+.flashcard .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.flashcard.flipped .fc-inner{transform:rotateY(180deg);}
+.flashcard .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.flashcard .fc-front{background:linear-gradient(150deg,#2c3e7a,#1a1a2e);color:#fff;font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;letter-spacing:.05em;flex-direction:column;gap:.4rem;}
+.flashcard .fc-front .fc-hint{font-size:.66rem;color:rgba(255,255,255,.45);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.flashcard .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.8rem;line-height:1.6;transform:rotateY(180deg);overflow-y:auto;}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:34px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+/* Chapter nav */
+.chapter-nav{display:flex;justify-content:space-between;gap:1rem;margin:2rem 0 0;flex-wrap:wrap;}
+.chapter-nav a{flex:1;min-width:220px;background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1rem 1.3rem;text-decoration:none;color:var(--ink);transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.chapter-nav a:hover{border-color:var(--accent2);transform:translateY(-2px);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.1em;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+footer a{color:var(--accent2);}
+
+/* ============================================================
+   CH05.2 新增樣式：字典鍵值視覺化 / 通訊錄卡片 / traceback / fib 對比
+   ============================================================ */
+.kv-canvas{display:flex;flex-wrap:wrap;gap:.6rem;background:#fafafa;border:1px solid #ececec;border-radius:8px;padding:1rem;min-height:110px;align-items:flex-start;align-content:flex-start;}
+.kv-pair{display:flex;border-radius:8px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.06);transition:all .3s;font-family:'JetBrains Mono',monospace;font-size:.85rem;}
+.kv-pair .kv-key{background:var(--accent2);color:#fff;padding:.5rem .8rem;font-weight:700;}
+.kv-pair .kv-val{background:#fff;border:2px solid var(--accent2);border-left:none;padding:.5rem .8rem;color:var(--ink);}
+.kv-pair.hl .kv-key{background:var(--accent);}
+.kv-pair.hl .kv-val{border-color:var(--accent);background:var(--highlight);}
+.kv-pair.removed{opacity:.35;text-decoration:line-through;}
+
+.contact-grid{display:flex;flex-wrap:wrap;gap:.7rem;align-content:flex-start;}
+.contact-card{border:2px solid var(--accent2);border-radius:10px;padding:.55rem .9rem;background:#fff;font-family:'JetBrains Mono',monospace;font-size:.8rem;box-shadow:0 3px 10px rgba(0,0,0,.06);transition:all .3s;min-width:165px;}
+.contact-card .cc-name{font-weight:700;color:var(--accent2);}
+.contact-card .cc-phone{color:var(--muted);}
+.contact-card.hl{border-color:var(--accent);background:var(--highlight);}
+.contact-card.hl .cc-phone{color:var(--accent);font-weight:700;}
+
+.dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.6rem;}
+@media(max-width:640px){.dual-grid{grid-template-columns:1fr;}}
+.dual-col .dc-label{font-family:'JetBrains Mono',monospace;font-size:.74rem;font-weight:700;color:var(--accent2);margin-bottom:.3rem;letter-spacing:.05em;}
+
+.traceback{background:#2a1216;color:#ff8a80;border-left:3px solid var(--accent);border-radius:6px;padding:.6rem .85rem;font-family:'JetBrains Mono',monospace;font-size:.74rem;line-height:1.55;white-space:pre-wrap;width:100%;}
+.traceback .tb-err{color:#ff5252;font-weight:700;}
+
+.fib-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;}
+@media(max-width:640px){.fib-grid{grid-template-columns:1fr;}}
+.fib-card{background:var(--card);border:2px solid var(--card-border);border-radius:12px;padding:1rem 1.2rem;}
+.fib-card.memo{border-color:var(--accent3);}
+.fib-card .fib-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--accent2);letter-spacing:.05em;margin-bottom:.5rem;}
+.fib-card.memo .fib-title{color:var(--accent3);}
+.fib-card .fib-num{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--ink);line-height:1.1;}
+.fib-card .fib-sub{font-size:.78rem;color:var(--muted);margin-top:.3rem;}
+.bar-track{background:#ececec;border-radius:6px;height:14px;margin-top:.6rem;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;transition:width .3s;background:var(--accent);width:0%;}
+.fib-card.memo .bar-fill{background:var(--accent3);}
+.slider-row{display:flex;align-items:center;gap:.8rem;margin:.8rem 0;}
+.slider-row label{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);}
+.slider-row input[type=range]{flex:1;accent-color:var(--accent2);}
+.slider-row .slider-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);min-width:34px;text-align:right;}
+
+/* --- New rules for this page only --- */
+/* 🎮 Game box */
+.game-box{background:linear-gradient(150deg,#1a1a2e 0%,#232345 100%);border-radius:14px;padding:1.5rem 1.7rem;margin:1.5rem 0;color:#fff;position:relative;overflow:hidden;}
+.game-box::before{content:'🎮';position:absolute;top:-14px;right:6px;font-size:5.2rem;opacity:.08;}
+.game-box .gb-tag{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#f39c12;letter-spacing:.2em;margin-bottom:.4rem;}
+.game-box h3{color:#fff;margin-top:0;}
+.game-box p{color:rgba(255,255,255,.82);}
+.game-console{background:#111;border-radius:8px;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#d4d4d4;min-height:120px;max-height:260px;overflow-y:auto;line-height:1.7;margin:.8rem 0;}
+.game-console .g-sys{color:#5dade2;}
+.game-console .g-win{color:#2ecc71;font-weight:700;}
+.game-console .g-lose{color:#e74c3c;font-weight:700;}
+.game-console .g-me{color:#f39c12;}
+.game-input-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.game-input-row input{font-family:'JetBrains Mono',monospace;font-size:.95rem;padding:.5rem .8rem;border:none;border-radius:8px;width:130px;}
+.game-note{font-size:.8rem;color:rgba(255,255,255,.72);margin-top:.7rem;}
+.game-note a{color:#2ecc71;}
+
+/* 🤖 Ask-AI exercise box */
+.ai-box{background:var(--card);border:2px dashed #8e44ad;border-radius:12px;padding:1.2rem 1.4rem;margin:1.3rem 0;position:relative;}
+.ai-box .ai-label{position:absolute;top:-11px;left:14px;background:#8e44ad;color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.ai-box p:last-child{margin-bottom:0;}
+.ai-box .ai-prompt{font-family:'JetBrains Mono',monospace;font-size:.85rem;background:rgba(142,68,173,.08);border-radius:6px;padding:.4rem .8rem;display:block;margin:.4rem 0;color:#6c3485;}
+
+/* 🎓 Chapter-end bridge */
+.bridge-box{background:#eafaf1;border:2px solid var(--accent3);border-radius:12px;padding:1.3rem 1.5rem;margin:2rem 0 0;}
+.bridge-box .bb-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent3);font-weight:700;letter-spacing:.12em;margin-bottom:.5rem;}
+.bridge-box ul{margin:.3rem 0 .8rem 1.3rem;font-size:.92rem;}
+.bridge-box .bb-next{font-size:.9rem;color:var(--accent2);border-top:1px dashed var(--accent3);padding-top:.6rem;margin-bottom:0;}
+
+/* CH05.2 頁面專屬：外星人艦隊卡片格 + game-box 內文字對比度微調 */
+.game-box code{background:rgba(255,255,255,.14);color:#fff;}
+.game-box .controls-bar{border-top-color:rgba(255,255,255,.15);}
+.game-box details{margin-top:.8rem;}
+.game-box summary{cursor:pointer;color:#5dade2;font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.game-box details p{font-size:.82rem;color:rgba(255,255,255,.7);margin:.6rem 0 .3rem;}
+.alien-fleet{display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem;margin:.9rem 0;}
+@media(max-width:640px){.alien-fleet{grid-template-columns:repeat(3,1fr);}}
+.alien-card{background:rgba(46,204,113,.16);border:2px solid #2ecc71;border-radius:8px;padding:.5rem .3rem;text-align:center;transition:background .4s,border-color .4s;}
+.alien-card .ac-emoji{font-size:1.3rem;display:block;}
+.alien-card .ac-score{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#eafaf1;font-weight:700;margin-top:.15rem;display:block;}
+.alien-card.upgraded{background:rgba(243,156,18,.22);border-color:#f39c12;}
+.alien-card.upgraded .ac-score{color:#ffe0a3;}
+
+/* 深色容器內的可讀性修正（code/summary/pill 在深色背景上原樣式太深） */
+.game-box code,.cta-box code{background:rgba(255,255,255,.14);color:#8be9fd;}
+.game-box details summary{cursor:pointer;color:#5dade2;font-size:.85rem;}
+.game-box .pill{background:rgba(255,255,255,.14);color:#f1fa8c;border-color:rgba(255,255,255,.28);}
+.game-box a{color:#2ecc71;}
+.cta-box a{color:#2ecc71;}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+
+/* ===== 題庫自測區 ===== */
+.sq-item{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.sq-item .sq-q{font-weight:700;margin-bottom:.7rem;}
+.sq-item .sq-q .sq-num{font-family:'JetBrains Mono',monospace;color:var(--accent);margin-right:.4rem;}
+.sq-opts{display:flex;flex-direction:column;gap:.45rem;}
+.sq-opt{text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;line-height:1.6;padding:.55rem .9rem;border-radius:8px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;}
+.sq-opt:hover{border-color:var(--accent2);}
+.sq-opt.correct{border-color:var(--accent3);background:rgba(26,107,74,.10);}
+.sq-opt.wrong{border-color:var(--accent);background:rgba(192,57,43,.08);}
+.sq-fb{display:none;margin-top:.7rem;font-size:.86rem;line-height:1.7;border-left:4px solid var(--accent2);padding:.5rem .9rem;background:var(--paper);border-radius:0 8px 8px 0;}
+.sq-fb.show{display:block;}
+.sq-fb.good{border-left-color:var(--accent3);}
+.sq-fb.bad{border-left-color:var(--accent);}
+
+.sq-code{background:var(--code-bg);color:var(--code-fg);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;padding:.7rem .9rem;border-radius:8px;margin:.2rem 0 .8rem;overflow-x:auto;white-space:pre;}
+</style>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<!-- Floating navigation sidebar -->
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#prologue" data-target="prologue"><span class="fn-num">P00</span><span class="fn-name">串列 vs 字典</span></a>
+  <a href="#create" data-target="create"><span class="fn-num">P01</span><span class="fn-name">建立／存取／修改／刪除</span></a>
+  <a href="#iterate" data-target="iterate"><span class="fn-num">P02</span><span class="fn-name">keys/values/items</span></a>
+  <a href="#membership" data-target="membership"><span class="fn-num">P03</span><span class="fn-name">in 檢查鍵是否存在</span></a>
+  <a href="#get" data-target="get"><span class="fn-num">P04</span><span class="fn-name">get() 安全存取</span></a>
+  <a href="#setdefault" data-target="setdefault"><span class="fn-num">P05</span><span class="fn-name">setdefault()</span></a>
+  <a href="#comprehension" data-target="comprehension"><span class="fn-num">P06</span><span class="fn-name">字典生成式</span></a>
+  <a href="#nested" data-target="nested"><span class="fn-num">P07</span><span class="fn-name">巢狀結構：通訊錄</span></a>
+  <a href="#fib" data-target="fib"><span class="fn-num">P08</span><span class="fn-name">案例：費波那契 memoization</span></a>
+  <a href="#sets" data-target="sets"><span class="fn-num">P09</span><span class="fn-name">集合 set</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">速查表</span></a>
+  <a href="#bankquiz" data-target="bankquiz"><span class="fn-num">QUIZ</span><span class="fn-name">自我檢測</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="chapter-tag">PREREQ P5</div>
+    <h1><span class="blue">字典</span>與<span class="green">集合</span>：用鍵找值</h1>
+    <div class="subtitle">先備知識複習 · 選讀，不列入作業與考試範圍</div>
+    <div class="big-formula">{key: value}｜get()｜setdefault()｜字典生成式｜memoization</div>
+    <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（先備複習 · 選讀，不列入評分）</div>
+  <p>① 這頁複習資料結構課程<strong>預設你已經會</strong>的 Python。已經熟的可以直接跳過。
+  ② 每節都附一個<strong>「這在資料結構課哪裡會用到」</strong>的小方框——那才是你該記住的部分。
+  ③ 讀完做 <a href="#bankquiz">自我檢測</a>，再翻 <a href="#cards">關鍵詞彙卡</a>。
+  <br><strong>本頁屬補充先備知識，不列入作業與考試範圍。</strong></p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#prologue"><span class="toc-num">P00</span>引言：從串列到字典</a>
+    <a href="#create"><span class="toc-num">P01</span>建立、存取、修改與刪除</a>
+    <a href="#iterate"><span class="toc-num">P02</span>keys() / values() / items()</a>
+    <a href="#membership"><span class="toc-num">P03</span>用 in 檢查鍵是否存在</a>
+    <a href="#get"><span class="toc-num">P04</span>get() 安全存取 vs []</a>
+    <a href="#setdefault"><span class="toc-num">P05</span>setdefault() 方法</a>
+    <a href="#comprehension"><span class="toc-num">P06</span>字典生成式</a>
+    <a href="#nested"><span class="toc-num">P07</span>巢狀結構：字典構成的串列</a>
+    <a href="#fib"><span class="toc-num">P08</span>案例：費波那契 memoization</a>
+    <a href="#sets"><span class="toc-num">P09</span>集合 set</a>
+    <a href="#reference"><span class="toc-num">REF</span>字典方法速查表</a>
+    <a href="#bankquiz"><span class="toc-num">QUIZ</span>自我檢測</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<section id="prologue">
+  <div class="section-number">PROLOGUE · 引言</div>
+  <h2>從「序位存取」到「鍵值對應」</h2>
+  <p>之前學過的 <code>串列</code> 用<strong>整數索引</strong>（0, 1, 2, …）存取元素——你必須記得「第幾個位置」放了什麼。但如果我們想儲存「科目 → 成績」「姓名 → 電話」這種對應關係，用索引就很不直覺。這時候就輪到<strong>字典（dictionary）</strong>登場：一種<strong>無序集合</strong>，用來儲存 <strong>鍵–值（key–value）</strong> 對，把不可變的<strong>鍵（key）</strong>對應到特定的<strong>值（value）</strong>，就像傳統紙本字典把「單字」對應到「解釋」一樣。</p>
+
+  <table class="cmp-table">
+    <tr><th></th><th>串列 list</th><th>字典 dictionary</th></tr>
+    <tr><td>怎麼存取一個元素</td><td>用整數索引：<code>lst[0]</code></td><td>用鍵：<code>d['機率統計']</code></td></tr>
+    <tr><td>順序</td><td class="best">有序，可切片</td><td class="worst">Python 3.6+ 會記住插入順序，但仍<strong>不能切片</strong></td></tr>
+    <tr><td>索引/鍵的型別</td><td>只能是整數</td><td>任何<strong>不可變</strong>型別（str、int、tuple…）</td></tr>
+  </table>
+
+  <div class="info-box">
+    <div class="info-label">💡 小知識：為什麼叫「字典」？</div>
+    <p style="margin-bottom:0;">Python 內部其實是用<strong>雜湊表（Hash Table）</strong>實作字典，在其他語言常被稱為 Hash 或 Associative Array。但「雜湊」容易讓人誤會成雜湊函數本身，所以 Python 選擇了更直觀的名字——就像紙本字典把「單字」對應到「解釋」，Python 的字典把「鍵」對應到「值」。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="create">
+  <div class="section-number">PART 01 · 建立、存取、修改、刪除</div>
+  <h2>建立字典：大括號 + 鍵值對</h2>
+  <p><code>dict()</code> 或空大括號 <code>{}</code> 可以建立一個空字典；用大括號包住多個以逗號分隔的 <code>鍵:值</code> 就能一次建立多筆資料。新增或更新項目一樣用方括號 <code>[]</code>：<code>grade['機率統計'] = 85</code>。</p>
+
+  <h3>🎬 互動：建立 → 新增鍵 → 查詢 → 修改 → 刪除</h3>
+  <p>以成績字典 <code>grade</code> 為例，逐步觀察每一行程式碼如何改變字典內容：</p>
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="kv-canvas" id="createCanvas"><span class="var-empty">按「單步 ▸」開始執行</span></div>
+      <div class="pseudo-code" id="createCode">
+<span class="line">grade = {}</span>
+<span class="line">grade[<span class="str">'機率統計'</span>] = <span class="num">85</span></span>
+<span class="line">grade[<span class="str">'函數論'</span>] = <span class="num">80</span></span>
+<span class="line"><span class="fn">print</span>(grade[<span class="str">'機率統計'</span>])</span>
+<span class="line">grade[<span class="str">'機率統計'</span>] = <span class="num">90</span>   <span class="com"># 鍵已存在 → 覆蓋舊值</span></span>
+<span class="line"><span class="kw">del</span> grade[<span class="str">'函數論'</span>]</span>
+<span class="line"><span class="fn">print</span>(grade)</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="createStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="createPlay">▶ 播放</button>
+        <button class="btn btn-step" id="createStep">單步 ▸</button>
+        <button class="btn btn-reset" id="createReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="createOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">鍵已存在時</div>
+        <p style="font-size:.82rem;margin:0;"><code>grade[key] = value</code> 若 <code>key</code> 已經在字典中，會直接<strong>覆蓋舊值</strong>；若不存在，則會<strong>新增</strong>一組鍵值對。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box warm">
+    <div class="info-label">⚠ 常見誤區</div>
+    <p>① 存取一個<strong>不存在的鍵</strong>時，直接用 <code>grade['英文']</code> 會拋出 <code>KeyError</code>——這和串列的「超出範圍」<code>IndexError</code> 是同一種概念，差別只是字典用「鍵不存在」而不是「位置超出範圍」。</p>
+    <p style="margin-bottom:0;">② 字典的<strong>鍵必須是不可變（immutable）型別</strong>，例如字串、整數或 tuple；<strong>串列（list）不能當鍵</strong>，因為串列是可變的——如果你嘗試 <code>d[[1,2]] = 'x'</code>，Python 會直接報 <code>TypeError: unhashable type: 'list'</code>。</p>
+  </div>
+
+  <p>另外，字典也不支援整數索引存取（例如 <code>grade[0]</code> 是不合法的，除非剛好有一個鍵叫做整數 0），也<strong>不能切片</strong>——因為字典本質上是無序集合，「第幾個」並沒有固定的意義。</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="iterate">
+  <div class="section-number">PART 02 · 遍歷字典</div>
+  <h2>keys()、values()、items() 與 for 迴圈</h2>
+  <p>字典其實會借給你三副眼鏡，讓你用不同角度看同一份資料：戴上 <span class="pill pill-blue">keys()</span> 這副眼鏡，只看得到所有的<strong>鍵</strong>；換上 <span class="pill pill-green">values()</span>，只看得到所有的<strong>值</strong>；戴上 <span class="pill pill-orange">items()</span>，鍵和值就一起入鏡，變成一組組 <code>(鍵, 值)</code> 元組。這三副「眼鏡」實際回傳的是 <code>dict_keys</code>／<code>dict_values</code>／<code>dict_items</code> 檢視物件，不是真正的 <code>list</code>，但一樣能直接放進 <code>for</code> 迴圈裡用；想要真正的串列，再包一層 <code>list()</code> 就好。</p>
+
+  <div class="info-box">
+    <div class="info-label">💡 為什麼不直接回傳 list？</div>
+    <p style="margin-bottom:0;">如果字典有上百萬筆資料，<code>keys()</code> 若直接回傳一個 list，光是配置那個 list 就要耗掉一大塊記憶體。用 <code>sys.getsizeof()</code> 實測一百萬筆資料的字典：<code>big_dict.keys()</code> 只佔 <strong>40 bytes</strong>，但轉成 <code>list(big_dict.keys())</code> 卻要 <strong>8,000,056 bytes</strong>！這就是為什麼 Python 選擇回傳「隨用隨產生」的檢視物件，而不是一次展開的 list。</p>
+  </div>
+
+  <p>預設情況下，直接對字典做 <code>for k in grade:</code> 遍歷的是<strong>鍵</strong>而不是值。搭配 <code>items()</code> 與多重指派，可以在同一個迴圈同時取得鍵和值：</p>
+
+  <h3>🎬 互動：用 items() 同時走訪鍵與值</h3>
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="kv-canvas" id="iterateCanvas"><span class="var-empty">按「單步 ▸」開始執行</span></div>
+      <div class="pseudo-code" id="iterateCode">
+<span class="line">grade = {<span class="str">'機率統計'</span>:<span class="num">85</span>, <span class="str">'函數論'</span>:<span class="num">80</span>, <span class="str">'程式語言'</span>:<span class="num">90</span>, <span class="str">'方程式論'</span>:<span class="num">95</span>}</span>
+<span class="line"><span class="kw">for</span> key, val <span class="kw">in</span> grade.items():</span>
+<span class="line">    <span class="fn">print</span>(key, val)</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="iterateStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="iteratePlay">▶ 播放</button>
+        <button class="btn btn-step" id="iterateStep">單步 ▸</button>
+        <button class="btn btn-reset" id="iterateReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="iterateOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">list(grade.items())</div>
+        <p style="font-size:.82rem;margin:0;">會得到一個元組串列：<br><code>[('機率統計',85), ('函數論',80), …]</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="membership">
+  <div class="section-number">PART 03 · 成員檢查</div>
+  <h2>用 in / not in 檢查鍵是否存在</h2>
+  <p>如同串列，<code>in</code> 和 <code>not in</code> 運算元可以用來檢查字典。<strong>預設情況下檢查的是鍵</strong>：<code>'機率統計' in grade</code> 等同於 <code>'機率統計' in grade.keys()</code>。如果想檢查的是「值」是否存在，要明確寫成 <code>value in grade.values()</code>。</p>
+
+  <table class="cmp-table">
+    <tr><th>運算式</th><th>結果</th><th>說明</th></tr>
+    <tr><td>'機率統計' in grade</td><td class="best">True</td><td>預設檢查鍵，'機率統計' 是字典裡的鍵</td></tr>
+    <tr><td>'英文' in grade.keys()</td><td class="worst">False</td><td>'英文' 不是任何一個鍵</td></tr>
+    <tr><td>85 in grade.values()</td><td class="best">True</td><td>85 是 '機率統計' 對應的值</td></tr>
+  </table>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 好習慣</div>
+    <p style="margin-bottom:0;">在直接用 <code>grade['英文']</code> 存取之前，先用 <code>if '英文' in grade:</code> 檢查鍵是否存在，可以避免 <code>KeyError</code>。不過下一節你會學到更簡潔的寫法——<code>get()</code> 方法！</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="get">
+  <div class="section-number">PART 04 · get() 方法</div>
+  <h2>get() 安全存取 vs 直接用 []</h2>
+  <p>每次存取前都要先 <code>if key in d:</code> 檢查很繁瑣。字典的 <code>get(key, fallback)</code> 方法接受兩個參數：要查詢的鍵，以及<strong>該鍵不存在時要回傳的備用值</strong>——永遠不會拋出 <code>KeyError</code>。</p>
+
+  <h3>🧪 互動：picnic[key] vs picnic.get(key, 0)</h3>
+  <p>固定字典 <code>picnic = {'蘋果': 5, '杯子': 2}</code>，輸入任意鍵，比較兩種存取方式：</p>
+  <div class="sandbox">
+    <div class="sandbox-label">🧪 SANDBOX</div>
+    <div class="input-row">
+      <label>鍵：</label>
+      <input type="text" id="picnicInput" placeholder="例如 蘋果" value="蘋果">
+    </div>
+    <div class="preset-row">
+      <button class="preset-btn" data-key="蘋果">蘋果</button>
+      <button class="preset-btn" data-key="杯子">杯子</button>
+      <button class="preset-btn" data-key="蛋">蛋</button>
+      <button class="preset-btn" data-key="餐巾">餐巾</button>
+    </div>
+    <div class="dual-grid">
+      <div class="dual-col">
+        <div class="dc-label">picnic[key]</div>
+        <div class="sandbox-result" id="bracketResult"></div>
+      </div>
+      <div class="dual-col">
+        <div class="dc-label">picnic.get(key, 0)</div>
+        <div class="sandbox-result" id="getResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <p>因為 <code>picnicItems</code> 字典裡沒有 <code>'蛋'</code> 這個鍵，<code>get('蛋', 0)</code> 會回傳備用值 <code>0</code>；但如果不用 <code>get()</code>，直接寫 <code>picnicItems['蛋']</code> 就會導致程式因為 <code>KeyError</code> 而中斷。</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="setdefault">
+  <div class="section-number">PART 05 · setdefault() 方法</div>
+  <h2>setdefault()：只在鍵不存在時才設定值</h2>
+  <p>有時候你想要「幫某個鍵設定初始值，但只在它還沒有值的時候」。傳統寫法要先判斷：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line">spam = {<span class="str">'名字'</span>: <span class="str">'Pooka'</span>, <span class="str">'年齡'</span>: <span class="num">5</span>}</span>
+<span class="line"><span class="kw">if</span> <span class="str">'興趣'</span> <span class="kw">not in</span> spam:</span>
+<span class="line">    spam[<span class="str">'興趣'</span>] = <span class="str">'睡覺'</span></span></div>
+  <p><code>setdefault(key, default)</code> 把這個模式濃縮成一行：第一個參數是要檢查的鍵，第二個參數是該鍵不存在時要設定的值；<strong>如果鍵已經存在，setdefault() 完全不會改動它</strong>。</p>
+
+  <h3>經典範例：統計字母出現次數</h3>
+  <p>計算一段文字中每個字元出現的次數，是 <code>setdefault()</code> 最常見的用途——確保鍵一定存在，才能安心地做 <code>count[character] = count[character] + 1</code>：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line">message = <span class="str">'It was a bright cold day in April, and the clocks were striking thirteen.'</span></span>
+<span class="line">count = {}</span>
+<span class="line"><span class="kw">for</span> character <span class="kw">in</span> message:</span>
+<span class="line">    count.setdefault(character, <span class="num">0</span>)   <span class="com"># 確保鍵存在，預設值 0</span></span>
+<span class="line">    count[character] = count[character] + <span class="num">1</span></span></div>
+
+  <table class="cmp-table">
+    <tr><th>字元</th><th>出現次數</th><th>說明</th></tr>
+    <tr><td>' '（空白）</td><td class="best">13</td><td>句子中最常出現的字元</td></tr>
+    <tr><td>'t'</td><td>6</td><td></td></tr>
+    <tr><td>'i'</td><td>6</td><td></td></tr>
+    <tr><td>'c'</td><td>3</td><td>對照課本說明：c 出現 3 次</td></tr>
+    <tr><td>'A'</td><td>1</td><td>大寫 A 只出現 1 次（區分大小寫）</td></tr>
+  </table>
+  <p style="font-size:.85rem;color:var(--muted);">（以上次數已用 Python 實際執行驗證，count 字典最終共有 23 個不同的鍵。）</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="comprehension">
+  <div class="section-number">PART 06 · 字典生成式</div>
+  <h2>字典生成式：一行敘述建立字典</h2>
+  <p>就像串列生成式，<strong>字典生成式</strong>提供了一種簡潔的語法，通常用來把一個字典映射成另一個字典。大括號搭配 <code>key:value for … in …</code> 的形式：</p>
+
+  <h3>範例一：反轉鍵與值</h3>
+  <div class="pseudo-code" style="margin-bottom:.6rem;">
+<span class="line">months = {<span class="str">'一月'</span>: <span class="num">1</span>, <span class="str">'二月'</span>: <span class="num">2</span>, <span class="str">'三月'</span>: <span class="num">3</span>}</span>
+<span class="line">months2 = {number:name <span class="kw">for</span> name, number <span class="kw">in</span> months.items()}</span></div>
+  <table class="cmp-table">
+    <tr><th>運算式</th><th>結果</th></tr>
+    <tr><td>months2</td><td class="best">{1: '一月', 2: '二月', 3: '三月'}</td></tr>
+  </table>
+
+  <h3>範例二：把成績串列映射成平均分數</h3>
+  <div class="pseudo-code" style="margin-bottom:.6rem;">
+<span class="line">grades = {<span class="str">'Sue'</span>: [<span class="num">98</span>, <span class="num">87</span>, <span class="num">94</span>], <span class="str">'Bob'</span>: [<span class="num">84</span>, <span class="num">95</span>, <span class="num">91</span>]}</span>
+<span class="line">grades2 = {k:sum(v)/len(v) <span class="kw">for</span> k, v <span class="kw">in</span> grades.items()}</span></div>
+  <table class="cmp-table">
+    <tr><th>運算式</th><th>結果</th></tr>
+    <tr><td>grades2</td><td class="best">{'Sue': 93.0, 'Bob': 90.0}</td></tr>
+  </table>
+  <p>注意 <code>grades</code> 本身是一個「值為 list」的字典，這已經是一種<strong>巢狀結構</strong>——下一節會正式介紹更常見的巢狀型態：<strong>字典構成的串列</strong>。</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="nested">
+  <div class="section-number">PART 07 · 巢狀結構</div>
+  <h2>字典構成的串列：管理一群相似的資料</h2>
+  <p>如果要儲存「一群」結構相同的資料——例如通訊錄裡的每一位聯絡人都有姓名和電話——最自然的做法是建立一個<strong>串列，裡面每個元素都是一個字典</strong>。這樣就能用 <code>for</code> 迴圈逐一處理，也能單獨修改某一筆資料。</p>
+
+  <h3>🎬 互動：建立通訊錄 → 更新一筆資料 → 印出全部</h3>
+  <div class="viz-layout">
+    <div class="viz-panel">
+      <div class="contact-grid" id="nestedCanvas"><span class="var-empty">按「單步 ▸」開始執行</span></div>
+      <div class="pseudo-code" id="nestedCode">
+<span class="line">contacts = []</span>
+<span class="line">contacts.append({<span class="str">'姓名'</span>:<span class="str">'小明'</span>, <span class="str">'電話'</span>:<span class="str">'0912-345-678'</span>})</span>
+<span class="line">contacts.append({<span class="str">'姓名'</span>:<span class="str">'小華'</span>, <span class="str">'電話'</span>:<span class="str">'0922-111-222'</span>})</span>
+<span class="line">contacts.append({<span class="str">'姓名'</span>:<span class="str">'小美'</span>, <span class="str">'電話'</span>:<span class="str">'0933-222-333'</span>})</span>
+<span class="line"><span class="kw">for</span> person <span class="kw">in</span> contacts:</span>
+<span class="line">    <span class="kw">if</span> person[<span class="str">'姓名'</span>] == <span class="str">'小華'</span>:</span>
+<span class="line">        person[<span class="str">'電話'</span>] = <span class="str">'0999-888-777'</span>   <span class="com"># 更新電話</span></span>
+<span class="line"><span class="kw">for</span> person <span class="kw">in</span> contacts:</span>
+<span class="line">    <span class="fn">print</span>(person[<span class="str">'姓名'</span>], person[<span class="str">'電話'</span>])</span></div>
+      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="nestedStatus">按「單步 ▸」開始</span></div>
+      <div class="controls-bar">
+        <button class="btn btn-play" id="nestedPlay">▶ 播放</button>
+        <button class="btn btn-step" id="nestedStep">單步 ▸</button>
+        <button class="btn btn-reset" id="nestedReset">↺ 重設</button>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="nestedOut"></div></div>
+      <div class="info-card">
+        <div class="ic-title">為什麼這樣設計？</div>
+        <p style="font-size:.82rem;margin:0;">每個聯絡人都是<strong>獨立的字典物件</strong>，即使內容長得一樣，Python 也把它們視為不同的物件——可以單獨修改某一筆，不影響其他人。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-box" id="alienGame">
+    <div class="gb-tag">GAME · 取自課本「字典構成的串列」範例</div>
+    <h3>👾 外星人隊伍：30 隻字典組成的艦隊</h3>
+    <p>通訊錄是「一串聯絡人字典」，外星人隊伍也一樣：按「生成艦隊」用 <code>for</code> 迴圈造出 30 隻綠色慢速外星人，再按「升級前 3 隻」，看 <code>for + if</code> 怎麼只挑出前 3 隻動手腳。</p>
+
+    <div class="controls-bar">
+      <button class="btn btn-play" id="alienSpawnBtn">🚀 生成艦隊</button>
+      <button class="btn btn-step" id="alienUpgradeBtn" disabled>⚡ 升級前 3 隻</button>
+      <button class="btn btn-reset" id="alienResetBtn">↺ 重設</button>
+    </div>
+
+    <div class="alien-fleet" id="alienFleet"><span class="var-empty" style="color:rgba(255,255,255,.78);">按「生成艦隊」開始</span></div>
+
+    <div class="status-banner" id="alienStatus"><span class="status-icon">▸</span><span class="status-text">按「生成艦隊」開始</span></div>
+
+    <details>
+      <summary>📜 顯示 Python 原始碼</summary>
+      <p>① 生成艦隊——對應「生成艦隊」按鈕：</p>
+      <div class="pseudo-code">
+<span class="line">aliens = []</span>
+<span class="line"><span class="com"># 創造30個綠色的外星人.</span></span>
+<span class="line"><span class="kw">for</span> alien_number <span class="kw">in</span> <span class="fn">range</span>(<span class="num">30</span>):</span>
+<span class="line">    new_alien = {<span class="str">'顏色'</span>: <span class="str">'綠色'</span>, <span class="str">'分數'</span>: <span class="num">5</span>, <span class="str">'速度'</span>: <span class="str">'慢速'</span>}</span>
+<span class="line">    aliens.append(new_alien)</span></div>
+      <p>② 升級前三隻——對應「升級前 3 隻」按鈕，就是這段 <code>for + if</code>：</p>
+      <div class="pseudo-code">
+<span class="line"><span class="kw">for</span> alien <span class="kw">in</span> aliens[:<span class="num">3</span>]:</span>
+<span class="line">    <span class="kw">if</span> alien[<span class="str">'顏色'</span>] == <span class="str">'綠色'</span>:</span>
+<span class="line">        alien[<span class="str">'顏色'</span>] = <span class="str">'黃色'</span></span>
+<span class="line">        alien[<span class="str">'速度'</span>] = <span class="str">'中速'</span></span>
+<span class="line">        alien[<span class="str">'分數'</span>] = <span class="num">10</span></span></div>
+    </details>
+
+    <p class="game-note">🐛 抓蟲挑戰：課本這一格的原始碼其實把 <code>alien['顏色']</code> 打成了 <code>alien['顏色r']</code>——想想看這一字之差會發生什麼事？（提示：對不存在的鍵做指派會「新增」一個鍵，所以外星人的顏色永遠不會變黃！）打開 <code>052_Dictionaries.ipynb</code> 找到外星人範例驗證看看，順便試試把 <code>aliens[:3]</code> 換成 <code>aliens[3:6]</code>。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="fib">
+  <div class="section-number">PART 08 · 章末案例</div>
+  <h2>用字典加速費波那契數列：memoization</h2>
+  <p>費波那契數列定義為 <code>F(0)=0</code>、<code>F(1)=1</code>、當 <code>n≥2</code> 時 <code>F(n)=F(n-1)+F(n-2)</code>。如果直接寫成純遞迴函數，計算 <code>F(n)</code> 會重複呼叫同樣的 <code>F(k)</code> 非常多次，呼叫次數隨 n 呈<strong>指數成長</strong>，n 稍微大一點就會慢到無法忍受。</p>
+
+  <p>解法是用<strong>字典</strong>把「已經算過的結果」快取（cache）起來——這個技巧叫做 <strong>memoization</strong>。下次遇到同樣的 n，直接從字典查表拿結果，不用重新計算：</p>
+  <div class="pseudo-code" style="margin-bottom:1rem;">
+<span class="line"><span class="kw">def</span> <span class="fn">fibonacci</span>(n, memo={}):</span>
+<span class="line">    <span class="kw">if</span> n <span class="kw">in</span> memo:          <span class="com"># 查表：算過就直接回傳</span></span>
+<span class="line">        <span class="kw">return</span> memo[n]</span>
+<span class="line">    <span class="kw">if</span> n <= <span class="num">1</span>:</span>
+<span class="line">        memo[n] = n</span>
+<span class="line">    <span class="kw">else</span>:</span>
+<span class="line">        memo[n] = fibonacci(n-<span class="num">1</span>, memo) + fibonacci(n-<span class="num">2</span>, memo)</span>
+<span class="line">    <span class="kw">return</span> memo[n]</span></div>
+
+  <h3>🎬 互動：純遞迴 vs 字典快取，呼叫次數大對決</h3>
+  <p>拖動滑桿改變 n，右側即時（用 JavaScript 實際執行遞迴並計數）比較兩種寫法各呼叫了幾次函數：</p>
+
+  <div class="slider-row">
+    <label for="fibN">n =</label>
+    <input type="range" id="fibN" min="5" max="20" value="10" step="1">
+    <span class="slider-val" id="fibNVal">10</span>
+  </div>
+
+  <div class="fib-grid">
+    <div class="fib-card">
+      <div class="fib-title">純遞迴 fib(n)</div>
+      <div class="fib-num" id="naiveCalls">—</div>
+      <div class="fib-sub">函數呼叫次數</div>
+      <div class="bar-track"><div class="bar-fill" id="naiveBar"></div></div>
+      <div class="fib-sub" id="naiveResult"></div>
+    </div>
+    <div class="fib-card memo">
+      <div class="fib-title">字典快取 fib(n)</div>
+      <div class="fib-num" id="memoCalls">—</div>
+      <div class="fib-sub">函數呼叫次數（其中 <span id="memoHits">—</span> 次是查表命中）</div>
+      <div class="bar-track"><div class="bar-fill" id="memoBar"></div></div>
+      <div class="fib-sub" id="memoResult"></div>
+    </div>
+  </div>
+
+  <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="fibConclusion"></span></div>
+
+  <div class="info-box green">
+    <div class="info-label">👨‍⚕️ 結論</div>
+    <p style="margin-bottom:0;"><strong>字典查詢把重複計算變成查表。</strong>純遞迴呼叫次數大約是 <code>2×F(n+1)-1</code>，隨 n 指數成長；用字典快取後，每個 n 只會真正計算一次，呼叫次數只跟 n 成正比（大約 <code>2n-1</code> 次）。這就是「用空間（字典）換時間」的經典範例。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<section id="sets">
+  <div class="section-number">PART 09 · 集合</div>
+  <h2>集合（set）：只有鍵、沒有值的字典</h2>
+  <p>如果你只想知道「這個東西在不在」，不需要對應的值，那就用<strong>集合</strong>。它跟字典共用同一套雜湊機制，所以成員檢查一樣是平均 $O(1)$。</p>
+  <p>集合的兩個性質：<strong>不重複</strong>（重複加入沒有作用）與<strong>無順序</strong>（不能用索引存取）。</p>
+
+<div class="deck-extra">
+  <div class="dx-label">集合的基本操作與四種集合運算</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line">a = {<span class="str">"</span><span class="str">FOOL</span><span class="str">"</span>, <span class="str">"</span><span class="str">POOL</span><span class="str">"</span>, <span class="str">"</span><span class="str">POLL</span><span class="str">"</span>}</span>
+<span class="line">b = {<span class="str">"</span><span class="str">POLL</span><span class="str">"</span>, <span class="str">"</span><span class="str">POLE</span><span class="str">"</span>, <span class="str">"</span><span class="str">PALE</span><span class="str">"</span>}</span>
+<span class="line"> </span>
+<span class="line">a.add(<span class="str">"</span><span class="str">POLE</span><span class="str">"</span>)</span>
+<span class="line">a.add(<span class="str">"</span><span class="str">FOOL</span><span class="str">"</span>)                    <span class="com"># 已經有了，不會重複加進去</span></span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">集合會自動去重:</span><span class="str">"</span>, <span class="fn">sorted</span>(a))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">成員檢查      :</span><span class="str">"</span>, <span class="str">"</span><span class="str">POOL</span><span class="str">"</span> in a)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">交集   a &amp; b  :</span><span class="str">"</span>, <span class="fn">sorted</span>(a &amp; b))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">聯集   a | b  :</span><span class="str">"</span>, <span class="fn">sorted</span>(a | b))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">差集   a - b  :</span><span class="str">"</span>, <span class="fn">sorted</span>(a - b))</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">對稱差 a ^ b  :</span><span class="str">"</span>, <span class="fn">sorted</span>(a ^ b))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>集合會自動去重: [&#x27;FOOL&#x27;, &#x27;POLE&#x27;, &#x27;POLL&#x27;, &#x27;POOL&#x27;]
+成員檢查      : True
+交集   a &amp; b  : [&#x27;POLL&#x27;]
+聯集   a | b  : [&#x27;FOOL&#x27;, &#x27;PALE&#x27;, &#x27;POLE&#x27;, &#x27;POLL&#x27;, &#x27;POOL&#x27;]
+差集   a - b  : [&#x27;FOOL&#x27;, &#x27;POOL&#x27;]
+對稱差 a ^ b  : [&#x27;FOOL&#x27;, &#x27;PALE&#x27;, &#x27;POLE&#x27;, &#x27;POOL&#x27;]</pre></div>
+  <p class="dx-note">建立空集合要寫 <code>set()</code> 而不是 <code>{{}}</code>——後者是空字典。四個運算子 <code>&amp;</code>、<code>|</code>、<code>-</code>、<code>^</code> 分別是交集、聯集、差集與對稱差，在處理「兩張圖的共同鄰居」「已走訪過哪些節點」時非常好用。</p>
+</div>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>操作</th><th>串列 list</th><th>集合 set</th><th>字典 dict</th></tr></thead>
+    <tbody>
+      <tr><td><code>x in c</code></td><td class="worst">$O(n)$ 逐一比對</td><td>$O(1)$ 平均</td><td>$O(1)$ 平均（查鍵）</td></tr>
+      <tr><td>允許重複</td><td>是</td><td>否</td><td>鍵不重複</td></tr>
+      <tr><td>有順序（可用索引）</td><td>是</td><td>否</td><td>保留插入順序，但不能用索引</td></tr>
+      <tr><td>元素限制</td><td>任何東西</td><td>必須可雜湊（不可變）</td><td>鍵必須可雜湊</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<div class="deck-extra">
+  <div class="dx-label">差多少？實測給你看</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">import</span> timeit</span>
+<span class="line"> </span>
+<span class="line">big_list = <span class="fn">list</span>(<span class="fn">range</span>(<span class="num">200000</span>))</span>
+<span class="line">big_set = <span class="fn">set</span>(big_list)</span>
+<span class="line"> </span>
+<span class="line">t_list = timeit.timeit(<span class="kw">lambda</span>: <span class="num">199999</span> in big_list, number=<span class="num">200</span>)</span>
+<span class="line">t_set = timeit.timeit(<span class="kw">lambda</span>: <span class="num">199999</span> in big_set, number=<span class="num">200</span>)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">list 的 in（20 萬筆，200 次）: </span><span class="str">{</span>t_list<span class="str">:</span><span class="str">.4f</span><span class="str">}</span><span class="str"> 秒</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">set  的 in（20 萬筆，200 次）: </span><span class="str">{</span>t_set<span class="str">:</span><span class="str">.6f</span><span class="str">}</span><span class="str"> 秒</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">f</span><span class="str">"</span><span class="str">倍數: 約 </span><span class="str">{</span>t_list / t_set<span class="str">:</span><span class="str">.0f</span><span class="str">}</span><span class="str"> 倍</span><span class="str">"</span>)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>list 的 in（20 萬筆，200 次）: 0.1094 秒
+set  的 in（20 萬筆，200 次）: 0.000015 秒
+倍數: 約 7518 倍</pre></div>
+  <p class="dx-note">同樣一件事，換一個容器快了四個數量級。這不是「調校」的差別，是「能不能做」的差別——而你唯一要改的只有一個字。</p>
+</div>
+
+  <div class="warn-box">
+    <div class="info-label">⚠️ 只有「不可變」的東西能放進集合</div>
+    <p style="margin-bottom:0;">字串、數字、元組可以；串列與字典不行，因為它們可以被就地修改，雜湊值會跟著變，集合就找不到它們了。想到「元組可以當鍵、串列不行」也是同一個原因。自訂類別要放進集合，得自己實作 <code>__hash__</code>——見 <a href="p9_oop_advanced.html#eqhash">P9</a>。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這一節在資料結構課哪裡會用到</div>
+  <p><b>第 07 章</b>整章都在解釋 set 與 dict 背後的雜湊表怎麼做到 $O(1)$；<b>第 08 章</b>的圖走訪用集合記錄「已經走過哪些節點」，
+  用串列做同樣的事會讓 BFS 從 $O(V+E)$ 退化成 $O(V^2)$。<b>第 02 章</b>的 anagram 問題也會拿 list 與 set 的 <code>in</code> 做對照計時。</p></div>
+</section>
+
+<section id="reference">
+  <div class="section-number">REFERENCE · 速查表</div>
+  <h2>本章速查表</h2>
+  <h3>字典常用操作</h3>
+  <table class="cmp-table">
+    <tr><th>操作</th><th>語法</th><th>提醒</th></tr>
+    <tr><td>建立空字典</td><td>{} 或 dict()</td><td>{} 也可以是空的，不會跟集合搞混（集合是 set()）</td></tr>
+    <tr><td>建立含資料的字典</td><td>{'a':1, 'b':2}</td><td>鍵不可重複，重複會被覆蓋</td></tr>
+    <tr><td>存取值</td><td>d[key]</td><td class="worst">鍵不存在會 KeyError！</td></tr>
+    <tr><td>安全存取</td><td>d.get(key, default)</td><td>鍵不存在時回傳 default，不會報錯</td></tr>
+    <tr><td>新增／更新</td><td>d[key] = value</td><td>鍵存在就覆蓋，不存在就新增</td></tr>
+    <tr><td>只在不存在時設值</td><td>d.setdefault(key, default)</td><td>鍵已存在則完全不改動</td></tr>
+    <tr><td>刪除</td><td>del d[key]</td><td>鍵不存在一樣會 KeyError</td></tr>
+    <tr><td>檢查鍵是否存在</td><td>key in d</td><td>預設檢查鍵；值要用 in d.values()</td></tr>
+    <tr><td>取得所有鍵／值／項目</td><td>d.keys() / d.values() / d.items()</td><td>回傳檢視物件，可用 list() 轉成真正的串列</td></tr>
+    <tr><td>字典生成式</td><td>{k:v for k,v in ...}</td><td>快速從可迭代物件建立字典</td></tr>
+  </table>
+
+  <h3>容器比較：串列、元組、字典</h3>
+  <table class="cmp-table">
+    <tr><th>特徵</th><th>串列 List</th><th>元組 Tuple</th><th>字典 Dictionary</th></tr>
+    <tr><td>可變（可原地修改）</td><td class="best">是</td><td class="worst">否</td><td class="best">是（鍵本身不可變）</td></tr>
+    <tr><td>可迭代（可用於 for 迴圈）</td><td class="best">是</td><td class="best">是</td><td class="best">是</td></tr>
+    <tr><td>有序（可用索引、切片存取）</td><td class="best">是</td><td class="best">是</td><td class="worst">否</td></tr>
+    <tr><td>允許重複值</td><td class="best">允許</td><td class="best">允許</td><td class="worst">鍵不允許重複</td></tr>
+  </table>
+
+  <div class="bridge-box">
+    <div class="bb-title">🎓 完課回顧</div>
+    <p>如果你是照著各章的 <code>ipynb</code> 一路做到這裡——恭喜，你已經走完高中生 Python 基礎教材的最後一章！回頭看看，每一章你都真的動手做出了一個小成品：</p>
+    <ul>
+      <li>CH02 流程控制——用巢狀迴圈畫出一棵聖誕樹</li>
+      <li>CH03 函式——猜數字遊戲 ＋ 龍與洞穴文字冒險，兩個遊戲的核心邏輯都是你自己寫的</li>
+      <li>CH04 串列與元組——挑戰經典的 1A2B 猜數字</li>
+      <li>CH05 字串——用 f-string 排出「神秘島嶼」玩家狀態表</li>
+      <li>CH05.2 字典——剛剛才指揮完一支 30 隻外星人的艦隊，用 <code>for + if</code> 讓它們升級</li>
+    </ul>
+    <p class="bb-next">INDEX ▸ 回課程目錄——你已經完成 Python 基礎全部章節！</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這一頁在資料結構課哪裡會用到</div><p><b>第 07 章</b>整章都在解釋「字典為什麼能 $O(1)$ 查到」——答案是雜湊表，而字典就是它的成品。P08 那一節的費波那契 memoization 正是 <b>第 06 章</b>動態規劃的入門；<b>第 08 章</b>的相鄰串列、字梯 bucket 也全部用字典表示。</p></div>
+
+</section>
+
+<section id="bankquiz">
+  <div class="section-number">QUIZ · 自我檢測</div>
+  <h2>自我檢測：字典與集合 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
+  <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下語句會印出什麼？</div>
+    <pre class="sq-code">d1 = {&quot;a&quot;: 1, &quot;b&quot;: 2}
+d2 = d1
+d2[&quot;a&quot;] = 99
+print&#40;d1)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！由於 d2 只是 d1 的參照，修改 d2 也會改變 d1。">{&quot;a&quot;: 99, &quot;b&quot;: 2}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。d2 不是獨立的副本；它指向與 d1 相同的字典。">{&quot;a&quot;: 1, &quot;b&quot;: 2}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。字典不能有重複的鍵；鍵 'a' 被覆蓋了。">{&quot;a&quot;: 99, &quot;b&quot;: 2, &quot;a&quot;: 1}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。程式碼執行不會出錯，因為賦值只會建立另一個指向同一字典的參照。">因為重新賦值發生錯誤</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q2.</span>以下語句會輸出什麼？</div>
+    <pre class="sq-code">d = {&quot;水果&quot;: &quot;蘋果&quot;, &quot;數量&quot;: 10, &quot;價錢&quot;: 2.5}
+print&#40;list(d.keys()))
+print&#40;list(d.values()))
+print&#40;list(d.items()))</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！將鍵、值和項目轉換為串列，會回傳預期的結果，並保持插入的順序。">[&quot;水果&quot;, &quot;數量&quot;, &quot;價錢&quot;] ⏎ [&quot;蘋果&quot;, 10, 2.5] ⏎ [(&quot;水果&quot;, &quot;蘋果&quot;), (&quot;數量&quot;, 10), (&quot;價錢&quot;, 2.5)]</button>
+      <button class="sq-opt" data-c="0" data-fb="不正確。輸出順序應該是鍵、值，最後是鍵-值對。">[&quot;水果&quot;, &quot;數量&quot;, &quot;價錢&quot;] ⏎ [(&quot;水果&quot;, &quot;蘋果&quot;), (&quot;數量&quot;, 10), (&quot;價錢&quot;, 2.5)] ⏎ [&quot;蘋果&quot;, 10, 2.5]</button>
+      <button class="sq-opt" data-c="0" data-fb="不正確。items() 方法回傳的是一個元組的串列，而不是扁平化的值串列。">[&quot;水果&quot;, &quot;數量&quot;, &quot;價錢&quot;] ⏎ [&quot;蘋果&quot;, 10, 2.5] ⏎ [&quot;水果&quot;, &quot;蘋果&quot;, &quot;數量&quot;, 10, &quot;價錢&quot;, 2.5]</button>
+      <button class="sq-opt" data-c="0" data-fb="不正確。由於使用了 list()，視圖對象會被轉換成串列，這使得輸出格式如正確答案所示。">它輸出字典的鍵、值和項目，而不將它們轉換為串列。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q3.</span>以下語句會印出什麼？</div>
+    <pre class="sq-code">d = {&quot;name&quot;: &quot;Alice&quot;, &quot;年齡&quot;: 25}
+print&#40;d.get(&quot;name&quot;))
+print&#40;d.get(&quot;性別&quot;, &quot;未提供&quot;))</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！get() 方法回傳 'name' 的值 'Alice'，對於缺少的 '性別' 鍵，回傳預設值 '未提供'。">Alice ⏎ 未提供</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。由於提供了 '性別' 鍵的預設值，get() 回傳 '未提供' 而不是 &#78;one。">Alice ⏎ &#78;one</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。'name' 鍵在字典中存在，因此回傳 'Alice'，而不是 &#78;one。">&#78;one ⏎ 未提供</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。get() 方法會安全地回傳缺少鍵的預設值，而不會引發錯誤。">發生錯誤</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q4.</span>執行以下語句後，字典 'd' 的最終狀態為何？</div>
+    <pre class="sq-code">d = {&quot;a&quot;: &quot;alpha&quot;}
+d.setdefault(&quot;a&quot;, &quot;ALPHA&quot;)
+d.setdefault(&quot;b&quot;, &quot;beta&quot;)
+d.setdefault(&quot;c&quot;, &quot;gamma&quot;)
+print&#40;d)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確！'a' 這個鍵已經存在，因此它的值保持為 &quot;alpha&quot;。'b' 和 'c' 被添加到字典中，對應的值分別是 &quot;beta&quot; 和 &quot;gamma&quot;。">{&quot;a&quot;: &quot;alpha&quot;, &quot;b&quot;: &quot;beta&quot;, &quot;c&quot;: &quot;gamma&quot;}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。setdefault() 方法不會改變已存在鍵的值；因此，'a' 的值仍然是 &quot;alpha&quot;。">{&quot;a&quot;: &quot;ALPHA&quot;, &quot;b&quot;: &quot;beta&quot;, &quot;c&quot;: &quot;gamma&quot;}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。雖然 'a' 的鍵未改變，但 'c' 鍵也被添加到字典中，並且其值為預設值。">{&quot;a&quot;: &quot;alpha&quot;, &quot;b&quot;: &quot;beta&quot;}</button>
+      <button class="sq-opt" data-c="0" data-fb="錯誤。最終字典應該包括 'c' 鍵及其預設值，而 'a' 的值保持不變。">{&quot;a&quot;: &quot;ALPHA&quot;, &quot;b&quot;: &quot;beta&quot;}</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q5.</span>執行以下程式碼後，哪一個集合會與 's' 相等？（提醒：集合是無序的。）</div>
+    <pre class="sq-code">s = {1, 2, 3, 4}
+s.add(5)
+s.update([3, 6, 7])
+s.remove(4)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="先加入 5，再用 update() 加入 6、7（3 已存在，不會重複），最後移除 4，因此集合包含 1、2、3、5、6、7。集合是無序的，所以顯示順序可能不同。">{1, 2, 3, 5, 6, 7}</button>
+      <button class="sq-opt" data-c="0" data-fb="update() 雖然加入了 6 和 7，但 remove(4) 會把 4 從集合中移除。">{1, 2, 3, 4, 5, 6, 7}</button>
+      <button class="sq-opt" data-c="0" data-fb="這個答案漏掉了 update() 加入的 6 和 7，而且 4 已被 remove() 移除。">{1, 2, 3, 4, 5}</button>
+      <button class="sq-opt" data-c="0" data-fb="這些集合操作都有效，而且 4 確實存在於集合中，因此 remove(4) 不會引發錯誤。">程式會引發 KeyError。</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q6.</span>有一份 20 萬筆的資料，要在迴圈裡反覆檢查「某個值在不在裡面」。下列哪個做法最好？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。集合與字典背後是雜湊表，成員檢查平均 O(1)；串列的 in 是逐一比對的 O(n)。實測在 20 萬筆資料上差了約七千倍——只改一個字，效能差四個數量級。第 07 章會解釋雜湊表為什麼做得到。">先把資料轉成 set，再用 in 檢查</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。串列的 in 要從頭掃到尾，放進迴圈就變成 O(n²)。這是最典型的「跑得出來但跑不動」。">維持串列，用 in 檢查就好</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。排序不會讓 in 變快，它仍然是線性掃描。排序後可以自己寫二分搜尋（O(log n)），但既然有集合就沒必要。">先把串列排序，再用 in 檢查</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。讀檔比讀記憶體慢好幾個數量級，這會讓情況更糟。">把資料寫進檔案，每次去檔案裡找</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+</section>
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="p4_lists_tuples.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">串列與元組</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="p6_strings.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">字串操作</div></a></div>
+</div><!-- /container -->
+
+<footer>
+  先備知識 P5 · 字典與集合 · 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============================================================
+   共用引擎：StepRunner / Quiz / Flashcards
+   ============================================================ */
+
+/** 逐步執行引擎：steps = [{line, vars, out, note, custom}] */
+function StepRunner(prefix, steps, opts) {
+  opts = opts || {};
+  const codeEl  = document.getElementById(prefix + 'Code');
+  const statusEl= document.getElementById(prefix + 'Status');
+  const varsEl  = document.getElementById(prefix + 'Vars');
+  const outEl   = document.getElementById(prefix + 'Out');
+  const playBtn = document.getElementById(prefix + 'Play');
+  const stepBtn = document.getElementById(prefix + 'Step');
+  const resetBtn= document.getElementById(prefix + 'Reset');
+  let idx = -1, timer = null;
+
+  function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
+
+  function render() {
+    lines().forEach((l,i)=>{
+      l.classList.toggle('active', idx>=0 && steps[idx].line===i);
+    });
+    if (idx < 0) {
+      if (statusEl) statusEl.textContent = '按「單步 ▸」開始';
+      if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
+      if (outEl) outEl.innerHTML = '';
+      if (opts.onReset) opts.onReset();
+      return;
+    }
+    const s = steps[idx];
+    if (statusEl) statusEl.textContent = s.note || '';
+    if (varsEl) {
+      if (s.vars && s.vars.length) {
+        varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
+          `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
+        ).join('') + '</table>';
+      } else {
+        varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+      }
+    }
+    if (outEl) {
+      outEl.innerHTML = (s.out||[]).map((o,i)=>{
+        const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
+        return `<div class="${cls}">${o}</div>`;
+      }).join('');
+      outEl.scrollTop = outEl.scrollHeight;
+    }
+    if (opts.onStep) opts.onStep(s, idx);
+  }
+
+  function step() {
+    if (idx < steps.length - 1) { idx++; render(); }
+    if (idx >= steps.length - 1) stopPlay();
+  }
+  function stopPlay(){
+    if (timer) { clearInterval(timer); timer = null; }
+    if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
+  }
+  function play(){
+    if (timer) { stopPlay(); return; }
+    if (idx >= steps.length - 1) { idx = -1; render(); }
+    playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
+    timer = setInterval(()=>{
+      if (idx >= steps.length - 1) stopPlay(); else step();
+    }, opts.interval || 1600);
+  }
+  function reset(){ stopPlay(); idx = -1; render(); }
+
+  if (playBtn) playBtn.addEventListener('click', play);
+  if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (resetBtn) resetBtn.addEventListener('click', reset);
+  render();
+  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+}
+
+/** Quiz 引擎：data = [{question, code, multi, supplementary, answers:[{answer, correct, feedback}]}] */
+
+/** Flashcards：data = [{front, back}] */
+
+/* ============================================================
+   P01 建立 / 存取 / 修改 / 刪除 runner
+   ============================================================ */
+function renderKV(canvasEl, state) {
+  if (!state || !state.pairs || !state.pairs.length) {
+    canvasEl.innerHTML = '<span class="var-empty">（空字典）</span>';
+    return;
+  }
+  canvasEl.innerHTML = state.pairs.map(p =>
+    `<div class="kv-pair${p.hl?' hl':''}${p.removed?' removed':''}">
+       <span class="kv-key">'${p.key}'</span><span class="kv-val">${p.val}</span>
+     </div>`).join('');
+}
+const createCanvas = document.getElementById('createCanvas');
+StepRunner('create', [
+  { line:0, out:[], note:'建立一個空字典',
+    canvas:{ pairs: [] } },
+  { line:1, out:[], note:"新增鍵 '機率統計' → 85",
+    canvas:{ pairs: [ {key:'機率統計', val:85, hl:true} ] } },
+  { line:2, out:[], note:"新增鍵 '函數論' → 80",
+    canvas:{ pairs: [ {key:'機率統計', val:85}, {key:'函數論', val:80, hl:true} ] } },
+  { line:3, out:['85'], newOut:true, note:"查詢 grade['機率統計'] 的值",
+    canvas:{ pairs: [ {key:'機率統計', val:85, hl:true}, {key:'函數論', val:80} ] } },
+  { line:4, out:['85'], note:"鍵已存在 → 直接覆蓋：85 變成 90",
+    canvas:{ pairs: [ {key:'機率統計', val:90, hl:true}, {key:'函數論', val:80} ] } },
+  { line:5, out:['85'], note:"用 del 刪除鍵 '函數論'",
+    canvas:{ pairs: [ {key:'機率統計', val:90}, {key:'函數論', val:80, removed:true} ] } },
+  { line:6, out:['85', "{'機率統計': 90}"], newOut:true, note:'✔ 印出整個字典，函數論已經消失',
+    canvas:{ pairs: [ {key:'機率統計', val:90} ] } },
+], {
+  onStep: s => renderKV(createCanvas, s.canvas),
+  onReset: () => renderKV(createCanvas, null),
+});
+
+/* ============================================================
+   P02 keys/values/items 遍歷 runner
+   ============================================================ */
+const iterateCanvas = document.getElementById('iterateCanvas');
+const GRADE_PAIRS = [
+  {key:'機率統計', val:85}, {key:'函數論', val:80}, {key:'程式語言', val:90}, {key:'方程式論', val:95}
+];
+function gradeState(hlIndex) {
+  return { pairs: GRADE_PAIRS.map((p,i)=>({key:p.key, val:p.val, hl:i===hlIndex})) };
+}
+StepRunner('iterate', [
+  { line:0, out:[], note:'建立含 4 筆資料的字典 grade', canvas: gradeState(-1) },
+  { line:1, out:[], note:'迴圈開始：取出第 1 組 (機率統計, 85)', canvas: gradeState(0) },
+  { line:2, out:['機率統計 85'], newOut:true, note:'print(key, val) → 機率統計 85', canvas: gradeState(0) },
+  { line:1, out:['機率統計 85'], note:'取出第 2 組 (函數論, 80)', canvas: gradeState(1) },
+  { line:2, out:['機率統計 85','函數論 80'], newOut:true, note:'print(key, val) → 函數論 80', canvas: gradeState(1) },
+  { line:1, out:['機率統計 85','函數論 80'], note:'取出第 3 組 (程式語言, 90)', canvas: gradeState(2) },
+  { line:2, out:['機率統計 85','函數論 80','程式語言 90'], newOut:true, note:'print(key, val) → 程式語言 90', canvas: gradeState(2) },
+  { line:1, out:['機率統計 85','函數論 80','程式語言 90'], note:'取出第 4 組 (方程式論, 95)', canvas: gradeState(3) },
+  { line:2, out:['機率統計 85','函數論 80','程式語言 90','方程式論 95'], newOut:true, note:'print(key, val) → 方程式論 95', canvas: gradeState(3) },
+  { line:1, out:['機率統計 85','函數論 80','程式語言 90','方程式論 95'], note:'沒有更多項目 → 迴圈結束', canvas: gradeState(-1) },
+], {
+  onStep: s => renderKV(iterateCanvas, s.canvas),
+  onReset: () => renderKV(iterateCanvas, null),
+});
+
+/* ============================================================
+   P04 picnic get() vs [] 沙盒
+   ============================================================ */
+(function initPicnicSandbox(){
+  const picnic = {'蘋果':5, '杯子':2};
+  const input = document.getElementById('picnicInput');
+  const bracketEl = document.getElementById('bracketResult');
+  const getEl = document.getElementById('getResult');
+  function check(){
+    const key = input.value;
+    if (!key) {
+      bracketEl.innerHTML = '<span class="bad">請輸入鍵</span>';
+      getEl.innerHTML = '<span class="bad">請輸入鍵</span>';
+      return;
+    }
+    const exists = Object.prototype.hasOwnProperty.call(picnic, key);
+    if (exists) {
+      bracketEl.innerHTML = `<span class="ok">✔</span> picnic['${key}'] → <span class="type-badge">${picnic[key]}</span>`;
+    } else {
+      bracketEl.innerHTML = `<div class="traceback">Traceback (most recent call last):
+  File "picnic.py", line 1, in &lt;module&gt;
+    picnic['${key}']
+<span class="tb-err">KeyError: '${key}'</span></div>`;
+    }
+    const val = exists ? picnic[key] : 0;
+    getEl.innerHTML = `<span class="ok">✔</span> picnic.get('${key}', 0) → <span class="type-badge">${val}</span>`;
+  }
+  input.addEventListener('input', check);
+  document.querySelectorAll('#get .preset-btn[data-key]').forEach(b=>{
+    b.addEventListener('click', ()=>{ input.value = b.dataset.key; check(); });
+  });
+  check();
+})();
+
+/* ============================================================
+   P07 通訊錄（字典構成的串列）runner
+   ============================================================ */
+const nestedCanvas = document.getElementById('nestedCanvas');
+function renderContacts(canvasEl, state) {
+  if (!state || !state.contacts || !state.contacts.length) {
+    canvasEl.innerHTML = '<span class="var-empty">（尚無聯絡人）</span>';
+    return;
+  }
+  canvasEl.innerHTML = state.contacts.map(c =>
+    `<div class="contact-card${c.hl?' hl':''}">
+       <div class="cc-name">${c.name}</div>
+       <div class="cc-phone">${c.phone}</div>
+     </div>`).join('');
+}
+const CONTACTS_BASE = [
+  {name:'小明', phone:'0912-345-678'},
+  {name:'小華', phone:'0922-111-222'},
+  {name:'小美', phone:'0933-222-333'},
+];
+function contactsUpTo(n, hlIndex, huaPhone) {
+  return { contacts: CONTACTS_BASE.slice(0, n).map((c,i) => ({
+    name: c.name,
+    phone: (c.name === '小華' && huaPhone) ? huaPhone : c.phone,
+    hl: i === hlIndex,
+  })) };
+}
+StepRunner('nested', [
+  { line:0, out:[], note:'建立空串列 contacts', canvas:{ contacts: [] } },
+  { line:1, out:[], note:'新增第 1 位聯絡人：小明', canvas: contactsUpTo(1, 0) },
+  { line:2, out:[], note:'新增第 2 位聯絡人：小華', canvas: contactsUpTo(2, 1) },
+  { line:3, out:[], note:'新增第 3 位聯絡人：小美', canvas: contactsUpTo(3, 2) },
+  { line:5, out:[], note:'第 1 位 小明：姓名 ≠ 小華 → 不執行更新', canvas: contactsUpTo(3, 0) },
+  { line:5, out:[], note:'第 2 位 小華：姓名 == 小華 → 條件成立！', canvas: contactsUpTo(3, 1) },
+  { line:6, out:[], note:"更新小華的電話為 '0999-888-777'", canvas: contactsUpTo(3, 1, '0999-888-777') },
+  { line:5, out:[], note:'第 3 位 小美：姓名 ≠ 小華 → 不執行更新', canvas: contactsUpTo(3, 2, '0999-888-777') },
+  { line:7, out:[], note:'開始第二個迴圈：印出所有聯絡人最新資料', canvas: contactsUpTo(3, -1, '0999-888-777') },
+  { line:8, out:['小明 0912-345-678'], newOut:true, note:'print(小明的姓名, 電話)', canvas: contactsUpTo(3, 0, '0999-888-777') },
+  { line:8, out:['小明 0912-345-678','小華 0999-888-777'], newOut:true, note:'print(小華的姓名, 電話) → 電話已更新！', canvas: contactsUpTo(3, 1, '0999-888-777') },
+  { line:8, out:['小明 0912-345-678','小華 0999-888-777','小美 0933-222-333'], newOut:true, note:'print(小美的姓名, 電話)', canvas: contactsUpTo(3, 2, '0999-888-777') },
+], {
+  onStep: s => renderContacts(nestedCanvas, s.canvas),
+  onReset: () => renderContacts(nestedCanvas, null),
+});
+
+/* ============================================================
+   P07-GAME 外星人隊伍（字典構成的串列，取自課本 cell 88 / 91）
+   ============================================================ */
+(function initAlienGame(){
+  const fleetEl   = document.getElementById('alienFleet');
+  const statusEl  = document.getElementById('alienStatus');
+  const spawnBtn  = document.getElementById('alienSpawnBtn');
+  const upgradeBtn= document.getElementById('alienUpgradeBtn');
+  const resetBtn  = document.getElementById('alienResetBtn');
+  let aliens = [];
+
+  function setStatus(text){
+    statusEl.innerHTML = '<span class="status-icon">▸</span><span class="status-text">' + text + '</span>';
+  }
+
+  function renderFleet(){
+    if (!aliens.length) {
+      fleetEl.innerHTML = '<span class="var-empty" style="color:rgba(255,255,255,.78);">按「生成艦隊」開始</span>';
+      return;
+    }
+    fleetEl.innerHTML = aliens.map(a => {
+      const upgraded = a['顏色'] === '黃色';
+      return `<div class="alien-card${upgraded ? ' upgraded' : ''}">
+        <span class="ac-emoji">👾</span>
+        <span class="ac-score">${a['分數']} 分</span>
+      </div>`;
+    }).join('');
+  }
+
+  // 對應 cell 88：aliens = []；for alien_number in range(30): new_alien = {...}
+  function spawnFleet(){
+    aliens = [];
+    for (let alien_number = 0; alien_number < 30; alien_number++) {
+      const new_alien = { '顏色': '綠色', '分數': 5, '速度': '慢速' };
+      aliens.push(new_alien);
+    }
+    renderFleet();
+    setStatus(`已生成 ${aliens.length} 隻外星人，每隻都是 {'顏色': '綠色', '分數': 5, '速度': '慢速'}`);
+    upgradeBtn.disabled = false;
+  }
+
+  // 對應 cell 91：for alien in aliens[:3]: if alien['顏色'] == '綠色': ...
+  function upgradeFirstThree(){
+    if (!aliens.length) return;
+    aliens.slice(0, 3).forEach(alien => {
+      if (alien['顏色'] === '綠色') {
+        alien['顏色'] = '黃色';
+        alien['速度'] = '中速';
+        alien['分數'] = 10;
+      }
+    });
+    renderFleet();
+    setStatus('前 3 隻外星人已升級：黃色／中速／10 分！其餘 27 隻維持綠色／慢速／5 分不變。');
+    upgradeBtn.disabled = true;
+  }
+
+  function resetFleet(){
+    aliens = [];
+    renderFleet();
+    setStatus('按「生成艦隊」開始');
+    upgradeBtn.disabled = true;
+  }
+
+  spawnBtn.addEventListener('click', spawnFleet);
+  upgradeBtn.addEventListener('click', upgradeFirstThree);
+  resetBtn.addEventListener('click', resetFleet);
+  renderFleet();
+})();
+
+/* ============================================================
+   P08 費波那契：純遞迴 vs 字典快取 對比
+   ============================================================ */
+(function initFibDemo(){
+  const slider = document.getElementById('fibN');
+  const valEl = document.getElementById('fibNVal');
+  const naiveCallsEl = document.getElementById('naiveCalls');
+  const naiveBarEl = document.getElementById('naiveBar');
+  const naiveResultEl = document.getElementById('naiveResult');
+  const memoCallsEl = document.getElementById('memoCalls');
+  const memoHitsEl = document.getElementById('memoHits');
+  const memoBarEl = document.getElementById('memoBar');
+  const memoResultEl = document.getElementById('memoResult');
+  const conclusionEl = document.getElementById('fibConclusion');
+  const MAXCALLS = 22000; // n=20 時純遞迴約 21891 次呼叫，作為長條圖參考上限
+
+  function naiveFib(n){
+    let calls = 0;
+    function fib(k){ calls++; return k<=1 ? k : fib(k-1)+fib(k-2); }
+    const result = fib(n);
+    return { calls, result };
+  }
+  function memoFib(n){
+    let calls = 0, hits = 0;
+    const memo = {};
+    function fib(k){
+      calls++;
+      if (k in memo) { hits++; return memo[k]; }
+      memo[k] = k<=1 ? k : fib(k-1)+fib(k-2);
+      return memo[k];
+    }
+    const result = fib(n);
+    return { calls, hits, result };
+  }
+
+  function update(){
+    const n = +slider.value;
+    valEl.textContent = n;
+    const naive = naiveFib(n);
+    const memo = memoFib(n);
+
+    naiveCallsEl.textContent = naive.calls.toLocaleString();
+    naiveBarEl.style.width = Math.min(100, naive.calls / MAXCALLS * 100) + '%';
+    naiveResultEl.textContent = `fib(${n}) = ${naive.result}`;
+
+    memoCallsEl.textContent = memo.calls.toLocaleString();
+    memoHitsEl.textContent = memo.hits;
+    memoBarEl.style.width = Math.min(100, memo.calls / MAXCALLS * 100) + '%';
+    memoResultEl.textContent = `fib(${n}) = ${memo.result}`;
+
+    const ratio = memo.calls > 0 ? Math.round(naive.calls / memo.calls) : 0;
+    conclusionEl.textContent = `n = ${n}：純遞迴呼叫了 ${naive.calls.toLocaleString()} 次，字典快取版只呼叫 ${memo.calls} 次（快了約 ${ratio} 倍）－ n 越大，差距越懸殊！`;
+  }
+  slider.addEventListener('input', update);
+  update();
+})();
+
+/* ============================================================
+   QUIZ 資料（改編自課程題庫 questions-TW/ch52；字典 4 題＋集合補充題 1 題）
+   ============================================================ */
+
+/* ============================================================
+   FLASHCARDS 資料（逐字取自課程字卡 flashcards-TW/ch52.json）
+   ============================================================ */
+
+/* ============================================================
+   Floating nav active highlight
+   ============================================================ */
+(function initFloatNav(){
+  const links = document.querySelectorAll('.float-nav a[data-target]');
+  const sections = [...links].map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update(){
+    let active = sections[0] && sections[0].id;
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.35) active = s.id;
+    }
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  update();
+})();
+</script>
+<script>
+const FLASHCARDS = [{"front": "鍵值對（Key-Value Pair）", "back": "由一個鍵及其關聯的值組成的對，通常用於字典中。"}, {"front": "鍵（Key）", "back": "一個不可變的識別符，用來在字典中存取對應的值。"}, {"front": "值（Value）", "back": "與字典中一個鍵關聯的資料。"}, {"front": "字典（Dictionary）", "back": "一個包含鍵值對的集合，其中每個鍵都是唯一的。"}, {"front": "字典生成式（Dictionary Comprehension）", "back": "一種使用單一敘述式從可迭代對象建立字典的簡潔方式。"}, {"front": "集合（Set）", "back": "不重複、無順序的容器，只存元素本身而沒有對應的值。與字典共用同一套雜湊機制，因此成員檢查平均是 O(1)。建立空集合要寫 set()，因為 {} 是空字典。"}, {"front": "可雜湊（Hashable）", "back": "能算出穩定雜湊值、因此可以當字典的鍵或放進集合的性質。字串、數字、元組可以；串列與字典不行，因為它們可以被就地修改，雜湊值會跟著變。"}, {"front": "雜湊表（Hash Table）", "back": "字典與集合背後的實作：用雜湊函數把鍵直接算成儲存位置，因此查詢不必逐一比對。這是第 07 章的主題，也是「字典為什麼是 O(1)」的答案。"}, {"front": "集合運算（Set Operations）", "back": "交集 &、聯集 |、差集 -、對稱差 ^。處理「兩個節點的共同鄰居」「還沒走訪過的節點」這類問題時比迴圈簡潔得多。"}, {"front": "安全取值（dict.get）", "back": "查不到鍵時回傳預設值而不是拋出 KeyError 的方法。寫成 d.get(key, default)，在統計次數與建圖時可以省下大量的存在性檢查。"}, {"front": "預設插入（dict.setdefault）", "back": "鍵不存在時先插入預設值再回傳它的方法。建相鄰串列時常寫成 d.setdefault(node, []).append(neighbor)。"}, {"front": "記憶化（Memoization）", "back": "用字典把已經算過的結果存起來，同樣的輸入再出現時直接查表。這是動態規劃的入門形式：讓費波那契從 O(2ⁿ) 降到 O(n)。"}, {"front": "成員檢查（Membership Test）", "back": "用 in 判斷元素在不在容器裡。串列是 O(n) 逐一比對，集合與字典是平均 O(1)。這一個字的差別在大資料上可以是幾千倍的效能差距。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+
+(function(){
+  document.querySelectorAll('.sq-item').forEach(item => {
+    const fb = item.querySelector('.sq-fb');
+    item.querySelectorAll('.sq-opt').forEach(btn => btn.addEventListener('click', () => {
+      const good = btn.dataset.c === '1';
+      item.querySelectorAll('.sq-opt').forEach(b => b.classList.remove('correct','wrong'));
+      btn.classList.add(good ? 'correct' : 'wrong');
+      fb.textContent = btn.dataset.fb;
+      fb.classList.add('show');
+      fb.classList.toggle('good', good);
+      fb.classList.toggle('bad', !good);
+    }));
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+[
+ {
+  "question": "以下程式印出什麼？",
+  "code": "class BinaryTree:\n    def __init__(self, key):\n        self.key = key\n        self.left = None\n\nclass AVLTree(BinaryTree):\n    def __init__(self, key):\n        self.balance = 0\n\nt = AVLTree(5)\nprint(t.balance)\nprint(t.key)",
+  "answers": [
+   {"answer": "先印 0，然後 AttributeError：找不到 key", "correct": true, "feedback": "正確。子類別寫了自己的 __init__ 卻沒有呼叫 super().__init__(key)，父類別設定的 key 與 left 根本沒被建立。這是繼承最常見的錯誤，而且錯誤爆出來的位置離真正的原因很遠。正確寫法是在子類別 __init__ 的第一行呼叫 super().__init__(key)。"},
+   {"answer": "0 然後 5", "correct": false, "feedback": "不對。父類別的 __init__ 被子類別的版本完全取代了，除非你自己呼叫 super()，否則它不會執行。"},
+   {"answer": "0 然後 None", "correct": false, "feedback": "不對。key 這個屬性根本不存在，不是值為 None——存取不存在的屬性會拋 AttributeError。"},
+   {"answer": "建立 AVLTree(5) 時就會出錯", "correct": false, "feedback": "不對。子類別的 __init__ 只吃一個參數，AVLTree(5) 完全合法，錯誤要等到存取 t.key 才發生。"}
+  ]
+ },
+ {
+  "question": "以下程式會發生什麼事？",
+  "code": "import heapq\n\nclass Job:\n    def __init__(self, name, priority):\n        self.name = name\n        self.priority = priority\n\njobs = [Job('備份', 5), Job('修 bug', 1)]\nheapq.heapify(jobs)",
+  "answers": [
+   {"answer": "TypeError：Job 之間不支援 < 運算", "correct": true, "feedback": "正確。heapq、sorted、min、max 以及本課六種排序法，全部只做一件事：兩兩比大小，也就是呼叫 __lt__。沒定義它，第一次比較就爆炸。解法是在 Job 裡加上 __lt__（例如比 priority）。"},
+   {"answer": "正常執行，按照 priority 由小到大排好", "correct": false, "feedback": "不對。Python 不會猜你想用哪個欄位比較，必須由你定義 __lt__ 或在呼叫時給 key。"},
+   {"answer": "正常執行，按照建立順序排列", "correct": false, "feedback": "不對。heapify 一定要比較元素，比不了就直接拋例外。"},
+   {"answer": "要先定義 __str__ 才能排序", "correct": false, "feedback": "不對。__str__ 只影響印出來的樣子，跟排序完全無關。"}
+  ]
+ },
+ {
+  "question": "以下程式印出什麼？",
+  "code": "class Point:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n\n    def __eq__(self, other):\n        return (self.x, self.y) == (other.x, other.y)\n\nprint(Point(1, 2) == Point(1, 2))\nprint(len({Point(1, 2), Point(3, 4)}))",
+  "answers": [
+   {"answer": "先印 True，然後 TypeError：unhashable type", "correct": true, "feedback": "正確。一旦你定義了 __eq__，Python 會把 __hash__ 設成 None，因為它無法保證你的相等定義與預設雜湊一致。要放進 set 或當 dict 的 key，就得自己補一個與 __eq__ 說法一致的 __hash__。這正是第 07 章雜湊表的前提。"},
+   {"answer": "True 然後 2", "correct": false, "feedback": "不對。放進 set 需要雜湊值，而這個類別已經失去 __hash__ 了。"},
+   {"answer": "False 然後 2", "correct": false, "feedback": "不對。__eq__ 有定義，兩個內容相同的 Point 會被判定為相等。"},
+   {"answer": "True 然後 1", "correct": false, "feedback": "不對。這兩個 Point 內容不同，就算能放進 set 也會是 2 個；但實際上會先拋 TypeError。"}
+  ]
+ },
+ {
+  "question": "以下程式印出什麼？",
+  "code": "class Bag:\n    def __init__(self, items):\n        self._items = list(items)\n\n    def __len__(self):\n        return len(self._items)\n\n    def __contains__(self, x):\n        return x in self._items\n\nb = Bag(['紅', '綠', '藍'])\nprint(len(b), '綠' in b)",
+  "answers": [
+   {"answer": "3 True", "correct": true, "feedback": "正確。len(b) 會去呼叫 b.__len__()，'綠' in b 會去呼叫 b.__contains__('綠')。Python 的內建語法幾乎都是 dunder 方法的門面——這就是自訂結構能用得跟內建型別一樣自然的原因。"},
+   {"answer": "TypeError：Bag 沒有長度", "correct": false, "feedback": "不對。只要實作了 __len__，len() 就能用。會噴這個錯的是沒實作 __len__ 的類別。"},
+   {"answer": "3 False", "correct": false, "feedback": "不對。__contains__ 直接把工作轉給內部的 list，'綠' 確實在裡面。"},
+   {"answer": "需要先繼承 list 才能這樣用", "correct": false, "feedback": "不對。這正是鴨子型別的重點：能力來自你實作了哪些協定，不是來自你繼承了誰。"}
+  ]
+ },
+ {
+  "question": "要實作一個「只能從兩端進出」的 Deque，下列哪個設計比較好？",
+  "answers": [
+   {"answer": "內部持有一個 list（組合），只對外提供四個端點操作", "correct": true, "feedback": "正確。組合（has-a）讓你完全控制對外介面：使用者只看得到 add_front／add_rear／remove_front／remove_rear。內部哪天想換成鏈結串列，呼叫端一行都不用改。pythonds3 的 Stack、Queue、Deque 全部採用這種做法。"},
+   {"answer": "class Deque(list) 直接繼承 list", "correct": false, "feedback": "不對。繼承會把父類別所有方法一起露出去：使用者可以對你的 Deque 呼叫 sort()、reverse()、insert(3, x)，全部違反雙端佇列的契約，而你擋不住。判斷法則是：父類別的每個方法用在子類別上都說得通嗎？只要有一個說不通就別繼承。"},
+   {"answer": "兩者完全等價，選喜歡的就好", "correct": false, "feedback": "不對。差別不在能不能動，在你對介面還有沒有控制權。"},
+   {"answer": "繼承比較好，因為可以少寫程式碼", "correct": false, "feedback": "不對。少寫的那幾行，代價是喪失對介面的控制。這門課的資料結構絕大多數該用組合。"}
+  ]
+ },
+ {
+  "question": "以下程式印出什麼？",
+  "code": "from dataclasses import dataclass\n\n@dataclass(order=True)\nclass Item:\n    priority: int\n    name: str\n\nitems = [Item(5, '備份'), Item(1, '修 bug')]\nprint(Item(1, 'x') == Item(1, 'x'))\nprint(sorted(items)[0].name)",
+  "answers": [
+   {"answer": "True 然後「修 bug」", "correct": true, "feedback": "正確。@dataclass 自動生成 __init__、__repr__、__eq__；order=True 再送你 __lt__ 等比較方法，比較時按照欄位宣告順序（先 priority 再 name）。所以 priority=1 的排在最前面。"},
+   {"answer": "False 然後「修 bug」", "correct": false, "feedback": "不對。dataclass 產生的 __eq__ 是逐欄位比較，兩個 Item(1, 'x') 相等。"},
+   {"answer": "True 然後「備份」", "correct": false, "feedback": "不對。order=True 的比較從第一個欄位 priority 開始，1 小於 5。"},
+   {"answer": "TypeError：Item 之間不支援 < 運算", "correct": false, "feedback": "不對。order=True 就是專門用來補上比較運算子的；如果寫成 @dataclass 沒有 order=True，才會是這個結果。"}
+  ]
+ },
+ {
+  "question": "有一個函數 walk(container)，內容是對 container 呼叫 add() 再 print 出來。下列哪個說法正確？",
+  "answers": [
+   {"answer": "任何有 add() 與 __str__ 的物件都能傳進去，不需要有共同父類別", "correct": true, "feedback": "正確。這就是鴨子型別：Python 不檢查型別，只在真正呼叫時看方法在不在。所以多型在 Python 甚至不需要繼承——兩個毫無關係的類別，只要介面對得上就能互換。第 07 章六種排序法能互換也是同一個道理。"},
+   {"answer": "只有繼承自同一個父類別的物件才能傳進去", "correct": false, "feedback": "不對。那是靜態型別語言的規則。Python 靠的是介面相符，不是繼承關係。"},
+   {"answer": "必須先用 isinstance() 檢查型別才安全", "correct": false, "feedback": "不對。Python 慣例上偏好直接呼叫、出錯再處理，過度使用 isinstance() 反而會破壞多型的彈性。"},
+   {"answer": "container 必須是內建型別", "correct": false, "feedback": "不對。自訂類別只要實作了需要的方法就完全可以。"}
+  ]
+ }
+]

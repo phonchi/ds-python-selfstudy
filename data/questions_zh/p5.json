@@ -1,0 +1,157 @@
+[
+ {
+  "question": "以下語句會印出什麼？",
+  "code": "d1 = {\"a\": 1, \"b\": 2}\nd2 = d1\nd2[\"a\"] = 99\nprint(d1)",
+  "answers": [
+   {
+    "answer": "{\"a\": 99, \"b\": 2}",
+    "correct": true,
+    "feedback": "正確！由於 d2 只是 d1 的參照，修改 d2 也會改變 d1。"
+   },
+   {
+    "answer": "{\"a\": 1, \"b\": 2}",
+    "correct": false,
+    "feedback": "錯誤。d2 不是獨立的副本；它指向與 d1 相同的字典。"
+   },
+   {
+    "answer": "{\"a\": 99, \"b\": 2, \"a\": 1}",
+    "correct": false,
+    "feedback": "錯誤。字典不能有重複的鍵；鍵 'a' 被覆蓋了。"
+   },
+   {
+    "answer": "因為重新賦值發生錯誤",
+    "correct": false,
+    "feedback": "錯誤。程式碼執行不會出錯，因為賦值只會建立另一個指向同一字典的參照。"
+   }
+  ]
+ },
+ {
+  "question": "以下語句會輸出什麼？",
+  "code": "d = {\"水果\": \"蘋果\", \"數量\": 10, \"價錢\": 2.5}\nprint(list(d.keys()))\nprint(list(d.values()))\nprint(list(d.items()))",
+  "answers": [
+   {
+    "answer": "[\"水果\", \"數量\", \"價錢\"] ⏎ [\"蘋果\", 10, 2.5] ⏎ [(\"水果\", \"蘋果\"), (\"數量\", 10), (\"價錢\", 2.5)]",
+    "correct": true,
+    "feedback": "正確！將鍵、值和項目轉換為串列，會回傳預期的結果，並保持插入的順序。"
+   },
+   {
+    "answer": "[\"水果\", \"數量\", \"價錢\"] ⏎ [(\"水果\", \"蘋果\"), (\"數量\", 10), (\"價錢\", 2.5)] ⏎ [\"蘋果\", 10, 2.5]",
+    "correct": false,
+    "feedback": "不正確。輸出順序應該是鍵、值，最後是鍵-值對。"
+   },
+   {
+    "answer": "[\"水果\", \"數量\", \"價錢\"] ⏎ [\"蘋果\", 10, 2.5] ⏎ [\"水果\", \"蘋果\", \"數量\", 10, \"價錢\", 2.5]",
+    "correct": false,
+    "feedback": "不正確。items() 方法回傳的是一個元組的串列，而不是扁平化的值串列。"
+   },
+   {
+    "answer": "它輸出字典的鍵、值和項目，而不將它們轉換為串列。",
+    "correct": false,
+    "feedback": "不正確。由於使用了 list()，視圖對象會被轉換成串列，這使得輸出格式如正確答案所示。"
+   }
+  ]
+ },
+ {
+  "question": "以下語句會印出什麼？",
+  "code": "d = {\"name\": \"Alice\", \"年齡\": 25}\nprint(d.get(\"name\"))\nprint(d.get(\"性別\", \"未提供\"))",
+  "answers": [
+   {
+    "answer": "Alice ⏎ 未提供",
+    "correct": true,
+    "feedback": "正確！get() 方法回傳 'name' 的值 'Alice'，對於缺少的 '性別' 鍵，回傳預設值 '未提供'。"
+   },
+   {
+    "answer": "Alice ⏎ None",
+    "correct": false,
+    "feedback": "錯誤。由於提供了 '性別' 鍵的預設值，get() 回傳 '未提供' 而不是 None。"
+   },
+   {
+    "answer": "None ⏎ 未提供",
+    "correct": false,
+    "feedback": "錯誤。'name' 鍵在字典中存在，因此回傳 'Alice'，而不是 None。"
+   },
+   {
+    "answer": "發生錯誤",
+    "correct": false,
+    "feedback": "錯誤。get() 方法會安全地回傳缺少鍵的預設值，而不會引發錯誤。"
+   }
+  ]
+ },
+ {
+  "question": "執行以下語句後，字典 'd' 的最終狀態為何？",
+  "code": "d = {\"a\": \"alpha\"}\nd.setdefault(\"a\", \"ALPHA\")\nd.setdefault(\"b\", \"beta\")\nd.setdefault(\"c\", \"gamma\")\nprint(d)",
+  "answers": [
+   {
+    "answer": "{\"a\": \"alpha\", \"b\": \"beta\", \"c\": \"gamma\"}",
+    "correct": true,
+    "feedback": "正確！'a' 這個鍵已經存在，因此它的值保持為 \"alpha\"。'b' 和 'c' 被添加到字典中，對應的值分別是 \"beta\" 和 \"gamma\"。"
+   },
+   {
+    "answer": "{\"a\": \"ALPHA\", \"b\": \"beta\", \"c\": \"gamma\"}",
+    "correct": false,
+    "feedback": "錯誤。setdefault() 方法不會改變已存在鍵的值；因此，'a' 的值仍然是 \"alpha\"。"
+   },
+   {
+    "answer": "{\"a\": \"alpha\", \"b\": \"beta\"}",
+    "correct": false,
+    "feedback": "錯誤。雖然 'a' 的鍵未改變，但 'c' 鍵也被添加到字典中，並且其值為預設值。"
+   },
+   {
+    "answer": "{\"a\": \"ALPHA\", \"b\": \"beta\"}",
+    "correct": false,
+    "feedback": "錯誤。最終字典應該包括 'c' 鍵及其預設值，而 'a' 的值保持不變。"
+   }
+  ]
+ },
+ {
+  "question": "執行以下程式碼後，哪一個集合會與 's' 相等？（提醒：集合是無序的。）",
+  "code": "s = {1, 2, 3, 4}\ns.add(5)\ns.update([3, 6, 7])\ns.remove(4)",
+  "answers": [
+   {
+    "answer": "{1, 2, 3, 5, 6, 7}",
+    "correct": true,
+    "feedback": "先加入 5，再用 update() 加入 6、7（3 已存在，不會重複），最後移除 4，因此集合包含 1、2、3、5、6、7。集合是無序的，所以顯示順序可能不同。"
+   },
+   {
+    "answer": "{1, 2, 3, 4, 5, 6, 7}",
+    "correct": false,
+    "feedback": "update() 雖然加入了 6 和 7，但 remove(4) 會把 4 從集合中移除。"
+   },
+   {
+    "answer": "{1, 2, 3, 4, 5}",
+    "correct": false,
+    "feedback": "這個答案漏掉了 update() 加入的 6 和 7，而且 4 已被 remove() 移除。"
+   },
+   {
+    "answer": "程式會引發 KeyError。",
+    "correct": false,
+    "feedback": "這些集合操作都有效，而且 4 確實存在於集合中，因此 remove(4) 不會引發錯誤。"
+   }
+  ]
+ },
+ {
+  "question": "有一份 20 萬筆的資料，要在迴圈裡反覆檢查「某個值在不在裡面」。下列哪個做法最好？",
+  "answers": [
+   {
+    "answer": "先把資料轉成 set，再用 in 檢查",
+    "correct": true,
+    "feedback": "正確。集合與字典背後是雜湊表，成員檢查平均 O(1)；串列的 in 是逐一比對的 O(n)。實測在 20 萬筆資料上差了約七千倍——只改一個字，效能差四個數量級。第 07 章會解釋雜湊表為什麼做得到。"
+   },
+   {
+    "answer": "維持串列，用 in 檢查就好",
+    "correct": false,
+    "feedback": "不對。串列的 in 要從頭掃到尾，放進迴圈就變成 O(n²)。這是最典型的「跑得出來但跑不動」。"
+   },
+   {
+    "answer": "先把串列排序，再用 in 檢查",
+    "correct": false,
+    "feedback": "不對。排序不會讓 in 變快，它仍然是線性掃描。排序後可以自己寫二分搜尋（O(log n)），但既然有集合就沒必要。"
+   },
+   {
+    "answer": "把資料寫進檔案，每次去檔案裡找",
+    "correct": false,
+    "feedback": "不對。讀檔比讀記憶體慢好幾個數量級，這會讓情況更糟。"
+   }
+  ]
+ }
+]

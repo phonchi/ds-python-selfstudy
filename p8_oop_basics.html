@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>物件導向（基礎）— 先備 P8（Python）</title>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e;--paper:#f7f3eb;--accent:#c0392b;--accent2:#2c3e7a;--accent3:#1a6b4a;
+  --muted:#8a8578;--card:#fffdf7;--card-border:#e8e2d6;--highlight:#fff3cd;
+  --code-bg:#2d2d3f;--code-fg:#e8e6df;
+  --node-white:#ffffff;--node-gray:#bdc3c7;--node-black:#34495e;
+  --node-current:#f39c12;--node-found:#16a085;--node-start:#9b59b6;
+  --edge-default:#95a5a6;--edge-tree:#27ae60;--edge-explore:#f39c12;--edge-mst:#1a6b4a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);line-height:1.9;font-size:17px;}
+
+/* Hero */
+.hero{min-height:62vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2rem;position:relative;overflow:hidden;background:linear-gradient(170deg,#1a1a2e 0%,#2c3e7a 40%,#1a6b4a 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.04) 0%,transparent 40%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.3;margin-bottom:1rem;}
+.hero h1 .green{color:#2ecc71;}
+.hero h1 .blue{color:#5dade2;}
+.hero h1 .orange{color:#f39c12;}
+.hero h1 .purple{color:#bb8fce;}
+.hero .subtitle{font-size:clamp(.95rem,2.2vw,1.2rem);color:rgba(255,255,255,.65);font-weight:300;margin-bottom:2rem;}
+.hero .big-formula{color:#2ecc71;background:rgba(0,0,0,.3);padding:.8rem 2rem;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,.1);margin-bottom:2rem;backdrop-filter:blur(4px);font-size:1.05rem;}
+.scroll-hint{color:rgba(255,255,255,.4);font-size:.9rem;animation:bounce 2s infinite;}
+.scroll-hint span{display:block;font-size:1.4rem;margin-top:.3rem;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+
+/* Hero mini-graph illustration */
+.hero-graph{position:absolute;right:5%;top:50%;transform:translateY(-50%);opacity:.18;pointer-events:none;}
+@media(max-width:900px){.hero-graph{display:none;}}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.5rem;}
+h2{font-family:'Noto Serif TC',serif;font-size:1.65rem;font-weight:700;color:var(--ink);margin-bottom:1.2rem;line-height:1.4;}
+h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;font-weight:700;color:var(--accent2);margin:1.4rem 0 .8rem;}
+section{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--card-border);}
+section:last-of-type{border-bottom:none;}
+p{margin-bottom:1rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:.92em;background:rgba(44,62,122,.08);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+strong{color:var(--ink);}
+
+/* TOC */
+.toc{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.2rem 1.5rem;margin:1rem 0 2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);font-weight:600;letter-spacing:.15em;margin-bottom:.7rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem .8rem;}
+.toc-grid a{color:var(--accent2);text-decoration:none;font-size:.9rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
+.toc-grid a:hover{color:var(--accent);}
+.toc-grid a .toc-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);min-width:34px;}
+
+/* Viz layout */
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
+@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+
+.viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
+
+/* Graph SVG canvas */
+.graph-canvas{position:relative;width:100%;height:380px;background:#fafafa;border-radius:8px;overflow:hidden;border:1px solid #ececec;}
+.graph-canvas svg{width:100%;height:100%;display:block;}
+
+/* SVG elements styles */
+.graph-edge{stroke:var(--edge-default);stroke-width:2;fill:none;transition:stroke .25s, stroke-width .25s;}
+.graph-edge.tree{stroke:var(--edge-tree);stroke-width:3.5;}
+.graph-edge.exploring{stroke:var(--edge-explore);stroke-width:3.5;stroke-dasharray:5 4;animation:dash 1s linear infinite;}
+.graph-edge.mst{stroke:var(--edge-mst);stroke-width:4;}
+.graph-edge.path{stroke:var(--accent);stroke-width:4;}
+.graph-edge.dotted{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 4;}
+@keyframes dash{to{stroke-dashoffset:-18;}}
+
+.edge-label{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);pointer-events:none;}
+.edge-label-bg{fill:#fafafa;stroke:#ececec;stroke-width:1;}
+
+.graph-node{cursor:pointer;}
+.graph-node circle{fill:var(--node-white);stroke:var(--ink);stroke-width:2;transition:fill .25s, stroke .25s, r .2s;}
+.graph-node.gray circle{fill:var(--node-gray);}
+.graph-node.black circle{fill:var(--node-black);stroke:var(--node-black);}
+.graph-node.current circle{fill:var(--node-current);stroke:#d68910;stroke-width:3;}
+.graph-node.start circle{fill:var(--node-start);stroke:#7d3c98;stroke-width:3;}
+.graph-node.found circle{fill:var(--node-found);stroke:#117a65;stroke-width:3;}
+.graph-node.in-mst circle{fill:#82e0aa;stroke:var(--accent3);stroke-width:3;}
+.graph-node text.node-key{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none;}
+.graph-node.black text.node-key{fill:#fff;}
+.graph-node.current text.node-key{fill:#fff;}
+.graph-node.start text.node-key{fill:#fff;}
+.graph-node.found text.node-key{fill:#fff;}
+.graph-node text.node-meta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;fill:var(--accent);text-anchor:middle;pointer-events:none;}
+
+/* Status banner */
+.status-banner{margin-top:.8rem;padding:.7rem 1rem;background:var(--code-bg);color:#fff;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;min-height:42px;display:flex;align-items:center;gap:.6rem;}
+.status-banner .status-icon{color:#2ecc71;font-weight:700;}
+.status-banner .status-text{flex:1;}
+
+/* Controls */
+.controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
+.btn-play{background:var(--accent3);color:#fff;}
+.btn-play:hover{background:#22845c;}
+.btn-play.active{background:var(--accent);}
+.btn-step{background:var(--accent2);color:#fff;}
+.btn-step:hover{background:#1f2e5f;}
+.btn-step:disabled{background:#ccc;cursor:not-allowed;}
+.btn-reset{background:var(--card-border);color:var(--ink);}
+.btn-reset:hover{background:#ccc;}
+.btn-toggle{background:var(--accent2);color:#fff;}
+.btn-toggle:hover{background:#1f2e5f;}
+.btn-toggle.off{background:#bbb;color:#555;}
+.btn-shuffle{background:#8e44ad;color:#fff;}
+.btn-shuffle:hover{background:#6c3485;}
+
+/* Slider row */
+.slider-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;background:var(--paper);border-radius:8px;margin-bottom:.5rem;}
+.slider-row .slider-label{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent2);font-weight:600;min-width:60px;}
+.slider-row input[type="range"]{flex:1;accent-color:var(--accent3);height:5px;cursor:pointer;}
+.slider-row .slider-val{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent);font-weight:600;min-width:60px;text-align:right;}
+
+/* Side panel */
+.side-panel{display:flex;flex-direction:column;gap:.85rem;}
+.info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-card .ic-title{font-size:.72rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);padding-bottom:.3rem;display:flex;align-items:center;justify-content:space-between;}
+.info-card .ic-title .ic-badge{font-size:.7rem;color:#fff;background:var(--accent3);padding:1px 7px;border-radius:3px;letter-spacing:.05em;font-weight:700;}
+.info-card .ic-row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.83rem;padding:.2rem 0;}
+.info-card .ic-label{color:var(--muted);}
+.info-card .ic-value{color:var(--ink);font-weight:600;}
+.info-card .ic-value.highlight{color:var(--accent);}
+.info-card .ic-value.big{font-size:1.4rem;color:var(--accent2);}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.4rem;}
+.stat-tile{background:var(--paper);border-radius:8px;padding:.5rem .7rem;text-align:center;}
+.stat-tile .stat-label{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+.stat-tile .stat-value{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent2);}
+
+/* Queue / Stack / PQ visualization */
+.ds-display{font-family:'JetBrains Mono',monospace;font-size:.8rem;background:var(--paper);border-radius:6px;padding:.5rem .7rem;min-height:36px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;border:1px dashed var(--card-border);}
+.ds-display .ds-empty{color:var(--muted);font-style:italic;}
+.ds-item{background:var(--accent2);color:#fff;padding:2px 8px;border-radius:4px;font-weight:600;}
+.ds-item.front{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-item.top{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-item.pq{background:var(--accent3);}
+.ds-item.pq.min{background:var(--accent);box-shadow:0 0 0 2px rgba(192,57,43,.3);}
+.ds-arrow{color:var(--muted);}
+
+/* Pseudo code */
+.pseudo-code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:.85rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.6;overflow-x:auto;}
+.pseudo-code .line{padding:1px 4px;border-radius:3px;display:block;white-space:pre;}
+.pseudo-code .line.active{background:rgba(243,156,18,.3);color:#fff;border-left:3px solid var(--node-current);padding-left:6px;}
+.pseudo-code .kw{color:#ff79c6;}
+.pseudo-code .fn{color:#50fa7b;}
+.pseudo-code .num{color:#bd93f9;}
+.pseudo-code .com{color:#6272a4;font-style:italic;}
+.pseudo-code .str{color:#f1fa8c;}
+
+/* Adjacency table */
+.adj-display{margin:.5rem 0;font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.adj-matrix{border-collapse:collapse;margin:.5rem auto;}
+.adj-matrix td,.adj-matrix th{border:1px solid var(--card-border);padding:6px 10px;text-align:center;min-width:34px;background:#fff;}
+.adj-matrix th{background:var(--accent2);color:#fff;font-weight:700;}
+.adj-matrix td.zero{color:#ccc;}
+.adj-matrix td.nonzero{background:#eafaf1;color:var(--accent3);font-weight:700;}
+.adj-matrix td.highlight{background:#fff3cd;}
+.adj-list{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:.7rem 1rem;}
+.adj-list .adj-row{padding:3px 0;border-bottom:1px dashed var(--card-border);}
+.adj-list .adj-row:last-child{border-bottom:none;}
+.adj-list .adj-key{color:var(--accent);font-weight:700;display:inline-block;min-width:32px;}
+.adj-list .adj-arrow{color:var(--muted);margin:0 6px;}
+.adj-list .adj-neighbor{background:#eef2ff;color:var(--accent2);padding:1px 8px;border-radius:4px;margin:1px 3px;display:inline-block;font-weight:600;}
+
+/* Chess board for Knight's tour */
+.chess-board{display:grid;background:#fff;border:2px solid var(--ink);border-radius:6px;overflow:hidden;margin:.5rem auto;width:fit-content;}
+.chess-cell{display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:700;position:relative;transition:background .2s;}
+.chess-cell.light{background:#f0d9b5;color:#666;}
+.chess-cell.dark{background:#b58863;color:#fff;}
+.chess-cell.visited{background:#27ae60 !important;color:#fff;}
+.chess-cell.current{background:#f39c12 !important;color:#fff;box-shadow:inset 0 0 0 3px #d68910;}
+.chess-cell.start{background:#9b59b6 !important;color:#fff;}
+.chess-cell .knight{font-size:1.4em;line-height:1;}
+.chess-cell .step-num{font-size:.7em;}
+
+/* Info box */
+.info-box{background:#eef2ff;border:2px solid var(--accent2);border-radius:10px;padding:1.1rem 1.4rem;margin:1.3rem 0;position:relative;}
+.info-box .info-label{position:absolute;top:-11px;left:14px;background:var(--accent2);color:#fff;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:4px;letter-spacing:.05em;}
+.info-box.warm{background:#fef5e7;border-color:#d68910;}
+.info-box.warm .info-label{background:#d68910;}
+.info-box.green{background:#eafaf1;border-color:var(--accent3);}
+.info-box.green .info-label{background:var(--accent3);}
+.info-box.purple{background:#f4ecf7;border-color:#8e44ad;}
+.info-box.purple .info-label{background:#8e44ad;}
+
+/* Pill labels */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:4px;margin:0 .15rem;vertical-align:1px;}
+.pill-blue{background:rgba(41,128,185,.12);color:#2980b9;border:1px solid rgba(41,128,185,.3);}
+.pill-red{background:rgba(192,57,43,.12);color:var(--accent);border:1px solid rgba(192,57,43,.3);}
+.pill-green{background:rgba(39,174,96,.12);color:var(--accent3);border:1px solid rgba(39,174,96,.3);}
+.pill-orange{background:rgba(243,156,18,.12);color:#d68910;border:1px solid rgba(243,156,18,.3);}
+.pill-purple{background:rgba(142,68,173,.12);color:#8e44ad;border:1px solid rgba(142,68,173,.3);}
+.pill-gray{background:rgba(0,0,0,.06);color:var(--muted);border:1px solid rgba(0,0,0,.12);}
+
+/* Comparison table */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.cmp-table th{background:var(--accent2);color:#fff;padding:.6rem .8rem;text-align:center;font-weight:600;font-size:.82rem;}
+.cmp-table td{padding:.6rem .8rem;text-align:center;border-bottom:1px solid var(--card-border);font-family:'JetBrains Mono',monospace;font-size:.82rem;}
+.cmp-table td:first-child{font-family:'Noto Sans TC',sans-serif;color:var(--accent2);font-weight:600;text-align:left;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:nth-child(even){background:rgba(0,0,0,.015);}
+.cmp-table .best{color:var(--accent3);font-weight:700;}
+.cmp-table .worst{color:var(--accent);font-weight:700;}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:.6rem;margin:.6rem 0;font-family:'JetBrains Mono',monospace;font-size:.75rem;}
+.legend-item{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;background:var(--paper);border-radius:5px;}
+.legend-item .lg-swatch{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink);}
+.legend-item .lg-edge{width:18px;height:3px;border-radius:2px;}
+
+/* Quiz */
+.quiz-box{background:var(--card);border:2px solid var(--accent2);border-radius:12px;padding:1.3rem 1.5rem;margin:1.5rem 0;}
+.quiz-box .quiz-label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.1em;margin-bottom:.5rem;}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0;}
+.quiz-opt{display:flex;align-items:center;gap:.6rem;padding:.55rem .9rem;background:var(--paper);border:2px solid var(--card-border);border-radius:8px;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;font-size:.86rem;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt .opt-letter{font-weight:700;color:var(--accent2);min-width:22px;}
+.quiz-opt.correct{background:#eafaf1;border-color:var(--accent3);}
+.quiz-opt.correct .opt-letter{color:var(--accent3);}
+.quiz-opt.wrong{background:#fef5e7;border-color:var(--accent);}
+.quiz-opt.wrong .opt-letter{color:var(--accent);}
+.quiz-feedback{margin-top:.7rem;padding:.7rem 1rem;border-radius:8px;font-size:.88rem;display:none;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct{background:#eafaf1;color:var(--accent3);border-left:4px solid var(--accent3);}
+.quiz-feedback.wrong{background:#fef5e7;color:var(--accent);border-left:4px solid var(--accent);}
+
+/* Floating sidebar navigation */
+.float-nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:2px;background:rgba(255,253,250,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--card-border);border-radius:12px;padding:10px 7px;box-shadow:0 6px 24px rgba(0,0,0,.10);font-family:'JetBrains Mono',monospace;max-height:88vh;overflow-y:auto;transition:padding .25s ease;}
+.float-nav .fn-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.68rem;color:var(--accent2);text-align:center;letter-spacing:1.5px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--card-border);max-width:0;overflow:hidden;transition:max-width .25s ease;}
+.float-nav:hover .fn-title{max-width:220px;}
+.float-nav a{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;color:var(--ink);text-decoration:none;white-space:nowrap;transition:all .2s ease;border-left:3px solid transparent;}
+.float-nav a .fn-num{font-weight:700;font-size:.66rem;color:var(--muted);letter-spacing:.4px;flex-shrink:0;width:30px;text-align:left;}
+.float-nav a .fn-name{font-family:'Noto Sans TC',sans-serif;font-size:.76rem;font-weight:500;max-width:0;overflow:hidden;transition:max-width .25s ease,padding .25s ease;padding:0;}
+.float-nav:hover a .fn-name{max-width:220px;padding-left:2px;}
+.float-nav a:hover{background:var(--card);}
+.float-nav a.active{background:var(--accent2);color:#fff;border-left-color:var(--accent);box-shadow:0 2px 6px rgba(192,57,43,.25);}
+.float-nav a.active .fn-num{color:rgba(255,255,255,.85);}
+.float-nav a.active .fn-name{color:#fff;}
+.float-nav .fn-top{margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border);justify-content:center;}
+.float-nav .fn-top .fn-num{width:auto;color:var(--accent2);font-size:.78rem;}
+@media(max-width:768px){
+  .float-nav{right:8px;top:auto;bottom:14px;transform:none;padding:6px 5px;max-height:70vh;}
+  .float-nav .fn-title{display:none;}
+  .float-nav a{padding:4px 7px;}
+  .float-nav a .fn-num{width:26px;font-size:.62rem;}
+}
+
+footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--card-border);}
+
+/* Distance / table inside graph viz */
+.vert-table{margin-top:.6rem;width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.78rem;}
+.vert-table th,.vert-table td{padding:4px 6px;text-align:center;border:1px solid var(--card-border);}
+.vert-table th{background:var(--accent2);color:#fff;font-weight:600;font-size:.74rem;}
+.vert-table td.tcell-current{background:#fff3cd;font-weight:700;color:var(--accent);}
+.vert-table td.tcell-done{background:#eafaf1;color:var(--accent3);}
+.vert-table td.tcell-inf{color:#ccc;}
+.sec-badge{font-size:.6em;color:var(--muted);border:1px solid var(--card-border);background:var(--card);padding:2px 10px;border-radius:999px;vertical-align:middle;margin-left:.6rem;font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.02em;white-space:nowrap;}
+
+/* Phase 8 shared widgets */
+.bs-stack{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;min-height:180px;justify-content:flex-start;padding:.6rem;}
+.bs-item{width:110px;text-align:center;padding:.4rem .6rem;background:#5b7eb8;color:#fff;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;box-shadow:0 2px 5px rgba(0,0,0,.15);}
+.bs-hl{background:#f39c12;}
+.bs-toplabel,.bq-label{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.bq-row{display:flex;align-items:center;gap:6px;min-height:64px;flex-wrap:wrap;padding:.4rem;}
+.bq-item{min-width:52px;text-align:center;padding:.45rem .5rem;background:#5b7eb8;color:#fff;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+.char-strip{display:flex;gap:3px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;padding:.4rem 0;}
+.char-cell{min-width:30px;text-align:center;padding:.35rem .25rem;border:1px solid var(--card-border);border-radius:5px;background:var(--card);}
+.char-cur{background:#f39c12;color:#fff;border-color:#f39c12;}
+.char-done{background:#e8f5ec;color:#1a6b4a;border-color:#bfe3cd;}
+.char-bad{background:#c0392b;color:#fff;border-color:#c0392b;}
+.token-out{display:flex;gap:4px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;min-height:40px;padding:.3rem 0;}
+.tok{padding:.3rem .55rem;border-radius:5px;background:#2c3e7a;color:#fff;font-weight:600;}
+.tok-op{background:#8e44ad;}
+.tok-new{outline:3px solid #f39c12;}
+.mono{font-family:'JetBrains Mono',monospace;}
+</style>
+<style>
+/* ===== 網站化附加樣式（study-guide / flashcards / chapter-nav）===== */
+.study-guide{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:12px;padding:1.2rem 1.4rem;margin:0 0 2.2rem;}
+.study-guide .sg-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:1.5px;color:var(--accent3);margin-bottom:.5rem;}
+.study-guide p{font-size:.92rem;margin-bottom:.5rem;}
+.study-guide .sg-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;}
+.study-guide .sg-links a{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--accent2);border:1px solid var(--card-border);border-radius:999px;padding:.3rem .85rem;text-decoration:none;transition:all .2s;}
+.study-guide .sg-links a:hover{background:var(--accent2);color:#fff;}
+.fc-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 1.2rem;}
+.fc-controls button{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:1px solid var(--card-border);cursor:pointer;background:var(--card);color:var(--ink);transition:all .2s;}
+.fc-controls button:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;}
+.fc-card{perspective:900px;height:170px;cursor:pointer;}
+.fc-card .fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d;}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-card .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:.9rem;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.fc-card .fc-front{background:linear-gradient(150deg,var(--accent2),var(--ink));color:#fff;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.02em;flex-direction:column;gap:.4rem;}
+.fc-card .fc-front .fc-hint{font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.1em;}
+.fc-card .fc-back{background:var(--card);border:2px solid var(--accent3);color:var(--ink);font-size:.78rem;line-height:1.55;transform:rotateY(180deg);overflow-y:auto;}
+.chapter-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch;margin:2.5rem 0 1rem;}
+.chapter-nav a{display:block;border:1px solid var(--card-border);border-radius:12px;padding:.8rem 1.1rem;text-decoration:none;color:var(--ink);background:var(--card);transition:all .2s;}
+.chapter-nav a:hover{border-color:var(--accent2);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.chapter-nav .nav-dir{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:.2rem;}
+.chapter-nav .nav-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;color:var(--accent2);}
+.chapter-nav a.next{text-align:right;}
+.chapter-nav a.home{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+@media(max-width:700px){.chapter-nav{grid-template-columns:1fr;}}
+</style>
+<style>
+/* ===== 講義範例卡 ===== */
+.deck-extra{margin:1.2rem 0;}
+.deck-extra .dx-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--accent3);margin-bottom:.4rem;}
+.deck-extra .dx-note{font-size:.9rem;margin-top:.6rem;}
+.expected-out{background:var(--card);border:1px solid var(--card-border);border-left:4px solid var(--accent3);border-radius:0 8px 8px 0;padding:.5rem .9rem;margin-top:.5rem;}
+.expected-out .eo-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:1px;color:var(--accent3);display:block;margin-bottom:.2rem;}
+.expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
+.warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
+.warn-box b{color:var(--accent);}
+</style>
+<!-- prereq-injected -->
+<style>
+.hero .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#f5b82e;letter-spacing:.3em;margin-bottom:.8rem;}
+.cmp-table-wrap{overflow-x:auto;margin-bottom:1rem;}
+.ds-hook{background:var(--card);border:1px solid var(--card-border);border-left:5px solid var(--accent3);border-radius:10px;padding:.8rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+.ds-hook .dh-title{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.2px;color:var(--accent3);margin-bottom:.3rem;}
+
+/* ===== 題庫自測區 ===== */
+.sq-item{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.sq-item .sq-q{font-weight:700;margin-bottom:.7rem;}
+.sq-item .sq-q .sq-num{font-family:'JetBrains Mono',monospace;color:var(--accent);margin-right:.4rem;}
+.sq-opts{display:flex;flex-direction:column;gap:.45rem;}
+.sq-opt{text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;line-height:1.6;padding:.55rem .9rem;border-radius:8px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .15s;}
+.sq-opt:hover{border-color:var(--accent2);}
+.sq-opt.correct{border-color:var(--accent3);background:rgba(26,107,74,.10);}
+.sq-opt.wrong{border-color:var(--accent);background:rgba(192,57,43,.08);}
+.sq-fb{display:none;margin-top:.7rem;font-size:.86rem;line-height:1.7;border-left:4px solid var(--accent2);padding:.5rem .9rem;background:var(--paper);border-radius:0 8px 8px 0;}
+.sq-fb.show{display:block;}
+.sq-fb.good{border-left-color:var(--accent3);}
+.sq-fb.bad{border-left-color:var(--accent);}
+
+.sq-code{background:var(--code-bg);color:var(--code-fg);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;padding:.7rem .9rem;border-radius:8px;margin:.2rem 0 .8rem;overflow-x:auto;white-space:pre;}
+</style>
+</head>
+<body>
+
+<nav class="float-nav" id="floatNav" aria-label="章節導覽">
+  <div class="fn-title">章節導覽</div>
+  <a href="#prologue" data-target="prologue"><span class="fn-num">P00</span><span class="fn-name">資料結構就是類別</span></a>
+  <a href="#classes" data-target="classes"><span class="fn-num">P01</span><span class="fn-name">類別與實例</span></a>
+  <a href="#init" data-target="init"><span class="fn-num">P02</span><span class="fn-name">__init__ 與 self</span></a>
+  <a href="#attrs" data-target="attrs"><span class="fn-num">P03</span><span class="fn-name">屬性與方法</span></a>
+  <a href="#encap" data-target="encap"><span class="fn-num">P04</span><span class="fn-name">封裝與 property</span></a>
+  <a href="#strrepr" data-target="strrepr"><span class="fn-num">P05</span><span class="fn-name">__str__ 與 __repr__</span></a>
+  <a href="#compose" data-target="compose"><span class="fn-num">P06</span><span class="fn-name">組合：蓋出 Stack</span></a>
+  <a href="#build" data-target="build"><span class="fn-num">P07</span><span class="fn-name">動手寫一個 Node</span></a>
+  <a href="#exercises" data-target="exercises"><span class="fn-num">EX</span><span class="fn-name">隨堂練習</span></a>
+  <a href="#reference" data-target="reference"><span class="fn-num">REF</span><span class="fn-name">速查表</span></a>
+  <a href="#bankquiz" data-target="bankquiz"><span class="fn-num">QUIZ</span><span class="fn-name">自我檢測</span></a>
+  <a href="#cards" data-target="cards"><span class="fn-num">CARD</span><span class="fn-name">關鍵詞彙卡</span></a>
+  <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <svg class="hero-graph" width="300" height="260" viewBox="0 0 300 260">
+  <g stroke="#fff" stroke-width="2.5" fill="none" opacity=".85">
+    <rect x="90" y="26" width="120" height="52" rx="8"/>
+    <line x1="150" y1="78" x2="150" y2="104"/>
+    <line x1="60" y1="104" x2="240" y2="104"/>
+    <line x1="60" y1="104" x2="60" y2="130"/>
+    <line x1="150" y1="104" x2="150" y2="130"/>
+    <line x1="240" y1="104" x2="240" y2="130"/>
+    <rect x="20" y="130" width="80" height="44" rx="7"/>
+    <rect x="110" y="130" width="80" height="44" rx="7"/>
+    <rect x="200" y="130" width="80" height="44" rx="7"/>
+  </g>
+  <g fill="#fff" opacity=".75" font-family="monospace" font-size="12">
+    <text x="112" y="57">class</text>
+    <text x="43" y="157">obj</text><text x="133" y="157">obj</text><text x="223" y="157">obj</text>
+  </g>
+</svg>
+  <div class="hero-content">
+    <div class="chapter-tag">PREREQ P8</div>
+    <h1><span class="blue">物件導向</span>（基礎）：資料＋操作打包成一個東西</h1>
+    <div class="subtitle">先備知識複習 · 選讀，不列入作業與考試範圍</div>
+    <div class="big-formula">class｜物件｜__init__｜self｜屬性｜方法｜__str__｜組合</div>
+    <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
+  </div>
+</div>
+
+<div class="container">
+<div class="study-guide">
+  <div class="sg-title">📌 本頁使用方式（先備複習 · 選讀，不列入評分）</div>
+  <p>① 這頁複習資料結構課程<strong>預設你已經會</strong>的 Python。已經熟的可以直接跳過。
+  ② 每節都附一個<strong>「這在資料結構課哪裡會用到」</strong>的小方框——那才是你該記住的部分。
+  ③ 讀完做 <a href="#bankquiz">自我檢測</a>，再翻 <a href="#cards">關鍵詞彙卡</a>。
+  <br><strong>本頁屬補充先備知識，不列入作業與考試範圍。</strong></p>
+  <div class="sg-links"><a href="index.html">🏠 章節總覽</a><a href="index.html#prereq">📚 先備頁總覽</a><a href="https://pythontutor.com/" target="_blank" rel="noopener">🔬 Python Tutor</a><a href="https://docs.python.org/zh-tw/3/tutorial/" target="_blank" rel="noopener">📖 Python 官方教學</a></div>
+</div>
+
+
+<div class="toc">
+  <div class="toc-title">CONTENTS · 內容目錄</div>
+  <div class="toc-grid">
+    <a href="#prologue"><span class="toc-num">P00</span>為什麼資料結構就是類別</a>
+    <a href="#classes"><span class="toc-num">P01</span>類別與實例</a>
+    <a href="#init"><span class="toc-num">P02</span>__init__ 與 self</a>
+    <a href="#attrs"><span class="toc-num">P03</span>屬性與方法</a>
+    <a href="#encap"><span class="toc-num">P04</span>封裝與 @property</a>
+    <a href="#strrepr"><span class="toc-num">P05</span>__str__ 與 __repr__</a>
+    <a href="#compose"><span class="toc-num">P06</span>組合：蓋出一個 Stack</a>
+    <a href="#build"><span class="toc-num">P07</span>動手寫一個 Node</a>
+    <a href="#exercises"><span class="toc-num">EX</span>隨堂練習</a>
+    <a href="#reference"><span class="toc-num">REF</span>速查表</a>
+    <a href="#bankquiz"><span class="toc-num">QUIZ</span>自我檢測</a>
+    <a href="#cards"><span class="toc-num">CARD</span>關鍵詞彙卡</a>
+  </div>
+</div>
+
+<section id="prologue">
+  <div class="section-number">PROLOGUE · 開場</div>
+  <h2>一個資料結構，就是一個類別</h2>
+  <p>先看本站首頁那段裝飾用的程式碼 —— 它不是隨便挑的：</p>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Stack:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="fn">self</span>.items = []</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">push</span>(<span class="fn">self</span>, item):</span>
+<span class="line">        <span class="fn">self</span>.items.append(item)</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">pop</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> <span class="fn">self</span>.items.pop()</span>
+<span class="line"> </span></div>
+  <p>這就是這門課的形狀。<strong>資料結構 = 資料（要存什麼）＋ 操作（能對它做什麼）</strong>，而 Python 用來把這兩件事包在一起的工具就是 <code>class</code>。</p>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>抽象資料型別（ADT）的說法</th><th>Python 的說法</th><th>例子</th></tr></thead>
+    <tbody>
+      <tr><td>這個結構「存什麼」</td><td>屬性（attribute）</td><td><code>self._items</code></td></tr>
+      <tr><td>這個結構「能做什麼」</td><td>方法（method）</td><td><code>push()</code>、<code>pop()</code></td></tr>
+      <tr><td>結構的規格（介面）</td><td><code>class</code> 定義</td><td><code>class Stack:</code></td></tr>
+      <tr><td>實際被建立出來的一個結構</td><td>物件／實例（object / instance）</td><td><code>s = Stack()</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="info-box">
+    <div class="info-label">💡 這一頁的目標</div>
+    <p style="margin-bottom:0;">讀完你要能<strong>從空白檔案寫出一個 <code>Node</code> 和一個 <code>Stack</code></strong>，並且說得出 <code>self</code> 是什麼、<code>__init__</code> 什麼時候被呼叫、為什麼要寫 <code>__str__</code>。這三件事撐起第 03 章之後的每一章。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="info-label">📌 本頁定位</div>
+    <p style="margin-bottom:0;">這是<strong>選讀的先備知識複習</strong>，不列入作業與考試範圍。但如果 P1–P9 只能挑兩頁讀，請讀 P8 和 <a href="p9_oop_advanced.html">P9</a> —— 第 04 章之後每個資料結構都是一個 <code>class</code>。</p>
+  </div>
+</section>
+
+<section id="classes">
+  <div class="section-number">PART 01 · 類別與實例</div>
+  <h2>藍圖與成品 <span class="sec-badge">四個必背詞</span></h2>
+  <p><strong>類別（class）是藍圖，物件（object）是照著藍圖蓋出來的東西。</strong>藍圖只有一份，蓋出來的房子可以有很多間，每一間的門牌、住戶各自不同。</p>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>詞</th><th>是什麼</th><th>在程式裡長什麼樣</th></tr></thead>
+    <tbody>
+      <tr><td><strong>類別</strong> class</td><td>藍圖／規格</td><td><code>class Node:</code></td></tr>
+      <tr><td><strong>物件／實例</strong> object / instance</td><td>照藍圖做出來的一個具體東西</td><td><code>n = Node(93)</code></td></tr>
+      <tr><td><strong>屬性</strong> attribute</td><td>物件身上存的資料</td><td><code>n._data</code></td></tr>
+      <tr><td><strong>方法</strong> method</td><td>綁在物件上的函數</td><td><code>n.get_data()</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="deck-extra">
+  <div class="dx-label">最小可用的 Node 類別（第 04 章鏈結串列的主角）</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Node:</span>
+<span class="line">    <span class="str">"""鏈結串列的節點：存一個值，再指向下一個節點。"""</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, node_data):</span>
+<span class="line">        <span class="fn">self</span>._data = node_data</span>
+<span class="line">        <span class="fn">self</span>._next = <span class="kw">None</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> <span class="str">f</span><span class="str">"</span><span class="str">Node(</span><span class="str">{</span><span class="fn">self</span>._data<span class="str">}</span><span class="str">)</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">n = Node(<span class="num">93</span>)</span>
+<span class="line"><span class="fn">print</span>(n)</span>
+<span class="line"><span class="fn">print</span>(n._data, n._next)</span>
+<span class="line"><span class="fn">print</span>(<span class="fn">type</span>(n), <span class="fn">isinstance</span>(n, Node))</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>Node(93)
+93 None
+&lt;class &#x27;__main__.Node&#x27;&gt; True</pre></div>
+  <p class="dx-note">三個觀察：① <code>Node(93)</code> 看起來像呼叫函數，其實是<strong>建立一個實例</strong>，會自動去跑 <code>__init__</code>。② <code>_next</code> 一開始是 <code>&#78;one</code>，代表「後面還沒接東西」。③ <code>type()</code> 告訴你它是哪個類別的實例。</p>
+</div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 04 章</div><code>Node</code> 是鏈結串列的基本磚塊。整章都在做同一件事：建立 Node、修改它的 <code>_next</code>、沿著 <code>_next</code> 走訪。看不懂 class，那一章就只能死背。</div>
+</section>
+
+<section id="init">
+  <div class="section-number">PART 02 · 建構式</div>
+  <h2><code>__init__</code> 與 <code>self</code>：兩個最容易卡住的地方</h2>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.3rem 0 .5rem;color:var(--accent2);"><code>__init__</code> 不是「建立物件」，是「把剛建好的物件初始化」</h3>
+  <p>你寫 <code>n = Node(93)</code> 的時候，Python 做兩件事：先配置一個空的物件，然後<strong>自動</strong>呼叫 <code>n.__init__(93)</code> 把它填好。所以 <code>__init__</code> 裡面做的事就是「這個物件一出生要帶著哪些資料」。</p>
+  <p>名字前後各兩條底線的方法叫 <strong>dunder method</strong>（double underscore），它們是 Python 跟你的類別溝通的暗號：你不會直接呼叫 <code>__init__</code>，是 Python 在對的時機幫你叫。</p>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.3rem 0 .5rem;color:var(--accent2);"><code>self</code> 不是關鍵字，它只是第一個參數</h3>
+  <p>方法被呼叫時，Python 會<strong>自動把「是誰呼叫的」塞進第一個參數</strong>。<code>n.get_data()</code> 實際上等同於 <code>Node.get_data(n)</code>。習慣上這個參數命名為 <code>self</code>，但那只是慣例 —— 重點是它一定要存在。</p>
+
+  <div class="deck-extra">
+  <div class="dx-label">忘記寫 self 的典型錯誤（值得認得這個訊息）</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Broken:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, x):</span>
+<span class="line">        <span class="fn">self</span>.x = x</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">show</span>():          <span class="com"># ← 忘了寫 self</span></span>
+<span class="line">        <span class="kw">return</span> <span class="str">"</span><span class="str">hi</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">b = Broken(<span class="num">1</span>)</span>
+<span class="line">b.show()</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>TypeError: Broken.show() takes 0 positional arguments but 1 was given</pre></div>
+  <p class="dx-note">訊息在說：「你這個方法宣告成不吃參數，可是我傳了一個進去」——那個被傳進去的就是 <code>b</code> 自己。看到 <em>takes 0 positional arguments but 1 was given</em>，九成是漏了 <code>self</code>。</p>
+</div>
+
+  <div class="quiz-box">
+    <div class="quiz-label">隨堂 1 · self 到底是誰</div>
+    <p>已知 <code>n = Node(93)</code>，下列哪一句跟 <code>n.get_data()</code> 完全等價？</p>
+    <div class="quiz-options" id="qsOptions">
+      <div class="quiz-opt" data-correct="false" data-fb="get_data 是定義在類別裡的，不是一個獨立的全域函數，直接這樣呼叫會 &#78;ameError。" onclick="quizCheck('qs', this)"><span class="opt-letter">(A)</span> <code>get_data(n)</code></div>
+      <div class="quiz-opt" data-correct="true" data-fb="正確。點號呼叫只是語法糖：Python 會把點號左邊的物件當成第一個參數（也就是 self）傳進去。" onclick="quizCheck('qs', this)"><span class="opt-letter">(B)</span> <code>Node.get_data(n)</code></div>
+      <div class="quiz-opt" data-correct="false" data-fb="這樣沒有把 n 傳進去，Python 會抱怨少了一個位置參數。" onclick="quizCheck('qs', this)"><span class="opt-letter">(C)</span> <code>Node.get_data()</code></div>
+    </div>
+    <div class="quiz-feedback" id="qsFeedback"></div>
+  </div>
+</section>
+
+<section id="attrs">
+  <div class="section-number">PART 03 · 屬性與方法</div>
+  <h2>實例屬性、類別屬性，還有 Python 找屬性的順序</h2>
+  <p><strong>實例屬性</strong>寫在 <code>__init__</code> 裡、掛在 <code>self</code> 上，每個物件各有一份。<strong>類別屬性</strong>寫在 class 區塊的最外層，整個類別共用一份。</p>
+
+  <div class="deck-extra">
+  <div class="dx-label">類別屬性的經典陷阱</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Counter:</span>
+<span class="line">    total = <span class="num">0</span>                 <span class="com"># 類別屬性：整個 Counter 家族共用一份</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, name):</span>
+<span class="line">        <span class="fn">self</span>.name = name      <span class="com"># 實例屬性：每個物件各自一份</span></span>
+<span class="line">        Counter.total += <span class="num">1</span></span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">a, b = Counter(<span class="str">"</span><span class="str">a</span><span class="str">"</span>), Counter(<span class="str">"</span><span class="str">b</span><span class="str">"</span>)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">a.name =</span><span class="str">"</span>, a.name, <span class="str">"</span><span class="str"> b.name =</span><span class="str">"</span>, b.name)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">Counter.total =</span><span class="str">"</span>, Counter.total, <span class="str">"</span><span class="str"> a.total =</span><span class="str">"</span>, a.total)</span>
+<span class="line"> </span>
+<span class="line">a.total = <span class="num">99</span>                  <span class="com"># 這行沒有改到類別屬性，而是「新建」了一個實例屬性</span></span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">a.total =</span><span class="str">"</span>, a.total, <span class="str">"</span><span class="str"> Counter.total =</span><span class="str">"</span>, Counter.total, <span class="str">"</span><span class="str"> b.total =</span><span class="str">"</span>, b.total)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>a.name = a  b.name = b
+Counter.total = 2  a.total = 2
+a.total = 99  Counter.total = 2  b.total = 2</pre></div>
+  <p class="dx-note">看最後一行：<code>a.total = 99</code> <strong>沒有</strong>改到 <code>Counter.total</code>，它在 <code>a</code> 身上<strong>新建</strong>了一個同名的實例屬性，從此把類別屬性遮住了。要改共用的那一份，必須寫 <code>Counter.total = 99</code>。</p>
+</div>
+
+  <p>為什麼會這樣？因為 Python 找屬性有固定順序：<strong>先找實例自己，找不到才往類別找，再往父類別找</strong>。下面這個逐步器把這個過程演一次。</p>
+
+  <div class="viz-layout">
+    <div>
+      <div class="viz-panel">
+        <div class="mono" id="lkStage" style="font-size:.9rem;line-height:1.9;min-height:200px;"></div>
+        <div class="status-banner" id="lkStatus"><span class="status-icon">›</span><span class="status-text">選一個要查的屬性，按「開始」看 Python 怎麼找。</span></div>
+        <div class="controls-bar">
+          <button class="btn btn-play" onclick="lkStart('name')">▶ 查 c.name</button>
+          <button class="btn btn-play" onclick="lkStart('total')">▶ 查 c.total</button>
+          <button class="btn btn-play" onclick="lkStart('missing')">▶ 查 c.missing</button>
+          <button class="btn btn-step" onclick="lkPlayer &amp;&amp; lkPlayer.step()">→ 單步</button>
+          <button class="btn btn-reset" onclick="lkReset()">⟲ 重設</button>
+        </div>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="info-card">
+        <div class="ic-title">查找順序 <span class="ic-badge">MRO</span></div>
+        <p style="font-size:.88rem;margin-bottom:0;">① 實例自己的 <code>__dict__</code><br>② 類別的 <code>__dict__</code><br>③ 父類別，一路往上到 <code>object</code><br>④ 都沒有 → <code>AttributeError</code></p>
+      </div>
+      <div class="info-card">
+        <div class="ic-title">為什麼要懂 <span class="ic-badge">WHY</span></div>
+        <p style="font-size:.88rem;margin-bottom:0;">這個順序解釋了兩件事：類別屬性為什麼會被實例屬性「遮住」，以及 <a href="p9_oop_advanced.html">P9</a> 的<strong>方法覆寫</strong>為什麼有效 —— 子類別的方法先被找到，父類別的就不會被用到。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 03、05 章</div><code>ArrayList</code> 用類別屬性存「預設容量」、用實例屬性存「目前有幾個元素」；<code>Stack</code> 的 <code>_items</code> 則一定要是實例屬性 —— 否則所有 Stack 會共用同一個 list，那就爆了。</div>
+</section>
+
+<section id="encap">
+  <div class="section-number">PART 04 · 封裝</div>
+  <h2>底線慣例與 <code>@property</code></h2>
+  <p>封裝的意思是：<strong>把內部怎麼存的細節藏起來，只暴露有意義的操作。</strong>使用 <code>Stack</code> 的人只該知道 <code>push</code> / <code>pop</code>，不該去戳 <code>s._items</code>；這樣你之後想把 list 換成鏈結串列，外面的程式碼完全不用改。</p>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>寫法</th><th>意思</th><th>Python 真的會擋嗎</th></tr></thead>
+    <tbody>
+      <tr><td><code>self.data</code></td><td>公開，外面可以自由使用</td><td>—</td></tr>
+      <tr><td><code>self._data</code></td><td><strong>慣例</strong>上的內部屬性，「請不要從外面碰」</td><td><strong>不會</strong>。純粹是給人看的約定</td></tr>
+      <tr><td><code>self.__data</code></td><td>觸發名稱改寫（name mangling），實際變成 <code>_ClassName__data</code></td><td>只是變得比較難碰，仍然碰得到</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Python 沒有 <code>private</code> 關鍵字，靠的是「大家都是成年人」的約定。<code>pythonds3</code> 的原始碼大量使用單底線加上 <code>@property</code>：</p>
+
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Node:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, node_data):</span>
+<span class="line">        <span class="fn">self</span>._data = node_data</span>
+<span class="line">        <span class="fn">self</span>._next = <span class="kw">None</span></span>
+<span class="line"> </span>
+<span class="line">    @property</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">data</span>(<span class="fn">self</span>):            <span class="com"># 讀取：n.data（注意沒有括號）</span></span>
+<span class="line">        <span class="kw">return</span> <span class="fn">self</span>._data</span>
+<span class="line"> </span>
+<span class="line">    @data.setter</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">data</span>(<span class="fn">self</span>, new_data):  <span class="com"># 寫入：n.data = 5</span></span>
+<span class="line">        <span class="fn">self</span>._data = new_data</span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">n = Node(<span class="num">93</span>)</span>
+<span class="line"><span class="fn">print</span>(n.data)     <span class="com"># 93     ← 讀起來像屬性，其實跑了一個方法</span></span>
+<span class="line">n.data = <span class="num">26</span>       <span class="com">#        ← 寫起來像屬性，其實跑了 setter</span></span>
+<span class="line"><span class="fn">print</span>(n.data)     <span class="com"># 26</span></span>
+<span class="line"> </span></div>
+
+  <div class="info-box green">
+    <div class="info-label">✅ <code>@property</code> 的好處</div>
+    <p style="margin-bottom:0;">外面用起來像單純的屬性（<code>n.data</code>），但你隨時可以在 getter/setter 裡加檢查、加轉換、加記錄，而<strong>不用改任何呼叫端的程式碼</strong>。這就是封裝的實際價值。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 04、09 章</div><code>pythonds3</code> 的 <code>Node</code> 與 <code>BinaryTree</code> 都用 <code>@property</code> 包住 <code>data</code>、<code>next</code>、<code>left_child</code>。看原始碼時看到 <code>@property</code> 不要慌，它就是個加了檢查的屬性。</div>
+</section>
+
+<section id="strrepr">
+  <div class="section-number">PART 05 · 印得出來</div>
+  <h2><code>__str__</code> 與 <code>__repr__</code>：讓你的物件說人話</h2>
+
+  <div class="deck-extra">
+  <div class="dx-label">沒有 __str__ 的下場</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Plain:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, v):</span>
+<span class="line">        <span class="fn">self</span>.v = v</span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">p = Plain(<span class="num">7</span>)</span>
+<span class="line"><span class="fn">print</span>(p)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>&lt;__main__.Plain object at 0x7f3c9c1d4e50&gt;</pre></div>
+  <p class="dx-note">這串東西只告訴你「它是個 Plain 物件、放在這個記憶體位址」——對 debug 完全沒有幫助。想像你 <code>print</code> 一棵有 20 個節點的樹，看到 20 行這種東西。</p>
+</div>
+
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>方法</th><th>誰會呼叫它</th><th>該寫成什麼樣</th></tr></thead>
+    <tbody>
+      <tr><td><code>__str__</code></td><td><code>str(x)</code>、<code>print(x)</code>、f-string</td><td>給人看的：好讀、簡潔</td></tr>
+      <tr><td><code>__repr__</code></td><td>互動式直譯器直接打變數名、<code>repr(x)</code>、<strong>印一個裝著物件的 list 時</strong></td><td>給開發者看的：精確、最好能貼回程式碼重建物件</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="info-box">
+    <div class="info-label">💡 只想寫一個的話，寫 <code>__repr__</code></div>
+    <p style="margin-bottom:0;">因為當 <code>__str__</code> 沒定義時，<code>print()</code> 會退而使用 <code>__repr__</code>；反過來不成立。而且 <code>print(list_of_nodes)</code> 印出的是每個元素的 <strong><code>__repr__</code></strong>，不是 <code>__str__</code> —— 這是很多人第一次覺得「我明明寫了 <code>__str__</code> 為什麼還是亂碼」的原因。</p>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 04、09 章</div>沒有 <code>__str__</code>，你在 debug 鏈結串列與二元樹時等於瞎子摸象。第 09 章的 <code>BinaryTree.__str__</code> 甚至是遞迴寫的：印自己、再印左右子樹。</div>
+</section>
+
+<section id="compose">
+  <div class="section-number">PART 06 · 組合</div>
+  <h2>用現成的東西蓋新的東西 <span class="sec-badge">has-a</span></h2>
+  <p>要做一個 <code>Stack</code>，你不需要從零管理記憶體 —— 直接<strong>持有一個 list</strong> 就好。這種「A 擁有一個 B」的關係叫做<strong>組合（composition）</strong>，是資料結構課裡最常見的蓋法。</p>
+
+  <div class="deck-extra">
+  <div class="dx-label">完整的 Stack：這一份會在第 05 章反覆出現</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Stack:</span>
+<span class="line">    <span class="str">"""堆疊 ADT：後進先出。內部用一個 list 存元素（這叫「組合」）。"""</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="fn">self</span>._items = []              <span class="com"># has-a：Stack 擁有一個 list</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">push</span>(<span class="fn">self</span>, item):</span>
+<span class="line">        <span class="fn">self</span>._items.append(item)      <span class="com"># list 尾端是堆疊頂端，append/pop 都是 O(1)</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">pop</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> <span class="fn">self</span>._items.pop()</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">peek</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> <span class="fn">self</span>._items[-<span class="num">1</span>]</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">is_empty</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> not <span class="fn">self</span>._items</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">size</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> <span class="fn">len</span>(<span class="fn">self</span>._items)</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__len__</span>(<span class="fn">self</span>):                <span class="com"># 讓內建的 len() 也能用</span></span>
+<span class="line">        <span class="kw">return</span> <span class="fn">len</span>(<span class="fn">self</span>._items)</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="fn">self</span>):                <span class="com"># 讓 print() 印得出人看得懂的東西</span></span>
+<span class="line">        <span class="kw">return</span> <span class="str">"</span><span class="str">底 </span><span class="str">"</span> + <span class="str">"</span><span class="str"> | </span><span class="str">"</span>.join(<span class="fn">map</span>(<span class="fn">str</span>, <span class="fn">self</span>._items)) + <span class="str">"</span><span class="str"> 頂</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">s = Stack()</span>
+<span class="line"><span class="kw">for</span> c in <span class="str">"</span><span class="str">abc</span><span class="str">"</span>:</span>
+<span class="line">    s.push(c)</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(s)</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">len(s) =</span><span class="str">"</span>, <span class="fn">len</span>(s), <span class="str">"</span><span class="str"> s.size() =</span><span class="str">"</span>, s.size())</span>
+<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">pop -&gt;</span><span class="str">"</span>, s.pop(), <span class="str">"</span><span class="str"> 剩下:</span><span class="str">"</span>, s)</span>
+<span class="line"> </span></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>底 a | b | c 頂
+len(s) = 3  s.size() = 3
+pop -&gt; c  剩下: 底 a | b 頂</pre></div>
+  <p class="dx-note">重點在 <code>self._items = []</code> 這一行：Stack <strong>不是</strong>一個 list，Stack <strong>有</strong>一個 list。外面的人只看得到 push/pop/peek，看不到裡面是 list ——所以你哪天要把它換成鏈結串列，外面一行都不用改。</p>
+</div>
+
+  <div class="quiz-box">
+    <div class="quiz-label">隨堂 2 · 選對那一端</div>
+    <p>上面的 <code>Stack</code> 把 list 的<strong>尾端</strong>當成堆疊頂端。如果改成把 list 的<strong>開頭</strong>當頂端（<code>insert(0, x)</code> 與 <code>pop(0)</code>），會發生什麼事？</p>
+    <div class="quiz-options" id="qcOptions">
+      <div class="quiz-opt" data-correct="false" data-fb="結果會一樣正確沒錯，但成本完全不同——這正是本題的重點。" onclick="quizCheck('qc', this)"><span class="opt-letter">(A)</span> 完全一樣，只是寫法不同</div>
+      <div class="quiz-opt" data-correct="true" data-fb="正確。在開頭插入或刪除，要把後面所有元素整批搬移，是 O(n)；尾端則是 O(1)。同樣的 ADT、同樣的正確結果，效能差一個數量級——第 02、05 章會詳細分析。" onclick="quizCheck('qc', this)"><span class="opt-letter">(B)</span> 行為一樣正確，但 push／pop 從 $O(1)$ 變成 $O(n)$</div>
+      <div class="quiz-opt" data-correct="false" data-fb="不會錯，list 兩端都支援插入與刪除。問題不在對錯，在成本。" onclick="quizCheck('qc', this)"><span class="opt-letter">(C)</span> 會出錯，list 不支援從開頭刪除</div>
+    </div>
+    <div class="quiz-feedback" id="qcFeedback"></div>
+  </div>
+
+  <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 05 章</div><code>Stack</code>、<code>Queue</code>、<code>Deque</code> 三個 ADT 在 pythonds3 裡全部用同一招：持有一個 list，只是選擇從哪一端操作。選錯端就是 O(n)。</div>
+</section>
+
+<section id="build">
+  <div class="section-number">PART 07 · 動手做</div>
+  <h2>從空白檔案寫一個 <code>Node</code> 與最小串列</h2>
+  <p>讀到這裡，把網頁關掉，開一個空的 notebook，試著不看答案寫出來：</p>
+
+  <div class="info-card">
+    <div class="ic-title">練習規格 <span class="ic-badge">TRY IT</span></div>
+    <p style="font-size:.9rem;margin-bottom:0;">① 寫一個 <code>Node</code> 類別，建構式吃一個值，存成 <code>_data</code>，並把 <code>_next</code> 設成 <code>&#78;one</code>。<br>
+    ② 幫它加上 <code>__repr__</code>，讓 <code>print</code> 一個 Node 的 list 看得懂。<br>
+    ③ 寫一個 <code>MiniList</code>，內部只存一個 <code>_head</code>；提供 <code>add(item)</code>（加在最前面）與 <code>__str__</code>（沿著 <code>_next</code> 走一遍，用箭頭串起來）。<br>
+    ④ 加入 31、17、93、26 之後，<code>print</code> 出來應該是 <code>26 -&gt; 93 -&gt; 17 -&gt; 31</code>。</p>
+  </div>
+
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> Node:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, node_data):</span>
+<span class="line">        <span class="fn">self</span>._data = node_data</span>
+<span class="line">        <span class="fn">self</span>._next = <span class="kw">None</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__repr__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="kw">return</span> <span class="str">f</span><span class="str">"</span><span class="str">Node(</span><span class="str">{</span><span class="fn">self</span>._data<span class="str">}</span><span class="str">)</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line"><span class="kw">class</span> MiniList:</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>):</span>
+<span class="line">        <span class="fn">self</span>._head = <span class="kw">None</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">add</span>(<span class="fn">self</span>, item):</span>
+<span class="line">        new = Node(item)</span>
+<span class="line">        new._next = <span class="fn">self</span>._head     <span class="com"># 新節點指向原本的第一個</span></span>
+<span class="line">        <span class="fn">self</span>._head = new           <span class="com"># 頭換成新節點</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="fn">self</span>):</span>
+<span class="line">        out, cur = [], <span class="fn">self</span>._head</span>
+<span class="line">        <span class="kw">while</span> cur is not <span class="kw">None</span>:</span>
+<span class="line">            out.append(<span class="fn">str</span>(cur._data))</span>
+<span class="line">            cur = cur._next</span>
+<span class="line">        <span class="kw">return</span> <span class="str">"</span><span class="str"> -&gt; </span><span class="str">"</span>.join(out)</span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">lst = MiniList()</span>
+<span class="line"><span class="kw">for</span> v in [<span class="num">31</span>, <span class="num">17</span>, <span class="num">93</span>, <span class="num">26</span>]:</span>
+<span class="line">    lst.add(v)</span>
+<span class="line"><span class="fn">print</span>(lst)                          <span class="com"># 26 -&gt; 93 -&gt; 17 -&gt; 31</span></span>
+<span class="line"> </span></div>
+
+  <div class="info-box purple">
+    <div class="info-label">🎯 過關標準</div>
+    <p style="margin-bottom:0;">如果你能不看上面這段、憑理解把 <code>add</code> 那兩行的順序寫對（先接上舊的頭，再把頭換成新的），你已經準備好進第 04 章了。順序寫反會怎樣？把它跑一次就知道 —— 那個錯誤本身就是最好的教材。</p>
+  </div>
+</section>
+
+<section id="exercises">
+  <div class="section-number">EX · 隨堂練習</div>
+  <h2>再兩題確認觀念 <span class="sec-badge">答錯就回上一節</span></h2>
+
+  <div class="quiz-box">
+    <div class="quiz-label">EXERCISE 1 · __init__ 的時機</div>
+    <p><code>__init__</code> 是什麼時候被呼叫的？</p>
+    <div class="quiz-options" id="q1Options">
+      <div class="quiz-opt" data-correct="false" data-fb="類別定義被讀到的時候，只是把方法登記起來，並不會執行它們。" onclick="quizCheck('q1', this)"><span class="opt-letter">(A)</span> Python 讀到 <code>class Node:</code> 那一行的時候</div>
+      <div class="quiz-opt" data-correct="true" data-fb="正確。每次建立實例（例如 Node(93)）時，Python 先配置物件，然後自動呼叫它的 __init__ 把初始狀態填好。你不會自己去呼叫它。" onclick="quizCheck('q1', this)"><span class="opt-letter">(B)</span> 每次建立一個新實例的時候，Python 自動呼叫</div>
+      <div class="quiz-opt" data-correct="false" data-fb="要手動呼叫的是一般方法。dunder 方法的特色就是由 Python 在對的時機替你呼叫。" onclick="quizCheck('q1', this)"><span class="opt-letter">(C)</span> 要自己寫 <code>n.__init__()</code> 才會執行</div>
+    </div>
+    <div class="quiz-feedback" id="q1Feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-label">EXERCISE 2 · 印出來的是哪一個</div>
+    <p>某個類別同時寫了 <code>__str__</code> 與 <code>__repr__</code>。執行 <code>print([obj1, obj2])</code> 時，會用到哪一個？</p>
+    <div class="quiz-options" id="q2Options">
+      <div class="quiz-opt" data-correct="false" data-fb="直接 print&#40;obj) 才會用 __str__。但這裡 print 的是一個 list。" onclick="quizCheck('q2', this)"><span class="opt-letter">(A)</span> <code>__str__</code></div>
+      <div class="quiz-opt" data-correct="true" data-fb="正確。容器（list、dict、tuple）在印出內容時，對每個元素呼叫的是 __repr__ 而不是 __str__。這就是「我明明寫了 __str__ 卻還是印出亂碼」的典型原因。" onclick="quizCheck('q2', this)"><span class="opt-letter">(B)</span> <code>__repr__</code></div>
+      <div class="quiz-opt" data-correct="false" data-fb="不會兩個都用。容器內的元素一律走 __repr__。" onclick="quizCheck('q2', this)"><span class="opt-letter">(C)</span> 兩個都會用到</div>
+    </div>
+    <div class="quiz-feedback" id="q2Feedback"></div>
+  </div>
+</section>
+
+<section id="reference">
+  <div class="section-number">REFERENCE · 速查表</div>
+  <h2>P8 速查表</h2>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.2rem 0 .5rem;color:var(--accent2);">語法骨架</h3>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> 類別名稱:</span>
+<span class="line">    類別屬性 = 值                    <span class="com"># 整個類別共用一份</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>, 參數):        <span class="com"># 建立實例時自動呼叫</span></span>
+<span class="line">        <span class="fn">self</span>.實例屬性 = 參數          <span class="com"># 每個物件各一份</span></span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">方法名稱</span>(<span class="fn">self</span>, 其他參數):     <span class="com"># 第一個參數一定是 self</span></span>
+<span class="line">        <span class="kw">return</span> ...</span>
+<span class="line"> </span>
+<span class="line">    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="fn">self</span>):               <span class="com"># print() 會用到</span></span>
+<span class="line">        <span class="kw">return</span> <span class="str">"</span><span class="str">人看得懂的字串</span><span class="str">"</span></span>
+<span class="line"> </span>
+<span class="line">    @property</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">唯讀屬性</span>(<span class="fn">self</span>):               <span class="com"># 讀起來像屬性，其實是方法</span></span>
+<span class="line">        <span class="kw">return</span> <span class="fn">self</span>._內部值</span>
+<span class="line"> </span>
+<span class="line"> </span>
+<span class="line">物件 = 類別名稱(參數)                 <span class="com"># 建立實例</span></span>
+<span class="line">物件.方法名稱(參數)                   <span class="com"># 呼叫方法</span></span>
+<span class="line"> </span></div>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.4rem 0 .5rem;color:var(--accent2);">本頁出現的 dunder</h3>
+  <div class="cmp-table-wrap">
+  <table class="cmp-table">
+    <thead><tr><th>dunder</th><th>被什麼觸發</th><th>本站哪裡用到</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">__init__</td><td>建立實例 <code>Node(93)</code></td><td>幾乎每一章</td></tr>
+      <tr><td class="mono">__str__</td><td><code>print(x)</code>、<code>str(x)</code>、f-string</td><td>第 04、05、09 章印出結構</td></tr>
+      <tr><td class="mono">__repr__</td><td><code>repr(x)</code>、印出裝著物件的容器</td><td>debug 時</td></tr>
+      <tr><td class="mono">__len__</td><td><code>len(x)</code></td><td>第 03、05 章</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:.9rem;color:var(--muted);">更多 dunder（<code>__lt__</code>、<code>__eq__</code>、<code>__getitem__</code>、<code>__iter__</code>…）以及繼承、多型，見 <a href="p9_oop_advanced.html"><strong>P9 · 物件導向（進階）</strong></a>。</p>
+
+  <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.4rem 0 .5rem;color:var(--accent2);">延伸閱讀</h3>
+  <table class="cmp-table">
+    <thead><tr><th>資源</th><th>看什麼</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://docs.python.org/zh-tw/3/tutorial/classes.html" target="_blank" rel="noopener">Python 官方教學 · 類別</a></td><td>最權威的說明，含名稱空間與作用域。</td></tr>
+      <tr><td><a href="https://github.com/RunestoneInteractive/pythonds/tree/master/_sources/Introduction" target="_blank" rel="noopener">pythonds · Introduction</a></td><td>教科書用 <code>Fraction</code> 與邏輯閘介紹類別，本站<a href="introduction.html">第 01 章</a>有完整互動版。</td></tr>
+      <tr><td><a href="https://pythontutor.com/" target="_blank" rel="noopener">Python Tutor</a></td><td>把上面的 <code>MiniList</code> 貼進去，逐步看 <code>_next</code> 怎麼接起來。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="bankquiz">
+  <div class="section-number">QUIZ · 自我檢測</div>
+  <h2>自我檢測：物件導向基礎 <span class="sec-badge">隨堂自測 · 6 題</span></h2>
+  <p>每個選項都有解說：選錯也點開看看為什麼錯。全對之後再往下翻詞彙卡。</p>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q1.</span>以下程式印出什麼？</div>
+    <pre class="sq-code">class Node:
+    de&#102; __init__(self, node_data):
+        self&#46;_data = node_data
+        self&#46;_next = &#78;one
+
+    de&#102; get_data(self):
+        return self&#46;_data
+
+n = Node(93)
+print&#40;n.get_data(), n._next)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。建立實例時 __init__ 自動執行，把 93 存進 _data、把 _next 設成 &#78;one（代表後面還沒接節點）。這就是第 04 章鏈結串列的基本磚塊。">93 &#78;one</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。_next 在 __init__ 裡被設成 &#78;one，跟 _data 無關。">93 93</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。get_data() 回傳的是屬性 _data 的值，不是類別名稱。">Node 93</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。__init__ 除了 self 只需要一個參數，Node(93) 剛好給了一個。">TypeError：缺少參數</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q2.</span>以下程式印出什麼？</div>
+    <pre class="sq-code">class Counter:
+    total = 0
+
+    de&#102; __init__(self, name):
+        self&#46;name = name
+        Counter.total += 1
+
+a = Counter('a')
+b = Counter('b')
+a.total = 99
+print&#40;Counter.total, a.total, b.total)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。a.total = 99 沒有改到類別屬性，而是在 a 身上新建了一個同名的實例屬性，把類別屬性遮住。Counter.total 與 b.total 仍然是 2。要改共用的那一份必須寫 Counter.total = 99。">2 99 2</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。透過實例賦值只會建立實例屬性，不會影響類別屬性，更不會影響其他實例。">99 99 99</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。a.total 已經被實例屬性遮住，讀到的是 99。">2 2 2</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。對實例賦值一個新屬性在 Python 是合法的，不會報錯。">AttributeError</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q3.</span>以下程式印出什麼？</div>
+    <pre class="sq-code">class Fraction:
+    de&#102; __init__(self, top, bottom):
+        self&#46;num = top
+        self&#46;den = bottom
+
+    de&#102; __str__(self):
+        return f'{self&#46;num}/{self&#46;den}'
+
+    de&#102; __repr__(self):
+        return f'Fraction({self&#46;num}, {self&#46;den})'
+
+f = Fraction(3, 4)
+print&#40;f)
+print&#40;[f])</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。print&#40;物件) 走 __str__；但印一個裝著物件的容器時，容器對每個元素呼叫的是 __repr__。這就是「我明明寫了 __str__ 為什麼 list 印出來還是怪怪的」的原因。">3/4 然後 [Fraction(3, 4)]</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。list 內的元素一律走 __repr__，不是 __str__。">3/4 然後 [3/4]</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。直接 print 一個物件時優先使用 __str__。">Fraction(3, 4) 然後 [Fraction(3, 4)]</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。只有在 __str__ 與 __repr__ 都沒定義時，才會印出預設的物件位址字串。">兩行都是物件的記憶體位址</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q4.</span>以下程式會發生什麼事？</div>
+    <pre class="sq-code">class Stack:
+    de&#102; __init__(self):
+        self&#46;_items = []
+
+    de&#102; push(item):
+        self&#46;_items.append(item)
+
+s = Stack()
+s.push(42)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。push 漏了 self。呼叫 s.push(42) 時 Python 會自動把 s 當第一個參數傳入，所以實際上傳了兩個，而 push 只宣告了一個。看到 takes 1 positional argument but 2 were given，先檢查 self。">TypeError：push() 宣告成不吃參數，卻收到一個</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。方法的第一個參數必須是 self（名稱可換，但一定要有），否則呼叫時參數數量對不上。">正常執行，42 被放進堆疊</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。錯誤發生在參數綁定階段，還沒進到函式主體，所以是 TypeError 不是 NameError。">NameError：找不到 self</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。呼叫的當下參數就對不上了，函式主體根本沒被執行到。">只有在存取 self&#46;_items 時才會出錯</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q5.</span>以下程式印出什麼？</div>
+    <pre class="sq-code">class Node:
+    de&#102; __init__(self, node_data):
+        self&#46;_data = node_data
+
+    @property
+    de&#102; data(self):
+        return self&#46;_data
+
+    @data.setter
+    de&#102; data(self, new_data):
+        self&#46;_data = new_data
+
+n = Node(93)
+n.data = 26
+print&#40;n.data, n._data)</pre>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。n.data = 26 觸發了 setter，setter 把值寫進 _data；讀 n.data 又觸發 getter 回傳 _data。外面用起來像屬性，內部其實跑了方法——這就是封裝的實際好處：之後想加檢查，呼叫端一行都不用改。">26 26</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。getter 回傳的就是 _data，兩者一定一致。">93 26</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。setter 已經把 _data 改成 26 了。">26 93</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。有寫 @data.setter 就可以賦值；只有在沒定義 setter 時才會是唯讀。">AttributeError：data 是唯讀的</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+  <div class="sq-item">
+    <div class="sq-q"><span class="sq-num">Q6.</span>把 Stack 內部從「用 list 尾端當頂端」改成「用 list 開頭當頂端」（insert(0, x) 與 pop(0)），會發生什麼？</div>
+    <div class="sq-opts">
+      <button class="sq-opt" data-c="1" data-fb="正確。在 list 開頭插入或刪除，要把後面所有元素整批往後（前）搬移。ADT 的行為沒變、測試也會過，但成本差一個數量級——這正是第 02 章與第 05 章要你分辨的東西。">結果一樣正確，但 push 與 pop 從 O(1) 變成 O(n)</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。行為一樣，成本不一樣。這種「安靜的效能問題」不會噴錯，只會在資料變大時才浮現。">完全一樣，只是寫法不同</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。list 兩端都能插入與刪除，問題不在能不能，在多貴。">會出錯，list 不支援從開頭刪除</button>
+      <button class="sq-opt" data-c="0" data-fb="不對。只要 push 與 pop 用同一端，就仍然是後進先出。改用不同端才會變成佇列。">堆疊會變成佇列</button>
+    </div>
+    <div class="sq-fb"></div>
+  </div>
+</section>
+<section id="cards">
+  <div class="section-number">CARDS · 關鍵詞彙卡</div>
+  <h2>關鍵詞彙卡：點卡片翻面</h2>
+  <p>先看正面術語，心中默想定義再翻面對答案；洗牌後再過一輪，直到每張都能不假思索說出來。</p>
+  <div class="fc-controls">
+    <button id="fcShuffle">🔀 洗牌</button>
+    <button id="fcFlipAll">全部翻面</button>
+    <button id="fcUnflip">全部翻回</button>
+  </div>
+  <div class="fc-grid" id="fcGrid"></div>
+</section>
+<div class="chapter-nav"><a class="prev" href="p7_files_exceptions.html"><div class="nav-dir">◂ 上一頁</div><div class="nav-title">檔案與例外</div></a><a class="home" href="index.html"><div class="nav-dir">INDEX</div><div class="nav-title">章節總覽</div></a><a class="next" href="p9_oop_advanced.html"><div class="nav-dir">下一頁 ▸</div><div class="nav-title">物件導向（進階）</div></a></div>
+</div>
+
+<footer>
+  先備知識 P8 · 物件導向（基礎）· 資料結構 × Python 互動自學網站<br>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent3);">Designed for NSYSU · Interactive Python self-study</span>
+</footer>
+
+<script>
+/* ============ shared utilities ============ */
+const $ = id => document.getElementById(id);
+
+function quizCheck(quizId, optEl) {
+  const isCorrect = optEl.dataset.correct === 'true';
+  optEl.parentElement.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('correct','wrong'));
+  optEl.classList.add(isCorrect ? 'correct' : 'wrong');
+  const fb = $(quizId + 'Feedback');
+  fb.classList.remove('correct','wrong');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  fb.innerHTML = (isCorrect ? '<strong>正確 ✓</strong> ' : '<strong>不對 ✗</strong> ') + (optEl.dataset.fb || '');
+}
+
+function hlLine(rootId, n) {
+  const root = $(rootId);
+  if (!root) return;
+  root.querySelectorAll('.line').forEach(l => l.classList.remove('active'));
+  if (n != null) {
+    const line = root.querySelector(`.line[data-l="${n}"]`);
+    if (line) line.classList.add('active');
+  }
+}
+
+/* step player: frames = [{...}], apply(frame) renders */
+class Player {
+  constructor({frames, apply, delayInput, onDone}) {
+    this.frames = frames; this.apply = apply;
+    this.delayInput = delayInput; this.i = -1; this.timer = null;
+    this.onDone = onDone || (()=>{});
+  }
+  step() {
+    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+    this.i += 1; this.apply(this.frames[this.i]);
+  }
+  play() {
+    this.stop();
+    const tick = () => {
+      if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+      this.step();
+      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+    };
+    tick();
+  }
+  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
+  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+}
+
+function setStatus(id, html) {
+  const el = $(id); if (el) el.querySelector('.status-text').innerHTML = html;
+}
+
+/* vertical box stack renderer (DOM) */
+function renderBoxStack(containerId, items, opts={}) {
+  const el = $(containerId); if (!el) return;
+  const hl = opts.highlight ?? -1;   // index from top (0 = top)
+  el.innerHTML = '';
+  const label = document.createElement('div');
+  label.className = 'bs-toplabel';
+  label.textContent = items.length ? 'top ↓' : '(empty)';
+  el.appendChild(label);
+  items.slice().reverse().forEach((v, idx) => {
+    const d = document.createElement('div');
+    d.className = 'bs-item' + (idx === hl ? ' bs-hl' : '');
+    d.textContent = v;
+    el.appendChild(d);
+  });
+}
+
+/* horizontal queue renderer: front at left */
+function renderBoxQueue(containerId, items, opts={}) {
+  const el = $(containerId); if (!el) return;
+  el.innerHTML = '';
+  const front = document.createElement('div');
+  front.className = 'bq-label'; front.textContent = items.length ? 'front →' : '(empty)';
+  el.appendChild(front);
+  items.forEach((v, idx) => {
+    const d = document.createElement('div');
+    d.className = 'bq-item' + (idx === (opts.highlight ?? -1) ? ' bs-hl' : '');
+    d.textContent = v;
+    el.appendChild(d);
+  });
+  const rear = document.createElement('div');
+  rear.className = 'bq-label'; rear.textContent = items.length ? '← rear' : '';
+  el.appendChild(rear);
+}
+
+/* floating nav scroll spy */
+(function setupNav() {
+  const nav = $('floatNav');
+  const links = nav.querySelectorAll('a[data-target]');
+  const sections = Array.from(links).map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function update() {
+    const y = window.scrollY + window.innerHeight * 0.3;
+    let active = sections[0]?.id;
+    for (const s of sections) if (s.offsetTop <= y) active = s.id;
+    links.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+
+/* ---------- P03 屬性查找逐步器 ---------- */
+let lkPlayer = null;
+
+const LK_SCOPES = [
+  {key: 'inst',  title: "c 的 __dict__（實例自己）", items: {name: "'a'"}},
+  {key: 'cls',   title: "Counter 的 __dict__（類別）", items: {total: '2', __init__: '&lt;function&gt;'}},
+  {key: 'obj',   title: "object 的 __dict__（最上層父類別）", items: {__str__: '&lt;slot&gt;', __eq__: '&lt;slot&gt;'}},
+];
+
+function lkRender(state) {
+  const {active, found, done, attr} = state;
+  const html = LK_SCOPES.map((sc, i) => {
+    let border = 'var(--card-border)', bg = 'var(--card)';
+    if (found === i)       { border = 'var(--node-found)'; bg = 'rgba(22,160,133,.10)'; }
+    else if (active === i) { border = 'var(--node-current)'; bg = 'rgba(243,156,18,.10)'; }
+    const keys = Object.entries(sc.items).map(([k, v]) => {
+      const hit = (found === i && k === attr);
+      return `<span style="display:inline-block;margin:.1rem .3rem .1rem 0;padding:.1rem .5rem;border-radius:6px;` +
+             `background:${hit ? 'var(--node-found)' : 'var(--paper)'};color:${hit ? '#fff' : 'var(--ink)'};` +
+             `font-weight:${hit ? 700 : 400};">${k}: ${v}</span>`;
+    }).join('');
+    return `<div style="border:2px solid ${border};background:${bg};border-radius:10px;padding:.5rem .8rem;margin-bottom:.5rem;">` +
+           `<div style="font-size:.72rem;color:var(--muted);letter-spacing:.05em;margin-bottom:.25rem;">${i + 1}. ${sc.title}</div>` +
+           `<div style="font-size:.82rem;">${keys || '<span style="color:var(--muted);">（空）</span>'}</div></div>`;
+  }).join('');
+  const tail = done === 'error'
+    ? `<div style="border:2px solid var(--accent);background:rgba(192,57,43,.08);border-radius:10px;padding:.5rem .8rem;color:var(--accent);font-weight:700;">AttributeError: 'Counter' object has no attribute '${attr}'</div>`
+    : '';
+  $('lkStage').innerHTML =
+    `<div style="font-size:.85rem;color:var(--muted);margin-bottom:.5rem;">查詢：<code>c.${attr}</code></div>` + html + tail;
+}
+
+function lkFrames(attr) {
+  const frames = [];
+  const owner = {name: 0, total: 1}[attr];   // undefined 表示找不到
+  for (let i = 0; i < LK_SCOPES.length; i++) {
+    frames.push({
+      state: {active: i, found: null, done: null, attr},
+      msg: `第 ${i + 1} 步：到「${LK_SCOPES[i].title}」裡找 <code>${attr}</code>…`,
+    });
+    if (owner === i) {
+      frames.push({
+        state: {active: i, found: i, done: 'ok', attr},
+        msg: `找到了！<strong>${LK_SCOPES[i].title}</strong> 裡有 <code>${attr}</code>，查找到此結束。`,
+      });
+      return frames;
+    }
+    frames.push({
+      state: {active: i, found: null, done: null, attr},
+      msg: `沒有 <code>${attr}</code>，往上一層繼續找。`,
+    });
+  }
+  frames.push({
+    state: {active: null, found: null, done: 'error', attr},
+    msg: '三層都找不到 → Python 拋出 <strong>AttributeError</strong>。',
+  });
+  return frames;
+}
+
+function lkStart(attr) {
+  if (lkPlayer) lkPlayer.stop();
+  lkPlayer = new Player({
+    frames: lkFrames(attr),
+    apply: f => { lkRender(f.state); setStatus('lkStatus', f.msg); },
+  });
+  lkPlayer.play();
+}
+
+function lkReset() {
+  if (lkPlayer) lkPlayer.stop();
+  lkPlayer = null;
+  lkRender({active: null, found: null, done: null, attr: '?'});
+  setStatus('lkStatus', '選一個要查的屬性，按上面的按鈕看 Python 怎麼找。');
+}
+
+(function () {
+  if ($('lkStage')) lkReset();
+})();
+
+</script>
+<script>
+const FLASHCARDS = [{"front": "類別（Class）", "back": "建立物件的藍圖：定義這一族物件會有哪些屬性與哪些方法。藍圖只有一份，照著它可以蓋出無數個物件。"}, {"front": "物件／實例（Object / Instance）", "back": "照著類別藍圖實際建立出來的一個具體東西。每個實例各自持有自己的資料，彼此互不影響。"}, {"front": "屬性（Attribute）", "back": "綁在物件或類別身上的變數，用來存放資料。例如 Node 的 _data 與 _next。"}, {"front": "方法（Method）", "back": "定義在類別內部的函數，第一個參數固定是呼叫它的那個實例。物件.方法() 的寫法會自動把物件當第一個參數傳進去。"}, {"front": "自身參考（self）", "back": "方法的第一個參數，代表「是誰在呼叫我」。它不是關鍵字，只是強烈的命名慣例；漏寫它會得到 takes 0 positional arguments but 1 was given 這類錯誤。"}, {"front": "建構式（__init__ / Constructor）", "back": "建立實例時 Python 自動呼叫的特殊方法，負責把物件的初始狀態填好。你不會自己呼叫它。"}, {"front": "實例屬性（Instance Attribute）", "back": "寫在 __init__ 裡、掛在 self 上的屬性，每個物件各有一份。Stack 的 _items 一定要是實例屬性，否則所有 Stack 會共用同一個串列。"}, {"front": "類別屬性（Class Attribute）", "back": "寫在類別區塊最外層的屬性，整個類別共用一份。透過實例賦值只會新建同名的實例屬性把它遮住，並不會改到共用的那一份。"}, {"front": "屬性查找順序（Attribute Lookup）", "back": "Python 找屬性的順序：先找實例自己的字典，找不到往類別找，再沿著父類別一路往上，全都沒有才拋出 AttributeError。方法覆寫之所以有效，就是因為子類別先被找到。"}, {"front": "特殊方法（Dunder / Magic Method）", "back": "名稱前後各有兩條底線的方法，例如 __init__、__str__、__len__。它們是 Python 內建語法與你的類別之間的接口，由 Python 在對的時機自動呼叫。"}, {"front": "人看的字串（__str__）", "back": "決定 print\u0028物件) 與 str(物件) 印出什麼的特殊方法，寫給人看，要好讀。沒有定義時 Python 會退而使用 __repr__。"}, {"front": "開發者看的字串（__repr__）", "back": "決定 repr(物件) 的輸出，也是印出裝著物件的容器（例如串列）時每個元素採用的形式。寫給開發者看，最好精確到能貼回程式碼重建物件。"}, {"front": "封裝（Encapsulation）", "back": "把內部實作細節藏起來、只暴露有意義操作的設計原則。使用 Stack 的人只需要知道 push 與 pop，不必知道裡面是串列——這樣哪天換成鏈結串列，外面的程式碼一行都不用改。"}, {"front": "底線慣例（Underscore Convention）", "back": "單底線 _data 表示「這是內部用的，請不要從外面碰」，純粹是約定，Python 不會擋。雙底線 __data 會觸發名稱改寫成 _類別名__data，只是變得比較難碰，仍然碰得到。"}, {"front": "性質（@property）", "back": "把方法包裝成看起來像屬性的裝飾器。外面寫 n.data 讀、n.data = 5 寫，內部其實跑了 getter 與 setter，因此可以隨時加上檢查而不影響呼叫端。"}, {"front": "組合（Composition）", "back": "「A 擁有一個 B」的設計關係，例如 Stack 內部持有一個串列。資料結構課裡最常用的蓋法：外界只看得到你提供的操作，內部實作可以隨時抽換。"}, {"front": "抽象資料型別（Abstract Data Type, ADT）", "back": "只規定「有哪些操作、各自代表什麼意思」而不指定如何實作的資料模型。堆疊、佇列、映射都是 ADT；類別則是把某個 ADT 具體實作出來的工具。"}];
+
+/* ===== Flashcards engine ===== */
+(function(){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const grid = document.getElementById('fcGrid');
+  if (!grid) return;
+  const render = cards => {
+    grid.innerHTML = cards.map(c =>
+      `<div class="fc-card"><div class="fc-inner">
+         <div class="fc-face fc-front"><div>${esc(c.front)}</div><div class="fc-hint">CLICK TO FLIP</div></div>
+         <div class="fc-face fc-back">${esc(c.back)}</div>
+       </div></div>`).join('');
+  };
+  render(FLASHCARDS);
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('flipped');
+  });
+  document.getElementById('fcShuffle').addEventListener('click', () => render([...FLASHCARDS].sort(() => Math.random() - .5)));
+  document.getElementById('fcUnflip').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.remove('flipped')));
+  document.getElementById('fcFlipAll').addEventListener('click', () => grid.querySelectorAll('.fc-card').forEach(c => c.classList.add('flipped')));
+})();
+
+(function(){
+  document.querySelectorAll('.sq-item').forEach(item => {
+    const fb = item.querySelector('.sq-fb');
+    item.querySelectorAll('.sq-opt').forEach(btn => btn.addEventListener('click', () => {
+      const good = btn.dataset.c === '1';
+      item.querySelectorAll('.sq-opt').forEach(b => b.classList.remove('correct','wrong'));
+      btn.classList.add(good ? 'correct' : 'wrong');
+      fb.textContent = btn.dataset.fb;
+      fb.classList.add('show');
+      fb.classList.toggle('good', good);
+      fb.classList.toggle('bad', !good);
+    }));
+  });
+})();
+</script>
+</body>
+</html>
