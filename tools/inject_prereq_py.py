@@ -9,7 +9,11 @@ CSS/JS 常數直接從 inject_site_py.py / inject_quiz_py.py 的原始碼取出�
 避免那兩支模組載入時就對九章正課頁執行注入）。
 """
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import contrast_fix  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
@@ -100,6 +104,12 @@ def inject(entry):
         print(f"miss {fname}.html（尚未撰寫，略過）")
         return
     s = path.read_text()
+
+    # 深色底對比修正：放在 MARKER 檢查之前，所以已注入過的頁面重跑也會被回填。
+    # 它自己有成對標記、自己判斷要不要更新，這裡不必管冪等。
+    if contrast_fix.ensure(path):
+        print(f"  {fname}.html 補上 contrast-fix")
+        s = path.read_text()
 
     # MathJax：自 PythonForMath 移植的頁面 head 沒有它，但頁面裡有 $…$ 數學式。
     # 這一步刻意放在 MARKER 之前，已注入過的頁面重跑也會被補上（冪等）。
