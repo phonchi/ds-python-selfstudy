@@ -75,7 +75,33 @@ P1–P6 的來源 [phonchi/PythonForMath](https://github.com/phonchi/PythonForMa
 ## 已知待辦
 
 - `data/flashcards_zh/ch7.json` 等正課母檔仍有少量贅語，改了會動到既有頁面，沒做。
-- `searching_sorting.html` 表頭裡的 `<code>put</code>` 在深藍底上看不見
-  （`.cmp-table th` 是深藍底白字，而 `code` 預設也是深藍字）。C++ 站的先備頁 CSS 已補覆寫規則，
-  這邊的既有頁面沒補。
+- ~~`searching_sorting.html` 表頭裡的 `<code>put</code>` 在深藍底上看不見~~
+  **這條是誤判，2026-08-29 查證後關閉**：那一頁根本沒有 `code{}` 規則，
+  `<code>` 繼承 `th` 的白字，實際看得見。<br>
+  但**同一類問題確實存在而且更嚴重**，已於同日全站修掉（見下方「深色底對比」）。
 - 全站在 375px 寬會橫向溢位 —— 既有特性，九章正課頁本來就這樣。
+
+---
+
+## 深色底對比（2026-08-29）
+
+`base.css` 的 `code{color:var(--accent2)}`（#2c3e7a）與 `strong{color:var(--ink)}`（#1a1a2e）
+只要落進深色底容器就會消失。本站清查出 17 處，最嚴重的是 `.info-box .info-label` 裡的
+`<code>`——底色也是 #2c3e7a，**對比 1.00，字跟背景完全同色**。
+
+修正放在每頁 `</head>` 之前一個帶成對標記的 `<style>`（`<!-- contrast-fix v1 -->`），
+由 `tools/contrast_fix.py` 冪等維護。**它完全不碰既有的 `<style>` 區塊**——
+本站的 CSS inline 在每頁而且有 12 種複本，靠層疊順序取勝就不必管複本差異。
+`tools/inject_prereq_py.py` 在 MARKER 檢查之前呼叫 `contrast_fix.ensure()`，
+所以新頁自帶修正、舊頁重跑也會回填。
+
+`tools/check_contrast.py` 是守門員，**驗的是 CSS 合約不是內容**：
+最嚴重的案例是 `setStatus()` 執行時才生出 `<strong>`，靜態走 DOM 看不到。
+它掃出所有深色底選擇器，逐標籤確認被覆寫區塊涵蓋。改 CSS 之後記得跑它。
+
+`tools/contrast_fix.py` 與 `tools/check_contrast.py` **與 `ds-cpp-selfstudy` 逐位元組相同**，
+改一邊要記得同步另一邊（跟 `check_links_*.py` 一樣的雙胞胎慣例）。
+
+**還沒處理的**：幾個容器自身的白字就已經不合格——`#fff` on `#d68910` = 2.82、
+on `#8e44ad` = 4.42、on `#5b7eb8` = 4.10。這批修正只讓行內元素追平容器，
+沒讓它們更差，但那幾個色票本身該另案調整。
