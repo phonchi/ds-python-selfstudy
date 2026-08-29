@@ -28,6 +28,7 @@ P1–P6 的內容改寫自 [PythonForMath](https://github.com/phonchi/PythonForM
 | `tools/inject_site_py.py`／`inject_quiz_py.py` | 九章正課頁的網站化注入，已全部注入完畢，重跑會 skip | `id="cards"`／`id="bankquiz"` |
 | `tools/enrich/enrich_lib_py.py` | `hl()` Python 上色、`card()` 範例卡、`run_py()` 實跑 | — |
 | `tools/build_py_zh.py` | 詞彙卡母檔的產生器，依賴 repo 外路徑，本機跑不動 | — |
+| `tools/_legacy/` | P1–P9 當初的一次性產生腳本（`port.py`、`gen_p7/8/9.py`、`assemble.py`…）。平常維護用不到，留著是為了知道內容怎麼來的、以及下次移植有範本。說明見該目錄的 `README.md` | — |
 
 ## 新增一頁的流程
 
@@ -64,6 +65,12 @@ python3 tools/check_links_py.py
 重複的修辭框架（`00a` 一頁用了六次「不是 A，而是 B」，降到兩次）與解說導引句。
 
 粗體與 emoji 密度本來就低於既有九章（粗體每 107 字一個 vs 九章 70），維持原樣沒動。
+
+## 素材與備份
+
+P1–P6 的來源 [phonchi/PythonForMath](https://github.com/phonchi/PythonForMath) 是公開 repo，
+**沒有複製進本 repo**（光 `Figures/` 就 2.1 MB）。要重跑移植就先 clone 一份。
+當初的產生腳本原本只存在於暫存目錄，2026-08-29 已搶救進 `tools/_legacy/`。
 
 ## 已知待辦
 

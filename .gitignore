@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+# 移植素材不進版控：PythonForMath 是公開 repo，隨時能重新 clone
+# （見 tools/_legacy/README.md）
+tools/_legacy/PythonForMath/
