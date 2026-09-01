@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -505,6 +506,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="big-formula">class｜物件｜__init__｜self｜屬性｜方法｜__str__｜組合</div>
     <div class="scroll-hint">向下捲動開始互動<span>↓</span></div>
   </div>
+
 </div>
 
 <div class="container">
@@ -590,6 +592,16 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
       <tr><td><strong>方法</strong> method</td><td>綁在物件上的函數</td><td><code>n.get_data()</code></td></tr>
     </tbody>
   </table>
+  </div>
+
+  <div class="info-box" style="margin-top:1rem;">
+    <div class="info-label">類別、實例與 self：同一張圖看懂</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.8rem;align-items:stretch;">
+      <div style="border:2px solid var(--accent2);border-radius:10px;padding:.7rem;"><strong>藍圖：<code>class Node</code></strong><br><code>__init__(self, data)</code><br><code>get_data(self)</code><br><small>方法只存一份</small></div>
+      <div style="border:2px solid var(--accent3);border-radius:10px;padding:.7rem;"><strong>實例 <code>n1 = Node(93)</code></strong><br><code>n1.__dict__ = {'_data': 93, '_next': None}</code></div>
+      <div style="border:2px solid var(--accent3);border-radius:10px;padding:.7rem;"><strong>實例 <code>n2 = Node(17)</code></strong><br><code>n2.__dict__ = {'_data': 17, '_next': None}</code></div>
+    </div>
+    <p style="margin:.7rem 0 0;"><code>n1.get_data()</code> 是語法糖，實際呼叫 <code>Node.get_data(n1)</code>；因此方法裡的 <code>self</code> 就是 <code>n1</code>。建立 <code>n1</code> 時，Python 先配置實例，再呼叫 <code>Node.__init__(n1, 93)</code> 填入自己的狀態。</p>
   </div>
 
   <div class="deck-extra">
@@ -693,20 +705,22 @@ a.total = 99  Counter.total = 2  b.total = 2</pre></div>
     <div>
       <div class="viz-panel">
         <div class="mono" id="lkStage" style="font-size:.9rem;line-height:1.9;min-height:200px;"></div>
-        <div class="status-banner" id="lkStatus"><span class="status-icon">›</span><span class="status-text">選一個要查的屬性，按「開始」看 Python 怎麼找。</span></div>
+        <div class="status-banner" id="lkStatus" aria-live="polite"><span class="status-icon">›</span><span class="status-text">選一個屬性，再按「下一步」。</span></div>
         <div class="controls-bar">
-          <button class="btn btn-play" onclick="lkStart('name')">▶ 查 c.name</button>
-          <button class="btn btn-play" onclick="lkStart('total')">▶ 查 c.total</button>
-          <button class="btn btn-play" onclick="lkStart('missing')">▶ 查 c.missing</button>
-          <button class="btn btn-step" onclick="lkPlayer &amp;&amp; lkPlayer.step()">→ 單步</button>
+          <select id="lkMode" onchange="lkLoad()" aria-label="查詢屬性"><option value="name">c.name</option><option value="total">c.total</option><option value="missing">c.missing</option></select>
+          <button class="btn btn-step" onclick="lkPlayer &amp;&amp; lkPlayer.prev()">← 上一步</button>
+          <button class="btn btn-play" id="lkPlay" onclick="lkPlayer &amp;&amp; lkPlayer.play()">▶ 播放</button>
+          <button class="btn btn-step" onclick="lkPlayer &amp;&amp; lkPlayer.step()">下一步 →</button>
           <button class="btn btn-reset" onclick="lkReset()">⟲ 重設</button>
+          <select id="lkSpeed" aria-label="播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select>
+          <span class="mono" id="lkCounter">0 / 2</span>
         </div>
       </div>
     </div>
     <div class="side-panel">
       <div class="info-card">
-        <div class="ic-title">查找順序 <span class="ic-badge">MRO</span></div>
-        <p style="font-size:.88rem;margin-bottom:0;">① 實例自己的 <code>__dict__</code><br>② 類別的 <code>__dict__</code><br>③ 父類別，一路往上到 <code>object</code><br>④ 都沒有 → <code>AttributeError</code></p>
+        <div class="ic-title">屬性查找（簡化版）</div>
+        <p style="font-size:.88rem;margin-bottom:0;">① 實例自己的 <code>__dict__</code><br>② 找不到才沿類別的 MRO：目前類別 → 父類別 → <code>object</code><br>③ 都沒有 → <code>AttributeError</code></p>
       </div>
       <div class="info-card">
         <div class="ic-title">為什麼要懂 <span class="ic-badge">WHY</span></div>
@@ -1161,26 +1175,32 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
+  constructor({frames, apply, delayInput, playButton, counter, onDone, onReset}) {
     this.frames = frames; this.apply = apply;
     this.delayInput = delayInput; this.i = -1; this.timer = null;
+    this.playButton = playButton; this.counter = counter;
     this.onDone = onDone || (()=>{});
+    this.onReset = onReset || (()=>{}); this.updateMeta();
   }
+  updateMeta() { if (this.counter) this.counter.textContent = `${this.i + 1} / ${this.frames.length}`; }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
-  }
-  play() {
     this.stop();
+    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+    this.i += 1; this.apply(this.frames[this.i]); this.updateMeta();
+  }
+  prev() { this.stop(); if (this.i >= 0) { this.i -= 1; if (this.i >= 0) this.apply(this.frames[this.i]); else this.onReset(); this.updateMeta(); } }
+  play() {
+    if (this.timer) { this.stop(); return; }
+    if (this.playButton) this.playButton.textContent = '⏸ 暫停';
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.apply(this.frames[this.i]); this.updateMeta();
+      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 1800);
     };
     tick();
   }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } if (this.playButton) this.playButton.textContent = '▶ 播放'; }
+  reset() { this.stop(); this.i = -1; this.onReset(); this.updateMeta(); }
 }
 
 function setStatus(id, html) {
@@ -1297,24 +1317,26 @@ function lkFrames(attr) {
   return frames;
 }
 
-function lkStart(attr) {
+function lkLoad() {
   if (lkPlayer) lkPlayer.stop();
+  const attr = $('lkMode').value;
   lkPlayer = new Player({
     frames: lkFrames(attr),
+    delayInput: $('lkSpeed'), playButton: $('lkPlay'), counter: $('lkCounter'),
     apply: f => { lkRender(f.state); setStatus('lkStatus', f.msg); },
+    onReset: lkResetView,
   });
-  lkPlayer.play();
+  lkResetView();
 }
 
-function lkReset() {
-  if (lkPlayer) lkPlayer.stop();
-  lkPlayer = null;
+function lkResetView() {
   lkRender({active: null, found: null, done: null, attr: '?'});
-  setStatus('lkStatus', '選一個要查的屬性，按上面的按鈕看 Python 怎麼找。');
+  setStatus('lkStatus', '情境已載入；按「下一步」查看 Python 怎麼找。');
 }
+function lkReset() { if (lkPlayer) lkPlayer.reset(); }
 
 (function () {
-  if ($('lkStage')) lkReset();
+  if ($('lkStage')) lkLoad();
 })();
 
 </script>

@@ -63,7 +63,9 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
+@media(max-width:600px){#knight .slider-row{flex-wrap:wrap;min-width:0;max-width:100%;}#knight .slider-row .slider-label{min-width:auto;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -105,6 +107,10 @@ strong{color:var(--ink);}
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.timeline-counter{font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--muted);min-width:5.5rem;text-align:center;}
+.timeline-speed{font-family:'JetBrains Mono',monospace;font-size:.76rem;padding:.38rem .5rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;color:var(--ink);}
+.timeline-scrubber{width:100%;accent-color:var(--accent3);margin-top:.35rem;}
+@media(max-width:390px){.controls-bar .btn{flex:1 1 calc(50% - .6rem);padding:.45rem .55rem}.timeline-counter{flex:1 1 100%}.timeline-speed{flex:1 1 100%}.timeline-scrubber{min-width:0}}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -726,12 +732,15 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
             <option value="G">G</option><option value="H">H</option>
           </select>
           <span style="font-size:.78rem;color:var(--muted);">速度</span>
-          <input type="range" id="bfsSpeed" min="200" max="1500" step="50" value="700" style="flex:1;accent-color:var(--accent3);">
+          <select class="timeline-speed" id="bfsSpeed" aria-label="BFS 播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="bfsPlay">▶ 開始</button>
-          <button class="btn btn-step" id="bfsStep">→ 單步</button>
+          <button class="btn btn-step" id="bfsPrev">← 上一步</button>
+          <button class="btn btn-step" id="bfsStep">下一步 →</button>
           <button class="btn btn-reset" id="bfsReset">↺ 重置</button>
+          <span class="timeline-counter" id="bfsCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="bfsScrubber" min="0" max="0" value="0" aria-label="BFS 步驟">
         </div>
         <div style="margin-top:.7rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;">
           <strong style="color:var(--accent2);">Queue：</strong>
@@ -871,12 +880,15 @@ cool(1) fail(2) fall(3) foil(1) fool(0) foul(1) page(5) pale(4) pall(3) pole(3) 
         </div>
         <div class="slider-row">
           <span style="font-size:.78rem;color:var(--muted);">速度</span>
-          <input type="range" id="wlSpeed" min="200" max="1500" step="50" value="500" style="flex:1;accent-color:var(--accent3);">
+          <select class="timeline-speed" id="wlSpeed" aria-label="Word Ladder 播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="wlPlay">▶ 找最短路徑</button>
-          <button class="btn btn-step" id="wlStep">→ 單步</button>
+          <button class="btn btn-step" id="wlPrev">← 上一步</button>
+          <button class="btn btn-step" id="wlStep">下一步 →</button>
           <button class="btn btn-reset" id="wlReset">↺ 重置</button>
+          <span class="timeline-counter" id="wlCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="wlScrubber" min="0" max="0" value="0" aria-label="Word Ladder 步驟">
         </div>
         <div style="margin-top:.7rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;">
           <strong style="color:var(--accent2);">Queue：</strong>
@@ -938,12 +950,15 @@ cool(1) fail(2) fall(3) foil(1) fool(0) foul(1) page(5) pale(4) pall(3) pole(3) 
             <option value="D">D</option><option value="E">E</option><option value="F">F</option>
           </select>
           <span style="font-size:.78rem;color:var(--muted);">速度</span>
-          <input type="range" id="dfsSpeed" min="200" max="1500" step="50" value="700" style="flex:1;accent-color:var(--accent3);">
+          <select class="timeline-speed" id="dfsSpeed" aria-label="DFS 播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="dfsPlay">▶ 開始</button>
-          <button class="btn btn-step" id="dfsStep">→ 單步</button>
+          <button class="btn btn-step" id="dfsPrev">← 上一步</button>
+          <button class="btn btn-step" id="dfsStep">下一步 →</button>
           <button class="btn btn-reset" id="dfsReset">↺ 重置</button>
+          <span class="timeline-counter" id="dfsCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="dfsScrubber" min="0" max="0" value="0" aria-label="DFS 步驟">
         </div>
         <div style="margin-top:.7rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;">
           <strong style="color:var(--accent2);">Recursion stack（隱式）：</strong>
@@ -1077,12 +1092,16 @@ cool(1) fail(2) fall(3) foil(1) fool(0) foul(1) page(5) pale(4) pall(3) pole(3) 
             <option value="0" selected>(0,0)</option>
           </select>
           <span style="font-size:.78rem;color:var(--muted);">速度</span>
-          <input type="range" id="knightSpeed" min="20" max="500" step="20" value="120" style="flex:1;accent-color:var(--accent3);">
+          <select class="timeline-speed" id="knightSpeed" aria-label="騎士巡遊播放速度"><option value="600">快速</option><option value="1200" selected>標準</option><option value="2200">慢速</option></select>
         </div>
         <div class="controls-bar">
           <button class="btn btn-toggle" id="knightHeur">使用 Warnsdorff: 開</button>
           <button class="btn btn-play" id="knightPlay">▶ 開始</button>
+          <button class="btn btn-step" id="knightPrev">← 上一步</button>
+          <button class="btn btn-step" id="knightStep">下一步 →</button>
           <button class="btn btn-reset" id="knightReset">↺ 重置</button>
+          <span class="timeline-counter" id="knightCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="knightScrubber" min="0" max="0" value="0" aria-label="騎士巡遊步驟">
         </div>
       </div>
     </div>
@@ -1142,12 +1161,15 @@ cool(1) fail(2) fall(3) foil(1) fool(0) foul(1) page(5) pale(4) pall(3) pole(3) 
             <option value="x">x</option><option value="y">y</option><option value="z">z</option>
           </select>
           <span style="font-size:.78rem;color:var(--muted);">速度</span>
-          <input type="range" id="dijSpeed" min="200" max="2000" step="50" value="800" style="flex:1;accent-color:var(--accent3);">
+          <select class="timeline-speed" id="dijSpeed" aria-label="Dijkstra 播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="dijPlay">▶ 開始</button>
-          <button class="btn btn-step" id="dijStep">→ 單步</button>
+          <button class="btn btn-step" id="dijPrev">← 上一步</button>
+          <button class="btn btn-step" id="dijStep">下一步 →</button>
           <button class="btn btn-reset" id="dijReset">↺ 重置</button>
+          <span class="timeline-counter" id="dijCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="dijScrubber" min="0" max="0" value="0" aria-label="Dijkstra 步驟">
         </div>
         <div style="margin-top:.7rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;">
           <strong style="color:var(--accent2);">Priority Queue：</strong>
@@ -1272,12 +1294,15 @@ u -&gt; x -&gt; y -&gt; z</pre></div>
             <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
           </select>
           <span style="font-size:.78rem;color:var(--muted);">速度</span>
-          <input type="range" id="primSpeed" min="200" max="2000" step="50" value="800" style="flex:1;accent-color:var(--accent3);">
+          <select class="timeline-speed" id="primSpeed" aria-label="Prim 播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="primPlay">▶ 開始</button>
-          <button class="btn btn-step" id="primStep">→ 單步</button>
+          <button class="btn btn-step" id="primPrev">← 上一步</button>
+          <button class="btn btn-step" id="primStep">下一步 →</button>
           <button class="btn btn-reset" id="primReset">↺ 重置</button>
+          <span class="timeline-counter" id="primCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="primScrubber" min="0" max="0" value="0" aria-label="Prim 步驟">
         </div>
         <div style="margin-top:.7rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;">
           <strong style="color:var(--accent2);">Priority Queue：</strong>
@@ -1380,10 +1405,14 @@ u -&gt; x -&gt; y -&gt; z</pre></div>
       <div class="viz-panel">
         <div class="graph-canvas" id="canvas-ts" style="height:400px;"></div>
         <div class="status-banner"><span class="status-icon">›</span><span class="status-text" id="tsStatus">按「① 跑 DFS」開始：節點上會標出 start/close 時間。</span></div>
-        <div class="controls-bar">
-          <button class="btn btn-play" onclick="tsRunDFS()">▶ ① 跑 DFS 標 closing time</button>
-          <button class="btn btn-step" onclick="tsOrder()">② 依 closing 遞減排出順序</button>
-          <button class="btn btn-reset" onclick="tsReset()">↺ 重置</button>
+        <div class="controls-bar" aria-label="拓撲排序播放控制">
+          <button class="btn btn-play" id="tsPlay" aria-label="播放拓撲排序">▶ 播放</button>
+          <button class="btn btn-step" id="tsPrev" aria-label="上一步">← 上一步</button>
+          <button class="btn btn-step" id="tsNext" aria-label="下一步">下一步 →</button>
+          <button class="btn btn-reset" id="tsResetBtn">↺ 重置</button>
+          <select class="timeline-speed" id="tsSpeed" aria-label="播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
+          <span class="timeline-counter" id="tsCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="tsScrubber" min="0" max="0" value="0" aria-label="拓撲排序步驟">
         </div>
         <div class="mono" id="tsOrderOut" style="font-size:.85rem;line-height:1.9;min-height:34px;padding:.4rem .2rem;"></div>
       </div>
@@ -1451,11 +1480,14 @@ u -&gt; x -&gt; y -&gt; z</pre></div>
       <div class="viz-panel">
         <div class="graph-canvas" id="canvas-scc" style="height:400px;"></div>
         <div class="status-banner"><span class="status-icon">›</span><span class="status-text" id="sccStatus">照按鈕順序 ①→②→③ 走一遍演算法。</span></div>
-        <div class="controls-bar">
-          <button class="btn btn-play" onclick="sccStep1()">▶ ① DFS on G</button>
-          <button class="btn btn-step" onclick="sccStep2()">② 轉置成 G&#7488;</button>
-          <button class="btn btn-step" onclick="sccStep3()">③ G&#7488; 上依 closing 遞減 DFS</button>
-          <button class="btn btn-reset" onclick="sccReset()">↺ 重置</button>
+        <div class="controls-bar" aria-label="SCC 播放控制">
+          <button class="btn btn-play" id="sccPlay" aria-label="播放 SCC 演算法">▶ 播放</button>
+          <button class="btn btn-step" id="sccPrev" aria-label="上一步">← 上一步</button>
+          <button class="btn btn-step" id="sccNext" aria-label="下一步">下一步 →</button>
+          <button class="btn btn-reset" id="sccResetBtn">↺ 重置</button>
+          <select class="timeline-speed" id="sccSpeed" aria-label="播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
+          <span class="timeline-counter" id="sccCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="sccScrubber" min="0" max="0" value="0" aria-label="SCC 步驟">
         </div>
         <div class="mono" id="sccOut" style="font-size:.85rem;line-height:1.9;min-height:34px;padding:.4rem .2rem;"></div>
       </div>
@@ -2045,6 +2077,79 @@ function buildAdjacency(config, undirected=true) {
   return adj;
 }
 
+/* Shared contract for the chapter's trace players.  Controllers only produce
+   immutable frames and render one frame; this timeline owns every timer and
+   index transition.  The generation token makes a stale callback harmless
+   after Reset or an input change (notably the Knight solver's old deferred
+   callback). */
+function attachTraceTimeline(ctrl, cfg) {
+  let generation = 0;
+  const playBtn = document.getElementById(cfg.playId);
+  const counter = document.getElementById(cfg.counterId);
+  const scrubber = document.getElementById(cfg.scrubberId);
+
+  function setPlaying(on) {
+    ctrl.playing = on;
+    playBtn.classList.toggle('active', on);
+    playBtn.textContent = on ? '⏸ 暫停' : cfg.playLabel;
+  }
+  function cancel() {
+    generation += 1;
+    if (ctrl.timer != null) clearTimeout(ctrl.timer);
+    ctrl.timer = null;
+    setPlaying(false);
+  }
+  function ensureFrames() {
+    if (!ctrl.steps.length) cfg.generate();
+    return ctrl.steps.length > 0;
+  }
+  function sync() {
+    const total = Math.max(1, ctrl.steps.length);
+    const shown = Math.min(total, ctrl.idx + 1);
+    counter.textContent = `步驟 ${shown} / ${total}`;
+    scrubber.max = Math.max(0, ctrl.steps.length - 1);
+    scrubber.value = Math.max(0, ctrl.idx);
+    scrubber.hidden = ctrl.steps.length < 8;
+  }
+  function render(index) {
+    if (!ensureFrames()) return false;
+    ctrl.idx = Math.max(0, Math.min(ctrl.steps.length - 1, index));
+    ctrl.applyStep(ctrl.steps[ctrl.idx]);
+    sync();
+    return true;
+  }
+  ctrl.stop = cancel;
+  ctrl.seek = (index) => { cancel(); return render(index); };
+  ctrl.prev = () => ctrl.seek(ctrl.idx - 1);
+  ctrl.step = () => { cancel(); return render(ctrl.idx + 1); };
+  ctrl.reset = () => {
+    cancel();
+    ctrl.steps = [];
+    ctrl.idx = 0;
+    if (cfg.beforeGenerate) cfg.beforeGenerate();
+    render(0);
+  };
+  ctrl.play = () => {
+    if (ctrl.playing) { cancel(); return; }
+    if (!ensureFrames()) return;
+    if (ctrl.idx >= ctrl.steps.length - 1) render(0);
+    setPlaying(true);
+    const token = ++generation;
+    const tick = () => {
+      if (!ctrl.playing || token !== generation) return;
+      if (ctrl.idx >= ctrl.steps.length - 1) { cancel(); return; }
+      render(ctrl.idx + 1);
+      if (ctrl.idx >= ctrl.steps.length - 1) { cancel(); return; }
+      ctrl.timer = setTimeout(tick, Number(document.getElementById(cfg.speedId).value));
+    };
+    // Keep the complete initial frame visible for one full selected delay.
+    ctrl.timer = setTimeout(tick, Number(document.getElementById(cfg.speedId).value));
+  };
+  document.getElementById(cfg.prevId).addEventListener('click', () => ctrl.prev());
+  scrubber.addEventListener('input', () => ctrl.seek(Number(scrubber.value)));
+  ctrl.reset();
+}
+
 class BFSController {
   constructor() {
     this.steps = [];
@@ -2182,6 +2287,10 @@ class BFSController {
   }
 }
 const bfsCtrl = new BFSController();
+attachTraceTimeline(bfsCtrl, {
+  playId:'bfsPlay', prevId:'bfsPrev', counterId:'bfsCounter', scrubberId:'bfsScrubber', speedId:'bfsSpeed', playLabel:'▶ 開始',
+  generate:() => bfsCtrl.generate(document.getElementById('bfsStart').value),
+});
 document.getElementById('bfsPlay').addEventListener('click', () => bfsCtrl.play());
 document.getElementById('bfsStep').addEventListener('click', () => { bfsCtrl.stop(); bfsCtrl.step(); });
 document.getElementById('bfsReset').addEventListener('click', () => bfsCtrl.reset());
@@ -2400,6 +2509,10 @@ class WordLadderController {
   }
 }
 const wlCtrl = new WordLadderController();
+attachTraceTimeline(wlCtrl, {
+  playId:'wlPlay', prevId:'wlPrev', counterId:'wlCounter', scrubberId:'wlScrubber', speedId:'wlSpeed', playLabel:'▶ 找最短路徑',
+  generate:() => wlCtrl.generate(document.getElementById('wlStart').value, document.getElementById('wlEnd').value),
+});
 document.getElementById('wlPlay').addEventListener('click', () => wlCtrl.play());
 document.getElementById('wlStep').addEventListener('click', () => { wlCtrl.stop(); wlCtrl.step(); });
 document.getElementById('wlReset').addEventListener('click', () => wlCtrl.reset());
@@ -2546,6 +2659,10 @@ class DFSController {
   }
 }
 const dfsCtrl = new DFSController();
+attachTraceTimeline(dfsCtrl, {
+  playId:'dfsPlay', prevId:'dfsPrev', counterId:'dfsCounter', scrubberId:'dfsScrubber', speedId:'dfsSpeed', playLabel:'▶ 開始',
+  generate:() => dfsCtrl.generate(document.getElementById('dfsStart').value),
+});
 document.getElementById('dfsPlay').addEventListener('click', () => dfsCtrl.play());
 document.getElementById('dfsStep').addEventListener('click', () => { dfsCtrl.stop(); dfsCtrl.step(); });
 document.getElementById('dfsReset').addEventListener('click', () => dfsCtrl.reset());
@@ -2626,7 +2743,7 @@ class KnightController {
     const steps = [];
     let exploredCount = 1, backtrackCount = 0;
     const target = n * n;
-    const TIME_LIMIT = 800000;  // 安全上限（步驟數）
+    const TIME_LIMIT = 5000;  // UI trace 上限，避免保存數十萬個完整 path snapshot
     let aborted = false;
 
     steps.push({ kind:'start', r: startR, c: startC, path: [[startR, startC]], explored: exploredCount, back: 0 });
@@ -2721,7 +2838,7 @@ class KnightController {
     } else if (s.kind === 'fail') {
       msg = `沒有可行解`; result = '<span style="color:var(--accent);">FAIL</span>';
     } else if (s.kind === 'aborted') {
-      msg = `步數超出上限（80 萬步），請改用 Warnsdorff 或縮小棋盤`; result = '<span style="color:var(--accent);">超時</span>';
+      msg = `可視 trace 超過 5,000 步，已停止；請開 Warnsdorff 或縮小棋盤`; result = '<span style="color:var(--accent);">已截斷</span>';
     }
     document.getElementById('knightStatus').innerHTML = msg;
     document.getElementById('knightResult').innerHTML = result;
@@ -2736,53 +2853,19 @@ class KnightController {
     document.getElementById('knightExplored').textContent = '0';
     document.getElementById('knightResult').textContent = '—';
   }
-  step() {
-    if (this.steps.length === 0) {
-      const n = this.size;
-      const start = parseInt(document.getElementById('knightStart').value);
-      const sr = Math.floor(start / n), sc = start % n;
-      document.getElementById('knightStatus').textContent = '計算中…請稍候';
-      // 用 setTimeout 讓畫面先更新
-      setTimeout(() => {
-        this.solve(sr, sc);
-        this.applyStep(this.steps[0]); this.idx = 1;
-        if (this.playing) this.scheduleNext();
-      }, 50);
-      return true;
-    }
-    if (this.idx >= this.steps.length) return false;
-    this.applyStep(this.steps[this.idx]); this.idx++;
-    return this.idx < this.steps.length;
-  }
-  scheduleNext() {
-    if (!this.playing) return;
-    const speed = parseInt(document.getElementById('knightSpeed').value);
-    this.timer = setTimeout(() => {
-      const more = this.step();
-      if (!more) { this.stop(); return; }
-      this.scheduleNext();
-    }, speed);
-  }
-  play() {
-    if (this.playing) return this.stop();
-    this.playing = true;
-    const btn = document.getElementById('knightPlay');
-    btn.classList.add('active'); btn.textContent = '⏸ 暫停';
-    if (this.steps.length === 0) {
-      this.step();   // will solve and trigger scheduleNext when done
-    } else {
-      this.scheduleNext();
-    }
-  }
-  stop() {
-    this.playing = false;
-    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
-    const btn = document.getElementById('knightPlay');
-    btn.classList.remove('active'); btn.textContent = '▶ 開始';
-  }
 }
 const knightCtrl = new KnightController();
+attachTraceTimeline(knightCtrl, {
+  playId:'knightPlay', prevId:'knightPrev', counterId:'knightCounter', scrubberId:'knightScrubber', speedId:'knightSpeed', playLabel:'▶ 開始',
+  beforeGenerate:() => knightCtrl.renderBoard(),
+  generate:() => {
+    const n = knightCtrl.size;
+    const start = Number(document.getElementById('knightStart').value);
+    knightCtrl.solve(Math.floor(start / n), start % n);
+  },
+});
 document.getElementById('knightPlay').addEventListener('click', () => knightCtrl.play());
+document.getElementById('knightStep').addEventListener('click', () => knightCtrl.step());
 document.getElementById('knightReset').addEventListener('click', () => knightCtrl.reset());
 document.getElementById('knightSize').addEventListener('change', (e) => {
   knightCtrl.size = parseInt(e.target.value);
@@ -2940,6 +3023,10 @@ class DijkstraController {
   }
 }
 const dijCtrl = new DijkstraController();
+attachTraceTimeline(dijCtrl, {
+  playId:'dijPlay', prevId:'dijPrev', counterId:'dijCounter', scrubberId:'dijScrubber', speedId:'dijSpeed', playLabel:'▶ 開始',
+  generate:() => dijCtrl.generate(document.getElementById('dijStart').value),
+});
 document.getElementById('dijPlay').addEventListener('click', () => dijCtrl.play());
 document.getElementById('dijStep').addEventListener('click', () => { dijCtrl.stop(); dijCtrl.step(); });
 document.getElementById('dijReset').addEventListener('click', () => dijCtrl.reset());
@@ -3088,6 +3175,10 @@ class PrimController {
   }
 }
 const primCtrl = new PrimController();
+attachTraceTimeline(primCtrl, {
+  playId:'primPlay', prevId:'primPrev', counterId:'primCounter', scrubberId:'primScrubber', speedId:'primSpeed', playLabel:'▶ 開始',
+  generate:() => primCtrl.generate(document.getElementById('primStart').value),
+});
 document.getElementById('primPlay').addEventListener('click', () => primCtrl.play());
 document.getElementById('primStep').addEventListener('click', () => { primCtrl.stop(); primCtrl.step(); });
 document.getElementById('primReset').addEventListener('click', () => primCtrl.reset());
@@ -3206,67 +3297,113 @@ tsConfig.edges.forEach(([u, v]) => { (tsAdj[u] = tsAdj[u] || []).push(v); });
 const tsR = new GraphRenderer('canvas-ts', tsConfig, {
   directed: true, showWeights: false, width: 600, height: 400,
 });
-let tsTimer = null, tsClose = null;
 
-function tsStatus(html) {
-  document.querySelector('#tsStatus').innerHTML = html;
+/* One controller contract drives both of the long graph traces.  Frames are
+   immutable, and applyFrame is deliberately render-only, so arbitrary seek
+   order cannot re-run DFS or mutate algorithm state. */
+function freezeTimelineFrame(frame) {
+  if (!frame || typeof frame !== 'object' || Object.isFrozen(frame)) return frame;
+  Object.values(frame).forEach(freezeTimelineFrame);
+  return Object.freeze(frame);
 }
-function tsRunDFS() {
-  tsReset(true);
-  const events = dfsCloseEvents(Object.keys(tsConfig.vertices), tsAdj);
-  const startT = {};
-  tsClose = {};
-  let i = 0;
-  tsTimer = setInterval(() => {
-    if (i >= events.length) {
-      clearInterval(tsTimer); tsTimer = null;
-      tsStatus('DFS 完成：每個節點都有 start/close time。接著按 ②。');
-      return;
-    }
-    const e = events[i++];
-    if (e.act === 'start') {
-      startT[e.v] = e.t;
-      tsR.setNodeClass(e.v, 'gray');
-      tsR.setNodeMeta(e.v, e.t + '/…');
-      tsStatus(`t=${e.t}：發現「${TS_FULL[e.v]}」（灰）`);
-    } else {
-      tsClose[e.v] = e.t;
-      tsR.setNodeClass(e.v, 'black');
-      tsR.setNodeMeta(e.v, startT[e.v] + '/' + e.t);
-      tsStatus(`t=${e.t}：「${TS_FULL[e.v]}」完成（黑），closing time = ${e.t}`);
-    }
-  }, 420);
-}
-function tsOrder() {
-  if (!tsClose || !Object.keys(tsClose).length) {
-    tsStatus('要先按 ① 跑 DFS，才有 closing time 可排。'); return;
+class GraphTimelineController {
+  constructor({frames, applyFrame, playId, prevId, nextId, resetId, speedId, counterId, scrubberId}) {
+    this.frames = frames.map(freezeTimelineFrame);
+    this.applyFrame = applyFrame;
+    this.idx = 0;
+    this.timer = null;
+    this.playBtn = document.getElementById(playId);
+    this.speed = document.getElementById(speedId);
+    this.counter = document.getElementById(counterId);
+    this.scrubber = document.getElementById(scrubberId);
+    this.scrubber.max = Math.max(0, this.frames.length - 1);
+    this.scrubber.hidden = this.frames.length < 8;
+    this.playBtn.onclick = () => this.timer ? this.pause() : this.play();
+    document.getElementById(prevId).onclick = () => this.seek(this.idx - 1);
+    document.getElementById(nextId).onclick = () => this.seek(this.idx + 1);
+    document.getElementById(resetId).onclick = () => this.seek(0);
+    this.scrubber.oninput = () => this.seek(Number(this.scrubber.value));
+    this.seek(0);
   }
-  if (tsTimer) { clearInterval(tsTimer); tsTimer = null; }
-  const order = Object.keys(tsClose).sort((a, b) => tsClose[b] - tsClose[a]);
-  const out = document.getElementById('tsOrderOut');
-  out.innerHTML = '';
-  let i = 0;
-  tsTimer = setInterval(() => {
-    if (i >= order.length) {
-      clearInterval(tsTimer); tsTimer = null;
-      tsStatus('完成！這一列保證每條邊的起點都排在終點前面：照著做就不會把生麵糊吃下肚。');
-      return;
+  delay() { return Number(this.speed.value) || 1800; }
+  updateControls() {
+    this.counter.textContent = `步驟 ${this.idx + 1} / ${this.frames.length}`;
+    this.scrubber.value = this.idx;
+  }
+  seek(index) {
+    this.pause();
+    this.idx = Math.max(0, Math.min(this.frames.length - 1, index));
+    this.applyFrame(this.frames[this.idx], this.idx);
+    this.updateControls();
+  }
+  advance() {
+    if (this.idx >= this.frames.length - 1) return false;
+    this.idx += 1;
+    this.applyFrame(this.frames[this.idx], this.idx);
+    this.updateControls();
+    return true;
+  }
+  play() {
+    if (this.timer) return;
+    if (this.idx >= this.frames.length - 1) this.seek(0);
+    this.playBtn.textContent = '⏸ 暫停';
+    this.playBtn.classList.add('active');
+    const tick = () => {
+      if (!this.advance()) { this.pause(); return; }
+      this.timer = setTimeout(tick, this.delay());
+    };
+    // Preserve the initial/current frame for one full reading interval.
+    this.timer = setTimeout(tick, this.delay());
+  }
+  pause() {
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = null;
+    this.playBtn.textContent = '▶ 播放';
+    this.playBtn.classList.remove('active');
+  }
+}
+
+function graphFrame(classes, meta, status, out='', graph='G') {
+  return freezeTimelineFrame({ classes: {...classes}, meta: {...meta}, status, out, graph });
+}
+function buildTopologicalFrames() {
+  const classes = {}, meta = {}, startT = {}, closeT = {}, frames = [];
+  frames.push(graphFrame(classes, meta, '按「播放」開始：先以 DFS 標出 start/close time，再依 closing time 遞減排出順序。'));
+  for (const e of dfsCloseEvents(Object.keys(tsConfig.vertices), tsAdj)) {
+    if (e.act === 'start') {
+      startT[e.v] = e.t; classes[e.v] = 'gray'; meta[e.v] = `${e.t}/…`;
+      frames.push(graphFrame(classes, meta, `① t=${e.t}：發現「${TS_FULL[e.v]}」（灰）`));
+    } else {
+      closeT[e.v] = e.t; classes[e.v] = 'black'; meta[e.v] = `${startT[e.v]}/${e.t}`;
+      frames.push(graphFrame(classes, meta, `① t=${e.t}：「${TS_FULL[e.v]}」完成（黑），closing time = ${e.t}`));
     }
-    const v = order[i++];
-    tsR.setNodeClass(v, 'found');
-    out.innerHTML = order.slice(0, i)
-      .map(k => `${TS_FULL[k]}<span style="opacity:.55;">(f=${tsClose[k]})</span>`)
-      .join(' → ');
-    tsStatus(`第 ${i} 位：「${TS_FULL[v]}」（closing time ${tsClose[v]}）`);
-  }, 520);
+  }
+  frames.push(graphFrame(classes, meta, '① DFS 完成：現在依 closing time 由大到小讀出頂點。'));
+  const order = Object.keys(closeT).sort((a, b) => closeT[b] - closeT[a]);
+  order.forEach((v, i) => {
+    classes[v] = 'found';
+    const out = order.slice(0, i + 1).map(k => `${TS_FULL[k]}<span style="opacity:.55;">(f=${closeT[k]})</span>`).join(' → ');
+    frames.push(graphFrame(classes, meta, `② 第 ${i + 1} 位：「${TS_FULL[v]}」（closing time ${closeT[v]}）`, out));
+  });
+  frames.push(graphFrame(classes, meta, '完成：這一列對每條邊 u→v 都把 u 排在 v 前面。',
+    order.map(k => `${TS_FULL[k]}<span style="opacity:.55;">(f=${closeT[k]})</span>`).join(' → ')));
+  return frames;
 }
-function tsReset(keepStatus) {
-  if (tsTimer) { clearInterval(tsTimer); tsTimer = null; }
+function applyTopologicalFrame(frame) {
   tsR.resetAll();
-  tsClose = null;
-  document.getElementById('tsOrderOut').innerHTML = '';
-  if (!keepStatus) tsStatus('按「① 跑 DFS」開始：節點上會標出 start/close 時間。');
+  Object.entries(frame.classes).forEach(([v, cls]) => tsR.setNodeClass(v, cls));
+  Object.entries(frame.meta).forEach(([v, value]) => tsR.setNodeMeta(v, value));
+  document.getElementById('tsStatus').innerHTML = frame.status;
+  document.getElementById('tsOrderOut').innerHTML = frame.out;
 }
+const tsTimeline = new GraphTimelineController({
+  frames: buildTopologicalFrames(), applyFrame: applyTopologicalFrame,
+  playId:'tsPlay', prevId:'tsPrev', nextId:'tsNext', resetId:'tsResetBtn',
+  speedId:'tsSpeed', counterId:'tsCounter', scrubberId:'tsScrubber'
+});
+function tsRunDFS() { tsTimeline.seek(0); tsTimeline.play(); }
+function tsOrder() { tsTimeline.seek(tsTimeline.frames.length - 1); }
+function tsReset() { tsTimeline.seek(0); }
 
 /* =============================================================
    PART 09: STRONGLY CONNECTED COMPONENTS (supplemental, pythonds 7.18)
@@ -3285,89 +3422,69 @@ const sccEdges = [
 ];
 const sccOpts = { directed: true, showWeights: false, width: 600, height: 400 };
 let sccR = new GraphRenderer('canvas-scc', { vertices: sccPos, edges: sccEdges }, sccOpts);
-let sccTimer = null, sccCloseT = null, sccOnGT = false;
-
-function sccStatus(html) { document.querySelector('#sccStatus').innerHTML = html; }
 function sccAdjOf(edges) {
   const adj = {};
   edges.forEach(([u, v]) => { (adj[u] = adj[u] || []).push(v); });
   return adj;
 }
-function sccStep1() {
-  sccReset(true);
-  const events = dfsCloseEvents(Object.keys(sccPos), sccAdjOf(sccEdges));
-  const startT = {};
-  sccCloseT = {};
-  let i = 0;
-  sccTimer = setInterval(() => {
-    if (i >= events.length) {
-      clearInterval(sccTimer); sccTimer = null;
-      sccStatus('第 ① 步完成：每個頂點都有 closing time。接著按 ② 轉置。');
-      return;
-    }
-    const e = events[i++];
+function buildSccFrames() {
+  const classes = {}, meta = {}, startT = {}, closeT = {}, frames = [];
+  frames.push(graphFrame(classes, meta, '按「播放」依序觀察：DFS on G → 轉置 → DFS forest on Gᵀ。'));
+  for (const e of dfsCloseEvents(Object.keys(sccPos), sccAdjOf(sccEdges))) {
     if (e.act === 'start') {
-      startT[e.v] = e.t;
-      sccR.setNodeClass(e.v, 'gray');
-      sccR.setNodeMeta(e.v, e.t + '/…');
+      startT[e.v] = e.t; classes[e.v] = 'gray'; meta[e.v] = `${e.t}/…`;
     } else {
-      sccCloseT[e.v] = e.t;
-      sccR.setNodeClass(e.v, 'black');
-      sccR.setNodeMeta(e.v, startT[e.v] + '/' + e.t);
+      closeT[e.v] = e.t; classes[e.v] = 'black'; meta[e.v] = `${startT[e.v]}/${e.t}`;
     }
-    sccStatus(`t=${e.t}：${e.act === 'start' ? '發現' : '完成'} ${e.v}`);
-  }, 380);
-}
-function sccStep2() {
-  if (!sccCloseT || !Object.keys(sccCloseT).length) {
-    sccStatus('要先按 ① 在 G 上跑 DFS。'); return;
+    frames.push(graphFrame(classes, meta, `① t=${e.t}：${e.act === 'start' ? '發現' : '完成'} ${e.v}`));
   }
-  if (sccTimer) { clearInterval(sccTimer); sccTimer = null; }
-  const rev = sccEdges.map(([u, v]) => [v, u]);
-  sccR = new GraphRenderer('canvas-scc', { vertices: sccPos, edges: rev }, sccOpts);
-  Object.keys(sccCloseT).forEach(v => sccR.setNodeMeta(v, 'f=' + sccCloseT[v]));
-  sccOnGT = true;
-  sccStatus('這是轉置圖 G&#7488;：所有邊都反向了，closing time 保留在節點下方。接著按 ③。');
-}
-function sccStep3() {
-  if (!sccOnGT) { sccStatus('要先按 ② 轉置成 G&#7488;。'); return; }
-  if (sccTimer) { clearInterval(sccTimer); sccTimer = null; }
+  const transposeMeta = Object.fromEntries(Object.keys(closeT).map(v => [v, `f=${closeT[v]}`]));
+  frames.push(graphFrame({}, transposeMeta, '② 轉置成 Gᵀ：所有邊反向；第一次 DFS 的 closing time 保留。', '', 'GT'));
   const revAdj = sccAdjOf(sccEdges.map(([u, v]) => [v, u]));
-  const roots = Object.keys(sccCloseT).sort((a, b) => sccCloseT[b] - sccCloseT[a]);
-  // 依 closing 遞減長森林；每棵樹＝一個 SCC
+  const roots = Object.keys(closeT).sort((a, b) => closeT[b] - closeT[a]);
   const seen = {}, trees = [];
   const collect = (v, tree) => {
     seen[v] = true; tree.push(v);
     (revAdj[v] || []).forEach(w => { if (!seen[w]) collect(w, tree); });
   };
-  roots.forEach(r => {
-    if (!seen[r]) { const tree = []; collect(r, tree); trees.push(tree); }
-  });
-  const treeCls = ['start', 'found', 'current'];
-  const steps = [];
-  trees.forEach((tree, ti) => tree.forEach(v => steps.push({ v, ti })));
-  const out = document.getElementById('sccOut');
-  out.innerHTML = '';
-  let i = 0;
-  sccTimer = setInterval(() => {
-    if (i >= steps.length) {
-      clearInterval(sccTimer); sccTimer = null;
-      out.innerHTML = trees.map((t, k) => `SCC${k + 1} = { ${t.join(', ')} }`).join('　｜　');
-      sccStatus(`完成：${trees.length} 棵樹＝${trees.length} 個強連通元件。跨元件的邊在 G&#7488; 裡走不出去，樹被「困」在元件內。`);
-      return;
-    }
-    const s = steps[i++];
-    sccR.setNodeClass(s.v, treeCls[s.ti % treeCls.length]);
-    sccStatus(`第 ${s.ti + 1} 棵樹收下 ${s.v}（起點是剩餘 closing time 最大者）`);
-  }, 380);
+  roots.forEach(r => { if (!seen[r]) { const tree = []; collect(r, tree); trees.push(tree); } });
+  const forestClasses = {}, treeCls = ['start', 'found', 'current'];
+  trees.forEach((tree, ti) => tree.forEach(v => {
+    forestClasses[v] = treeCls[ti % treeCls.length];
+    const partial = trees.slice(0, ti).map((t, k) => `SCC${k + 1} = { ${t.join(', ')} }`);
+    const now = tree.filter(k => forestClasses[k]).map(k => k);
+    partial.push(`SCC${ti + 1} = { ${now.join(', ')} }`);
+    frames.push(graphFrame(forestClasses, transposeMeta,
+      `③ 第 ${ti + 1} 棵 DFS 樹收下 ${v}（依剩餘 closing time 最大者開新樹）`, partial.join('　｜　'), 'GT'));
+  }));
+  const result = trees.map((t, k) => `SCC${k + 1} = { ${t.join(', ')} }`).join('　｜　');
+  frames.push(graphFrame(forestClasses, transposeMeta,
+    `完成：${trees.length} 棵 DFS 樹＝${trees.length} 個強連通元件。`, result, 'GT'));
+  return frames;
 }
-function sccReset(keepStatus) {
-  if (sccTimer) { clearInterval(sccTimer); sccTimer = null; }
-  sccR = new GraphRenderer('canvas-scc', { vertices: sccPos, edges: sccEdges }, sccOpts);
-  sccCloseT = null; sccOnGT = false;
-  document.getElementById('sccOut').innerHTML = '';
-  if (!keepStatus) sccStatus('照按鈕順序 ①→②→③ 走一遍演算法。');
+let sccRenderedGraph = 'G';
+function applySccFrame(frame) {
+  if (sccRenderedGraph !== frame.graph) {
+    const edges = frame.graph === 'GT' ? sccEdges.map(([u, v]) => [v, u]) : sccEdges;
+    sccR = new GraphRenderer('canvas-scc', { vertices: sccPos, edges }, sccOpts);
+    sccRenderedGraph = frame.graph;
+  } else {
+    sccR.resetAll();
+  }
+  Object.entries(frame.classes).forEach(([v, cls]) => sccR.setNodeClass(v, cls));
+  Object.entries(frame.meta).forEach(([v, value]) => sccR.setNodeMeta(v, value));
+  document.getElementById('sccStatus').innerHTML = frame.status;
+  document.getElementById('sccOut').innerHTML = frame.out;
 }
+const sccTimeline = new GraphTimelineController({
+  frames: buildSccFrames(), applyFrame: applySccFrame,
+  playId:'sccPlay', prevId:'sccPrev', nextId:'sccNext', resetId:'sccResetBtn',
+  speedId:'sccSpeed', counterId:'sccCounter', scrubberId:'sccScrubber'
+});
+function sccStep1() { sccTimeline.seek(0); sccTimeline.play(); }
+function sccStep2() { sccTimeline.seek(sccTimeline.frames.findIndex(f => f.graph === 'GT')); }
+function sccStep3() { sccTimeline.play(); }
+function sccReset() { sccTimeline.seek(0); }
 
 /* =============================================================
    QUIZ HANDLER

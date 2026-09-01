@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -638,6 +639,14 @@ False</pre></div>
       <button class="btn" onclick="cmpShow('ref')">referential（存指標）</button>
     </div>
   </div>
+  <div class="viz-panel" style="margin-top:.8rem;">
+    <div class="status-banner"><span class="status-icon">›</span><span class="status-text">ArrayList 的 O(n) 就藏在這些搬移裡；不需要動畫也看得清楚。</span></div>
+    <table class="cmp-table" style="width:100%;font-size:.8rem;">
+      <thead><tr><th>操作</th><th>操作前</th><th>必須搬移</th><th>操作後</th></tr></thead>
+      <tbody><tr><td>insert(2, X)</td><td>[A,B,C,D]</td><td>D→4、C→3</td><td>[A,B,X,C,D]</td></tr>
+      <tr><td>erase(2)</td><td>[A,B,X,C,D]</td><td>C→2、D→3</td><td>[A,B,C,D]</td></tr></tbody>
+    </table>
+  </div>
   
 <div class="quiz-box">
   <div class="quiz-label">QUIZ · cache 效應</div>
@@ -700,10 +709,10 @@ True</pre></div>
       <div class="viz-panel">
         <div id="mdGrid" style="display:grid;grid-template-columns:repeat(4, 64px);gap:5px;justify-content:center;padding:.5rem;"></div>
         <div class="bq-row" id="mdFlat" style="min-height:56px;"></div>
-        <div class="status-banner" id="mdStatus"><span class="status-icon">›</span><span class="status-text">3×4 的 int 陣列。點上面格子，看它攤平後的位置；或播放兩種走訪順序。</span></div>
-        <div class="controls-bar">
-          <button class="btn" onclick="mdWalk('row')">▶ row-major 走訪</button>
-          <button class="btn" onclick="mdWalk('col')">▶ column 走訪（跳格！）</button>
+        <div class="status-banner" id="mdStatus"><span class="status-icon">›</span><span class="status-text">3×4 的 int 陣列。點上面格子，看它攤平後的位置；下方直接並排兩種走訪順序。</span></div>
+        <div class="controls-bar" style="display:block;">
+          <div class="mono" style="font-size:.75rem;">row-major：0 → 1 → 2 → 3 → 4 → … → 11</div>
+          <div class="mono" style="font-size:.75rem;margin-top:.25rem;">column traversal：0 → 4 → 8 → 1 → 5 → 9 → 2 → 6 → 10 → 3 → 7 → 11</div>
         </div>
       </div>
     </div>
@@ -712,7 +721,7 @@ True</pre></div>
         <div class="ic-title">效能後果</div>
         <div style="font-size:.87rem;line-height:1.9;">row-major 佈局下，<code>for i: for j: M[i, j]</code>
         是順著記憶體走（cache 友善）；內外圈對調就變成每步跳 4×行數 bytes：
-        大矩陣可差 <strong>5~10 倍</strong>。講義還示範了 numpy 的向量化寫法 <code>b = b + 1</code>：連迴圈都省了，快一個數量級。</div>
+        大矩陣通常會造成更多 cache miss；實際倍率依硬體、dtype 與矩陣大小而定。講義還示範了 numpy 的向量化寫法 <code>b = b + 1</code>。</div>
       </div>
       <div class="info-card">
         <div class="ic-title">Python 寫法</div>
@@ -770,6 +779,7 @@ False True</pre></div>
         <div class="mono" id="spStore" style="font-size:.82rem;line-height:1.9;min-height:70px;"></div>
         <div class="status-banner" id="spStatus"><span class="status-icon">›</span><span class="status-text">點格子輸入非零值（再點一次歸零），下方即時顯示 COO 與 DOK 兩種儲存內容。</span></div>
         <div class="controls-bar">
+          <label class="mono">寫入值 <input id="spValue" type="number" value="5" min="1" style="width:62px;"></label>
           <button class="btn" onclick="spRandom()">隨機放 4 個非零</button>
           <button class="btn" onclick="spClear()">清空</button>
         </div>
@@ -978,26 +988,61 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
-    this.frames = frames; this.apply = apply;
-    this.delayInput = delayInput; this.i = -1; this.timer = null;
-    this.onDone = onDone || (()=>{});
+  constructor({frames, apply, delayInput, delay=1800, onDone, onIndex}) {
+    this.frames = frames || []; this.apply = apply;
+    this.delayInput = delayInput; this.delay = delay; this.i = 0; this.timer = null;
+    this.onDone = onDone || (()=>{}); this.onIndex = onIndex || (()=>{});
+    this.progress = null; this.counter = null;
+    if (delayInput && delayInput.closest('.controls-bar')) {
+      const bar = delayInput.closest('.controls-bar');
+      bar.querySelectorAll('.player-progress,.player-counter').forEach(x=>x.remove());
+      this.counter = document.createElement('span'); this.counter.className='player-counter mono';
+      this.counter.style.fontSize='.72rem'; bar.appendChild(this.counter);
+      if (this.frames.length >= 8) {
+        this.progress=document.createElement('input'); this.progress.type='range';
+        this.progress.className='player-progress'; this.progress.min=0; this.progress.max=this.frames.length-1; this.progress.value=0;
+        this.progress.style.cssText='flex:1 1 120px;min-width:90px;';
+        this.progress.oninput=()=>this.seek(this.progress.value); bar.appendChild(this.progress);
+      }
+    }
+  }
+  currentDelay() {
+    return this.delayInput ? parseInt(this.delayInput.value, 10) : this.delay;
+  }
+  render() {
+    if (!this.frames.length) return;
+    this.apply(this.frames[this.i]); this.onIndex(this.i, this.frames.length);
+    if (this.counter) this.counter.textContent=(this.i+1)+'/'+this.frames.length;
+    if (this.progress) this.progress.value=this.i;
   }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
+    this.stop();
+    if (this.i + 1 >= this.frames.length) { this.onDone(); return false; }
+    this.i += 1; this.render(); return true;
+  }
+  prev() {
+    this.stop();
+    if (this.i <= 0) return false;
+    this.i -= 1; this.render(); return true;
+  }
+  seek(i) {
+    this.stop();
+    this.i = Math.max(0, Math.min(this.frames.length - 1, Number(i) || 0));
+    this.render();
   }
   play() {
-    this.stop();
+    if (this.timer) { this.stop(); return; }
+    if (!this.frames.length) return;
+    if (this.i >= this.frames.length - 1) { this.i = 0; this.render(); }
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.render();
+      this.timer = setTimeout(tick, this.currentDelay());
     };
-    tick();
+    this.timer = setTimeout(tick, this.currentDelay());
   }
   stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  reset() { this.stop(); this.i = 0; this.render(); }
 }
 
 function setStatus(id, html) {
@@ -1100,7 +1145,6 @@ cmpShow('compact');
 
 /* ---------- P03 multidim ---------- */
 const MD_R = 3, MD_C = 4;
-let mdTimer = null;
 function mdRender(hl) {
   const g = $('mdGrid'); g.innerHTML = '';
   for (let i = 0; i < MD_R; i++) for (let j = 0; j < MD_C; j++) {
@@ -1126,21 +1170,6 @@ function mdRender(hl) {
     f.appendChild(d);
   }
 }
-function mdWalk(mode) {
-  if (mdTimer) clearInterval(mdTimer);
-  const order = [];
-  if (mode === 'row') { for (let i=0;i<MD_R;i++) for (let j=0;j<MD_C;j++) order.push(i*MD_C+j); }
-  else { for (let j=0;j<MD_C;j++) for (let i=0;i<MD_R;i++) order.push(i*MD_C+j); }
-  let t = 0;
-  mdTimer = setInterval(() => {
-    if (t >= order.length) { clearInterval(mdTimer);
-      setStatus('mdStatus', mode === 'row'
-        ? 'row-major 走訪：攤平索引 0,1,2,…連續前進：cache line 一路吃到飽。'
-        : 'column 走訪：攤平索引 0,4,8,1,5,9,…每步跳 4 格：大矩陣時 cache miss 連發。');
-      return; }
-    mdRender(order[t]); t++;
-  }, 260);
-}
 mdRender(-1);
 
 /* ---------- P04 sparse ---------- */
@@ -1157,7 +1186,7 @@ function spRender() {
     d.textContent = v || '0';
     d.onclick = () => {
       if (spData[key]) delete spData[key];
-      else spData[key] = Math.floor(Math.random()*9) + 1;
+      else spData[key] = Math.max(1, parseInt($('spValue').value || '1', 10));
       spRender();
     };
     g.appendChild(d);

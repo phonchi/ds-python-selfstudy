@@ -78,7 +78,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 .side-panel{display:flex;flex-direction:column;gap:.85rem;}
 .info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
@@ -102,6 +103,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.runner-counter{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:auto}.runner-speed{font:600 .74rem 'JetBrains Mono',monospace;padding:.35rem;border:1px solid var(--card-border);border-radius:6px;background:var(--card);color:var(--ink)}.runner-scrubber{flex-basis:100%;width:100%}
+@media(max-width:390px){.controls-bar{gap:.4rem}.controls-bar .btn{padding:.42rem .62rem}.runner-counter{margin-left:0;width:100%}.runner-speed{max-width:118px}.viz-panel{padding:.8rem}.side-panel{min-width:0}.seq-cell{min-width:52px}}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -654,7 +657,7 @@ footer a{color:var(--accent2);}
     <p style="margin-bottom:0;"><code>append()</code>、<code>insert()</code>、<code>sort()</code> 都是<strong>就地修改（modify in-place）</strong>串列本身，回傳值是 <code>None</code>。千萬不要寫 <code>t = t.append('d')</code>——這會把 <code>t</code> 變成 <code>None</code>！正確寫法是直接呼叫 <code>t.append('d')</code>，串列會自動被改變。方法屬於單一資料型別：<code>append()</code> 是 <code>list</code> 的方法，不能用在 <code>string</code> 或 <code>integer</code> 上。</p>
   </div>
 
-  <p>🎬 逐步執行下面這段程式，觀察 <code>t</code> 的內容如何一步步變化（黃色 = 這步驟受影響的元素，橘色編號 = 插入的新位置）：</p>
+  <p>🎬 逐步執行下面這段程式，觀察 <code>t</code> 的內容與索引如何變化（黃色 = 受影響的元素，綠色 = 新加入的元素）：</p>
 
   <div class="viz-layout">
     <div class="viz-panel">
@@ -1042,7 +1045,7 @@ function StepRunner(prefix, steps, opts) {
   const playBtn = document.getElementById(prefix + 'Play');
   const stepBtn = document.getElementById(prefix + 'Step');
   const resetBtn= document.getElementById(prefix + 'Reset');
-  let idx = -1, timer = null;
+  let idx=-1,timer=null;const spatial=opts.kind==='spatial',vals=spatial?[600,1200,2200]:[900,1800,3000],names=spatial?['快 600ms','正常 1200ms','慢 2200ms']:['快 900ms','正常 1800ms','慢 3000ms'];const controls=playBtn&&playBtn.closest('.controls-bar');let prevBtn=null,counter=null,speed=null,scrubber=null;if(controls){prevBtn=document.createElement('button');prevBtn.className='btn btn-step';prevBtn.textContent='◂ 上一步';controls.insertBefore(prevBtn,stepBtn);if(stepBtn)stepBtn.textContent='下一步 ▸';counter=document.createElement('span');counter.className='runner-counter';controls.appendChild(counter);speed=document.createElement('select');speed.className='runner-speed';speed.setAttribute('aria-label','播放速度');vals.forEach((v,i)=>{const o=document.createElement('option');o.value=v;o.textContent=names[i];if(i===1)o.selected=true;speed.appendChild(o)});controls.appendChild(speed);if(steps.length>=8){scrubber=document.createElement('input');scrubber.type='range';scrubber.min=0;scrubber.max=steps.length;scrubber.value=0;scrubber.className='runner-scrubber';scrubber.setAttribute('aria-label','執行步驟');controls.appendChild(scrubber)}}if(statusEl)statusEl.setAttribute('aria-live','polite');if(outEl)outEl.setAttribute('aria-live','polite');
 
   function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
 
@@ -1055,6 +1058,7 @@ function StepRunner(prefix, steps, opts) {
       if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
       if (outEl) outEl.innerHTML = '';
       if (opts.onReset) opts.onReset();
+      if(counter)counter.textContent=`第 0 / ${steps.length} 步`;if(scrubber)scrubber.value=0;
       return;
     }
     const s = steps[idx];
@@ -1076,6 +1080,7 @@ function StepRunner(prefix, steps, opts) {
       outEl.scrollTop = outEl.scrollHeight;
     }
     if (opts.onStep) opts.onStep(s, idx);
+    if(counter)counter.textContent=`第 ${idx+1} / ${steps.length} 步`;if(scrubber)scrubber.value=idx+1;
   }
 
   function step() {
@@ -1083,24 +1088,24 @@ function StepRunner(prefix, steps, opts) {
     if (idx >= steps.length - 1) stopPlay();
   }
   function stopPlay(){
-    if (timer) { clearInterval(timer); timer = null; }
+    if (timer) { clearTimeout(timer); timer = null; }
     if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
   }
   function play(){
     if (timer) { stopPlay(); return; }
     if (idx >= steps.length - 1) { idx = -1; render(); }
     playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
-    timer = setInterval(()=>{
-      if (idx >= steps.length - 1) stopPlay(); else step();
-    }, opts.interval || 1600);
+    const tick=()=>{if(idx>=steps.length-1){stopPlay();return}step();if(idx<steps.length-1)timer=setTimeout(tick,Number(speed?.value||vals[1]))};tick();
   }
   function reset(){ stopPlay(); idx = -1; render(); }
 
   if (playBtn) playBtn.addEventListener('click', play);
   if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if(prevBtn)prevBtn.addEventListener('click',()=>{stopPlay();if(idx>=0){idx--;render()}});
   if (resetBtn) resetBtn.addEventListener('click', reset);
+  if(scrubber)scrubber.addEventListener('input',()=>{stopPlay();idx=Number(scrubber.value)-1;render()});
   render();
-  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+  return {reset,play,setSteps(newSteps){stopPlay();steps=newSteps;idx=-1;if(scrubber)scrubber.max=steps.length;render()}};
 }
 
 /** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
@@ -1224,12 +1229,12 @@ const SLICE_PRESETS = [
 function renderMethodCells(cells) {
   const el = document.getElementById('methodCells');
   if (!cells) { el.innerHTML = '<span class="var-empty">按「單步 ▸」開始執行</span>'; return; }
-  el.innerHTML = cells.map(c => {
+  el.innerHTML = cells.map((c,i) => {
     const cls = ['seq-cell'];
     if (c.hit) cls.push('hit');
     if (c.isNew) cls.push('newcell');
     if (c.removed) cls.push('removed');
-    return `<div class="seq-cell-wrap"><div class="${cls.join(' ')}">'${c.v}'</div></div>`;
+    return `<div class="seq-cell-wrap"><div class="seq-idx">${i}</div><div class="${cls.join(' ')}">'${c.v}'</div></div>`;
   }).join('');
 }
 StepRunner('method', [
@@ -1248,6 +1253,7 @@ StepRunner('method', [
   { line:6, out:["['elephant', 'cat', 'bat', 'ant']"], newOut:true, note:'✔ print(t) → 印出最終結果',
     cells:[{v:'elephant'},{v:'cat'},{v:'bat'},{v:'ant'}] },
 ], {
+  kind:'spatial',
   onStep: s => renderMethodCells(s.cells),
   onReset: () => renderMethodCells(null),
 });
@@ -1286,6 +1292,7 @@ StepRunner('ref', [
       {val:"[0, 'Hello!', 2]", tags:[{text:'spam',cls:'tag-a'},{text:'cheese',cls:'tag-b'}]},
       {val:"[99, 'Hello!', 2]", tags:[{text:'clone'}]} ] } },
 ], {
+  kind:'spatial',
   onStep: s => renderRefCanvas(s.canvas),
   onReset: () => renderRefCanvas(null),
 });

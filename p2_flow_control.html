@@ -82,7 +82,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 .side-panel{display:flex;flex-direction:column;gap:.85rem;}
 .info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
@@ -106,6 +107,9 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.runner-counter{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:auto}.runner-speed{font:600 .74rem 'JetBrains Mono',monospace;padding:.35rem;border:1px solid var(--card-border);border-radius:6px;background:var(--card);color:var(--ink)}.runner-scrubber{flex-basis:100%;width:100%}
+.indent-map{margin:1rem 0;padding:.9rem;background:var(--paper);border:1px solid var(--card-border);border-radius:10px}.indent-map>div{border-left:5px solid var(--accent2);padding:.5rem .8rem}.indent-map>div>div{margin:.55rem 0 .2rem 1.4rem;border-left:5px solid var(--accent3);padding:.45rem .7rem;background:var(--card);border-radius:0 7px 7px 0}.indent-map strong{display:block;font-size:.78rem;color:var(--accent2);margin-bottom:.25rem}.indent-map code{overflow-wrap:anywhere}
+@media(max-width:390px){.controls-bar{gap:.4rem}.controls-bar .btn{padding:.42rem .62rem}.runner-counter{margin-left:0;width:100%}.runner-speed{max-width:118px}.viz-panel{padding:.8rem}.side-panel{min-width:0}}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -560,29 +564,7 @@ footer a{color:var(--accent2);}
 <span class="line"><span class="fn">print</span>((<span class="num">1</span> == <span class="num">2</span>) <span class="kw">or</span> (<span class="num">2</span> == <span class="num">2</span>))   <span class="com"># True</span></span>
 <span class="line"><span class="fn">print</span>(<span class="kw">not</span> (<span class="num">1</span>==<span class="num">3</span>) <span class="kw">and</span> (<span class="num">3</span>==<span class="num">4</span>))  <span class="com"># False</span></span></div>
 
-  <h3>🧪 互動：and / or / not 真值表</h3>
-  <p>點選 A、B 的 True / False 組合，右側即時顯示 <code>A and B</code>、<code>A or B</code>、<code>not A</code> 三個運算結果，並在真值表中反白目前選到的那一列：</p>
-  <div class="sandbox">
-    <div class="sandbox-label">🧪 SANDBOX</div>
-    <div class="input-row">
-      <label>A =</label>
-      <div class="truth-btn-row" id="truthAButtons">
-        <button class="preset-btn active" data-val="true">True</button>
-        <button class="preset-btn" data-val="false">False</button>
-      </div>
-    </div>
-    <div class="input-row">
-      <label>B =</label>
-      <div class="truth-btn-row" id="truthBButtons">
-        <button class="preset-btn active" data-val="true">True</button>
-        <button class="preset-btn" data-val="false">False</button>
-      </div>
-    </div>
-    <div class="sandbox-result" id="truthResult"></div>
-    <table class="cmp-table" id="truthTable" style="margin-top:1rem;">
-      <tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not A</th></tr>
-    </table>
-  </div>
+  <p>完整真值表集中在本頁的 <a href="#reference">REF 速查表</a>，避免同一張表重複兩次。閱讀前先自行預測：當 A=False、B=True 時，<code>A and B</code>、<code>A or B</code> 與 <code>not A</code> 各是多少？</p>
 
   <p>布林運算子也有<strong>優先順序</strong>：所有數學與比較運算子執行完後，Python 會先算 <code>not</code>，再算 <code>and</code>，最後才算 <code>or</code>。完整的優先順序（由高到低）：</p>
   <table class="cmp-table">
@@ -618,6 +600,9 @@ footer a{color:var(--accent2);}
 <span class="line">        <span class="fn">print</span>(<span class="str">'允許存取。'</span>)</span>
 <span class="line">    <span class="kw">else</span>:</span>
 <span class="line">        <span class="fn">print</span>(<span class="str">'密碼錯誤。'</span>)</span></div>
+  <div class="indent-map" aria-label="巢狀縮排區塊">
+    <div><strong>外層 if 區塊</strong><code>print('你好, Mary')</code><div><strong>內層 if 區塊</strong><code>print('允許存取。')</code></div><div><strong>內層 else 區塊</strong><code>print('密碼錯誤。')</code></div></div>
+  </div>
   <p>第一個區塊從 <code>print('你好, Mary')</code> 開始，包含它之後所有更深縮排的行；在它裡面又巢狀了一個只有一行的區塊 <code>print('允許存取。')</code>；第三個區塊同樣只有一行 <code>print('密碼錯誤。')</code>。</p>
 
   <div class="info-box warm">
@@ -644,12 +629,13 @@ footer a{color:var(--accent2);}
   <p>如果想在條件為 False 時執行「另一組」程式碼，可以加上 <strong><code>else</code> 子句</strong>（分支執行）：由於條件必為 True 或 False，兩個分支中<strong>必定會執行其中一個</strong>。跟人生一樣，我們不會只有兩條路！若可能性超過兩種，可以用 <strong><code>elif</code>（鏈式條件）</strong>串接多個分支：「如果第一個條件為真就做這個；否則如果第二個條件為真就做那個；否則……」。</p>
 
   <h3>🎬 互動：逐步執行 if / elif / else</h3>
-  <p>假設 <code>name = 'Carol'</code>、<code>age = 3000</code>，逐步執行下面的鏈式條件判斷，觀察 Python 如何依序檢查每個條件，直到找到第一個為 True 的分支（或全部落空後執行 else）：</p>
+  <p>選一組輸入，再逐步執行鏈式條件；三個 preset 分別會走進 if、elif、else：</p>
+  <div class="preset-row" id="condPresets"><button class="preset-btn" data-name="Alice" data-age="3000">Alice, 3000 → if</button><button class="preset-btn" data-name="Carol" data-age="10">Carol, 10 → elif</button><button class="preset-btn active" data-name="Carol" data-age="3000">Carol, 3000 → else</button></div>
   <div class="viz-layout">
     <div class="viz-panel">
       <div class="pseudo-code" id="condCode">
-<span class="line">name = <span class="str">'Carol'</span></span>
-<span class="line">age = <span class="num">3000</span></span>
+<span class="line">name = <span class="str" id="condNameVal">'Carol'</span></span>
+<span class="line">age = <span class="num" id="condAgeVal">3000</span></span>
 <span class="line"><span class="kw">if</span> name == <span class="str">'Alice'</span>:</span>
 <span class="line">    <span class="fn">print</span>(<span class="str">'Hi, Alice.'</span>)</span>
 <span class="line"><span class="kw">elif</span> age &lt; <span class="num">12</span>:</span>
@@ -831,7 +817,7 @@ footer a{color:var(--accent2);}
   <div class="game-box" id="treeGame">
     <div class="gb-tag">GAME · ASCII CHRISTMAS TREE</div>
     <h3>🎄 聖誕樹產生器</h3>
-    <p>拖拉層數，按下按鈕，看巢狀迴圈怎麼一行一行把樹「疊」出來——外層迴圈跑幾次，就長出幾層；內層迴圈跑幾次，這一層就印幾個 <code>*</code>。</p>
+    <p>拖拉層數並產生結果：外層迴圈跑幾次，就有幾列；第 <code>row</code> 列的內層迴圈執行 <code>row</code> 次，因此印出同樣數量的 <code>*</code>。</p>
     <div class="game-console" id="treeOutput">（拖拉層數，按下「畫聖誕樹」開始）</div>
     <div class="game-input-row">
       <label for="treeLevel" style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:rgba(255,255,255,.85);">層數 = <span id="treeLevelVal">5</span></label>
@@ -1053,6 +1039,10 @@ function StepRunner(prefix, steps, opts) {
   const stepBtn = document.getElementById(prefix + 'Step');
   const resetBtn= document.getElementById(prefix + 'Reset');
   let idx = -1, timer = null;
+  const spatial=opts.kind==='spatial', vals=spatial?[600,1200,2200]:[900,1800,3000], names=spatial?['快 600ms','正常 1200ms','慢 2200ms']:['快 900ms','正常 1800ms','慢 3000ms'];
+  const controls=playBtn&&playBtn.closest('.controls-bar'); let prevBtn=null,counter=null,speed=null,scrubber=null;
+  if(controls){prevBtn=document.createElement('button');prevBtn.className='btn btn-step';prevBtn.textContent='◂ 上一步';controls.insertBefore(prevBtn,stepBtn);if(stepBtn)stepBtn.textContent='下一步 ▸';counter=document.createElement('span');counter.className='runner-counter';controls.appendChild(counter);speed=document.createElement('select');speed.className='runner-speed';speed.setAttribute('aria-label','播放速度');vals.forEach((v,i)=>{const o=document.createElement('option');o.value=v;o.textContent=names[i];if(i===1)o.selected=true;speed.appendChild(o)});controls.appendChild(speed);if(steps.length>=8){scrubber=document.createElement('input');scrubber.type='range';scrubber.min=0;scrubber.max=steps.length;scrubber.value=0;scrubber.className='runner-scrubber';scrubber.setAttribute('aria-label','執行步驟');controls.appendChild(scrubber)}}
+  if(statusEl)statusEl.setAttribute('aria-live','polite');if(outEl)outEl.setAttribute('aria-live','polite');
 
   function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
 
@@ -1065,6 +1055,7 @@ function StepRunner(prefix, steps, opts) {
       if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
       if (outEl) outEl.innerHTML = '';
       if (opts.onReset) opts.onReset();
+      if(counter)counter.textContent=`第 0 / ${steps.length} 步`;if(scrubber)scrubber.value=0;
       return;
     }
     const s = steps[idx];
@@ -1086,6 +1077,7 @@ function StepRunner(prefix, steps, opts) {
       outEl.scrollTop = outEl.scrollHeight;
     }
     if (opts.onStep) opts.onStep(s, idx);
+    if(counter)counter.textContent=`第 ${idx+1} / ${steps.length} 步`;if(scrubber)scrubber.value=idx+1;
   }
 
   function step() {
@@ -1093,24 +1085,24 @@ function StepRunner(prefix, steps, opts) {
     if (idx >= steps.length - 1) stopPlay();
   }
   function stopPlay(){
-    if (timer) { clearInterval(timer); timer = null; }
+    if (timer) { clearTimeout(timer); timer = null; }
     if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
   }
   function play(){
     if (timer) { stopPlay(); return; }
     if (idx >= steps.length - 1) { idx = -1; render(); }
     playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
-    timer = setInterval(()=>{
-      if (idx >= steps.length - 1) stopPlay(); else step();
-    }, opts.interval || 1600);
+    const tick=()=>{if(idx>=steps.length-1){stopPlay();return}step();if(idx<steps.length-1)timer=setTimeout(tick,Number(speed?.value||vals[1]))};tick();
   }
   function reset(){ stopPlay(); idx = -1; render(); }
 
   if (playBtn) playBtn.addEventListener('click', play);
   if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if(prevBtn)prevBtn.addEventListener('click',()=>{stopPlay();if(idx>=0){idx--;render()}});
   if (resetBtn) resetBtn.addEventListener('click', reset);
+  if(scrubber)scrubber.addEventListener('input',()=>{stopPlay();idx=Number(scrubber.value)-1;render()});
   render();
-  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+  return { reset, play, setSteps(newSteps){stopPlay();steps=newSteps;idx=-1;if(scrubber)scrubber.max=steps.length;render()} };
 }
 
 /** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
@@ -1118,69 +1110,19 @@ function StepRunner(prefix, steps, opts) {
 /** Flashcards：data = [{front, back}] */
 
 /* ============================================================
-   P02 真值表互動（and / or / not）
-   ============================================================ */
-(function initTruthTable(){
-  const aButtons = document.querySelectorAll('#truthAButtons .preset-btn');
-  const bButtons = document.querySelectorAll('#truthBButtons .preset-btn');
-  const result = document.getElementById('truthResult');
-  const table = document.getElementById('truthTable');
-  let A = true, B = true;
-
-  const ROWS = [[true,true],[true,false],[false,true],[false,false]];
-
-  function renderTable(){
-    // 移除舊資料列（保留表頭第一列）
-    table.querySelectorAll('tr.data-row').forEach(r => r.remove());
-    ROWS.forEach(([a,b])=>{
-      const tr = document.createElement('tr');
-      tr.className = 'data-row' + (a===A && b===B ? ' hl-row' : '');
-      tr.innerHTML = `<td>${a}</td><td>${b}</td><td>${a && b}</td><td>${a || b}</td><td>${!a}</td>`;
-      table.appendChild(tr);
-    });
-  }
-
-  function renderResult(){
-    result.innerHTML =
-      `<span class="ok">A and B</span> = ${A && B}　` +
-      `<span class="ok">A or B</span> = ${A || B}　` +
-      `<span class="ok">not A</span> = ${!A}`;
-  }
-
-  function update(){ renderResult(); renderTable(); }
-
-  aButtons.forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      aButtons.forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      A = btn.dataset.val === 'true';
-      update();
-    });
-  });
-  bButtons.forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      bButtons.forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      B = btn.dataset.val === 'true';
-      update();
-    });
-  });
-
-  update();
-})();
-
-/* ============================================================
    P04 if / elif / else 逐步執行
    name = 'Carol', age = 3000
    ============================================================ */
-StepRunner('cond', [
-  { line:0, vars:[['name',"'Carol'",'str',1]], out:[], note:"name 被指派為 'Carol'" },
-  { line:1, vars:[['name',"'Carol'",'str'],['age','3000','int',1]], out:[], note:'age 被指派為 3000' },
-  { line:2, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:[], note:"檢查 if 條件：'Carol' == 'Alice' → False，跳過此區塊，繼續檢查 elif" },
-  { line:4, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:[], note:'檢查 elif 條件：3000 < 12 → False，繼續往下' },
-  { line:6, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:[], note:'if 與 elif 條件皆為 False → 執行 else 區塊' },
-  { line:7, vars:[['name',"'Carol'",'str'],['age','3000','int']], out:['You are neither Alice nor a little kid.'], newOut:true, note:'✔ 印出 else 區塊的內容，鏈式判斷結束' },
-]);
+function condSteps(name,age){
+  const v=()=>[['name',`'${name}'`,'str'],['age',String(age),'int']];
+  const s=[{line:0,vars:[[ 'name',`'${name}'`,'str',1]],out:[],note:`name = '${name}'`},{line:1,vars:v().map((x,i)=>i? [...x,1]:x),out:[],note:`age = ${age}`},{line:2,vars:v(),out:[],note:`'${name}' == 'Alice' → ${name==='Alice'}`}];
+  if(name==='Alice'){s.push({line:3,vars:v(),out:['Hi, Alice.'],newOut:true,note:'第一個條件為 True；執行 if，後續分支不再檢查'});return s}
+  s.push({line:4,vars:v(),out:[],note:`${age} < 12 → ${age<12}`});
+  if(age<12){s.push({line:5,vars:v(),out:['You are not Alice, kidd.'],newOut:true,note:'elif 為 True；執行此分支後結束'});return s}
+  s.push({line:6,vars:v(),out:[],note:'if 與 elif 都是 False；執行 else'});s.push({line:7,vars:v(),out:['You are neither Alice nor a little kid.'],newOut:true,note:'印出 else 內容，鏈式判斷結束'});return s;
+}
+const condRunner=StepRunner('cond',condSteps('Carol',3000));
+document.querySelectorAll('#condPresets button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#condPresets button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('condNameVal').textContent=`'${b.dataset.name}'`;document.getElementById('condAgeVal').textContent=b.dataset.age;condRunner.setSteps(condSteps(b.dataset.name,Number(b.dataset.age)))}));
 
 /* ============================================================
    P05 while 迴圈逐步展開（spam = 0; while spam < 5: ...）
@@ -1191,13 +1133,10 @@ StepRunner('cond', [
   ];
   let out = [];
   for (let i = 0; i < 5; i++) {
-    const before = i; // spam value entering this round
-    steps.push({ line:1, vars:[['spam',String(before),'int']], out:[...out], note:`第 ${i+1} 輪檢查條件：${before} < 5 → True，進入迴圈主體` });
     out = [...out, 'Hello, world.'];
-    steps.push({ line:2, vars:[['spam',String(before),'int']], out:[...out], newOut:true, note:`執行 print('Hello, world.')（第 ${i+1} 次）` });
-    steps.push({ line:3, vars:[['spam',String(before+1),'int',1]], out:[...out], note:`spam += 1 → spam = ${before+1}，回到迴圈開頭重新檢查條件` });
+    steps.push({ line:3, vars:[['spam',String(i+1),'int',1]], out:[...out], newOut:true, note:`第 ${i+1} 輪：${i} < 5 為 True → 印出一次 → spam 更新為 ${i+1}` });
   }
-  steps.push({ line:1, vars:[['spam','5','int']], out:[...out], note:'第 6 輪檢查條件：5 < 5 → False，條件不成立，跳出迴圈' });
+  steps.push({ line:1, vars:[['spam','5','int']], out:[...out], note:'最後檢查：5 < 5 → False，跳出迴圈；主體共執行 5 次' });
   StepRunner('wl', steps);
 })();
 
@@ -1300,7 +1239,7 @@ StepRunner('cond', [
     const n = Number(levelInput.value);
     const lines = generateTreeLines(n);
     output.innerHTML =
-      `<div class="g-sys">&gt;&gt;&gt; 執行中 ... 層數 n = ${n}</div>` +
+      `<div class="g-sys">&gt;&gt;&gt; 產生結果：層數 n = ${n}</div>` +
       lines.map(l => `<div>${l}</div>`).join('') +
       `<div class="g-win">✔ 完成！共 ${n} 層，${lines.reduce((s,l)=>s+l.length,0)} 顆星星</div>`;
   }

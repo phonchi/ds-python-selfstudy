@@ -58,7 +58,8 @@ code{background:#f0ebe0;padding:1px 6px;border-radius:4px;font-family:'JetBrains
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -97,6 +98,10 @@ code{background:#f0ebe0;padding:1px 6px;border-radius:4px;font-family:'JetBrains
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.timeline-counter{font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--muted);min-width:5.5rem;text-align:center;}
+.timeline-scrubber{width:100%;accent-color:var(--accent3);margin-top:.35rem;}
+.timeline-speed{font-family:'JetBrains Mono',monospace;font-size:.76rem;padding:.38rem .5rem;border:1px solid var(--card-border);border-radius:6px;background:#fff;color:var(--ink);}
+@media(max-width:390px){.controls-bar .btn{flex:1 1 calc(50% - .6rem);padding:.45rem .55rem}.timeline-counter{flex:1 1 100%}.timeline-speed{flex:1 1 100%}.timeline-scrubber{min-width:0}.controls-bar>div{min-width:0!important;flex-basis:100%!important}}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -648,6 +653,11 @@ hello</pre></div>
 <section id="nodes-refs">
   <div class="section-number">PART 02 · 樹的實作</div>
   <h2>Nodes &amp; References：用類別與遞迴結構表示二元樹 <span class="sec-badge">pythonds §6.6</span></h2>
+  <div class="viz-panel" style="margin-bottom:1rem;overflow-x:auto;">
+    <table class="cmp-table" style="width:100%;font-size:.8rem;min-width:520px;"><thead><tr><th>同一棵樹</th><th>List of lists（§6.5）</th><th>Nodes &amp; References（§6.6）</th></tr></thead>
+    <tbody><tr><td>root A；left B；right C</td><td class="mono">['A', ['B', [], []], ['C', [], []]]</td><td class="mono">A.left → B<br>A.right → C</td></tr>
+    <tr><td>適合</td><td>短小、遞迴索引</td><td>方法、parent/child 更新、擴充</td></tr></tbody></table>
+  </div>
   <p>實作二元樹有兩種常見方法：<strong>list of lists</strong>（用巢狀串列）與 <strong>nodes and references</strong>（用節點物件 + 指標）。後者更貼近物件導向的思維：我們定義一個 <code>BinaryTree</code> 類別，每個物件帶 <code>key</code>、<code>left_child</code>、<code>right_child</code> 三個屬性。當 <code>left_child</code> 不是 <code>None</code> 時，它本身就是另一棵 <code>BinaryTree</code>，這就是樹的遞迴結構。</p>
 
   <h3>先看另一種表示：List of Lists <span class="sec-badge">pythonds §6.5 · 講義補充</span></h3>
@@ -676,9 +686,13 @@ hello</pre></div>
         </div>
         <div class="status-banner"><span class="status-icon">›</span><span class="status-text" id="nrStatus">按「下一步」逐行執行程式碼，看樹如何長出來</span></div>
         <div class="controls-bar">
-          <button class="btn btn-step" id="nrStep">→ 下一步</button>
-          <button class="btn btn-reset" id="nrReset">↺ 重置</button>
           <button class="btn btn-play" id="nrPlay">▶ 自動播放</button>
+          <button class="btn btn-step" id="nrPrev">← 上一步</button>
+          <button class="btn btn-step" id="nrStep">下一步 →</button>
+          <button class="btn btn-reset" id="nrReset">↺ 重置</button>
+          <select class="timeline-speed" id="nrSpeed" aria-label="節點與參考播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
+          <span class="timeline-counter" id="nrCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="nrScrubber" min="0" max="0" value="0" aria-label="節點與參考步驟" hidden>
         </div>
       </div>
     </div>
@@ -755,12 +769,15 @@ hello</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="parsePlay">▶ 開始建構</button>
-          <button class="btn btn-step" id="parseStep">→ 單步</button>
+          <button class="btn btn-step" id="parsePrev">← 上一步</button>
+          <button class="btn btn-step" id="parseStep">下一步 →</button>
           <button class="btn btn-reset" id="parseReset">↺ 重置</button>
           <button class="btn btn-toggle" id="parseEvalBtn">⊕ 評估表達式</button>
+          <span class="timeline-counter" id="parseCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="parseScrubber" min="0" max="0" value="0" aria-label="解析樹步驟" hidden>
           <div style="flex:1;min-width:120px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="parseSpeed" min="200" max="2000" step="100" value="700" style="flex:1;accent-color:var(--accent3);">
+            <select class="timeline-speed" id="parseSpeed" aria-label="解析樹播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
           </div>
         </div>
       </div>
@@ -836,11 +853,14 @@ hello</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="travPlay">▶ 開始</button>
-          <button class="btn btn-step" id="travStep">→ 單步</button>
+          <button class="btn btn-step" id="travPrev">← 上一步</button>
+          <button class="btn btn-step" id="travStep">下一步 →</button>
           <button class="btn btn-reset" id="travReset">↺ 重置</button>
+          <span class="timeline-counter" id="travCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="travScrubber" min="0" max="0" value="0" aria-label="樹走訪步驟" hidden>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="travSpeed" min="200" max="1800" step="100" value="700" style="flex:1;accent-color:var(--accent3);">
+            <select class="timeline-speed" id="travSpeed" aria-label="走訪播放速度"><option value="600">快速</option><option value="1200" selected>標準</option><option value="2200">慢速</option></select>
           </div>
         </div>
       </div>
@@ -926,11 +946,14 @@ hello</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="heapPlay">▶ 開始</button>
-          <button class="btn btn-step" id="heapStep">→ 單步</button>
+          <button class="btn btn-step" id="heapPrev">← 上一步</button>
+          <button class="btn btn-step" id="heapStep">下一步 →</button>
           <button class="btn btn-reset" id="heapReset">↺ 重置</button>
+          <span class="timeline-counter" id="heapCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="heapScrubber" min="0" max="0" value="0" aria-label="Heap 動畫步驟" hidden>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="heapSpeed" min="200" max="2000" step="100" value="700" style="flex:1;accent-color:var(--accent3);">
+            <select class="timeline-speed" id="heapSpeed" aria-label="Heap 播放速度"><option value="600">快速</option><option value="1200" selected>標準</option><option value="2200">慢速</option></select>
           </div>
         </div>
       </div>
@@ -1086,11 +1109,15 @@ Sorted list: [1, 2, 3, 5, 7, 8, 9, 10, 15]</pre></div>
           <button class="btn btn-play" data-bstop="get" style="background:var(--accent2);">get (搜尋)</button>
         </div>
         <div class="controls-bar">
-          <button class="btn btn-step" id="bstStep">→ 單步</button>
+          <button class="btn btn-play" id="bstPlay">▶ 播放</button>
+          <button class="btn btn-step" id="bstPrev">← 上一步</button>
+          <button class="btn btn-step" id="bstStep">下一步 →</button>
           <button class="btn btn-reset" id="bstReset">↺ 重置</button>
+          <span class="timeline-counter" id="bstCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="bstScrubber" min="0" max="0" value="0" aria-label="BST 動畫步驟" hidden>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="bstSpeed" min="200" max="1800" step="100" value="700" style="flex:1;accent-color:var(--accent3);">
+            <select class="timeline-speed" id="bstSpeed" aria-label="BST 播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
           </div>
         </div>
       </div>
@@ -1201,8 +1228,14 @@ Sorted list: [1, 3, 5, 7, 8, 10, 12, 15, 20, 22]</pre></div>
           <label>刪除 key：</label>
           <input type="number" id="delKey" value="30" style="width:80px;">
           <button class="btn btn-play" id="delPlay">▶ 刪除</button>
-          <button class="btn btn-step" id="delStep">→ 單步</button>
+          <button class="btn btn-step" id="delPrev">← 上一步</button>
+          <button class="btn btn-step" id="delStep">下一步 →</button>
           <button class="btn btn-reset" id="delReset">↺ 重建</button>
+        </div>
+        <div class="controls-bar" style="margin-top:.5rem;padding-top:.5rem;">
+          <select class="timeline-speed" id="delSpeed" aria-label="刪除動畫速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
+          <span class="timeline-counter" id="delCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="delScrubber" min="0" max="0" value="0" aria-label="BST 刪除動畫步驟" hidden>
         </div>
         <div class="preset-row">
           <button class="preset-btn" data-delk="20">Case 1：刪 20（葉）</button>
@@ -1386,11 +1419,14 @@ Sorted list: [1, 3, 5, 7, 8, 10, 12, 15, 20, 22]</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="avlPlay">▶ 執行旋轉</button>
-          <button class="btn btn-step" id="avlStep">→ 單步</button>
+          <button class="btn btn-step" id="avlPrev">← 上一步</button>
+          <button class="btn btn-step" id="avlStep">下一步 →</button>
           <button class="btn btn-reset" id="avlReset">↺ 重置</button>
+          <span class="timeline-counter" id="avlCounter">步驟 1 / 1</span>
+          <input class="timeline-scrubber" type="range" id="avlScrubber" min="0" max="0" value="0" aria-label="AVL 旋轉步驟" hidden>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="avlSpeed" min="300" max="2000" step="100" value="900" style="flex:1;accent-color:var(--accent3);">
+            <select class="timeline-speed" id="avlSpeed" aria-label="AVL 播放速度"><option value="900">快速</option><option value="1800" selected>標準</option><option value="3000">慢速</option></select>
           </div>
         </div>
       </div>
@@ -1668,6 +1704,45 @@ class TNode {
 }
 TNode._id = 0;
 
+/* Complete, JSON-like tree snapshots.  Parent links are recorded explicitly so
+   every frame can be reconstructed independently of the live working model. */
+function snapshotTree(root) {
+  const nodes = [];
+  for (const n of allNodes(root)) {
+    nodes.push({
+      id:n.id, key:n.key,
+      leftId:n.left ? n.left.id : null,
+      rightId:n.right ? n.right.id : null,
+      parentId:n.parent ? n.parent.id : null
+    });
+  }
+  return {rootId:root ? root.id : null, nodes};
+}
+function treeFromSnapshot(snapshot) {
+  if (!snapshot || snapshot.rootId == null) return null;
+  const byId = new Map();
+  let maxId = -1;
+  snapshot.nodes.forEach(data => {
+    const n = new TNode(data.key);
+    n.id = data.id;
+    maxId = Math.max(maxId, data.id);
+    byId.set(data.id, n);
+  });
+  snapshot.nodes.forEach(data => {
+    const n = byId.get(data.id);
+    n.left = data.leftId == null ? null : byId.get(data.leftId);
+    n.right = data.rightId == null ? null : byId.get(data.rightId);
+    n.parent = data.parentId == null ? null : byId.get(data.parentId);
+  });
+  TNode._id = Math.max(TNode._id, maxId + 1);
+  return byId.get(snapshot.rootId) || null;
+}
+function freezeFrame(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  Object.values(value).forEach(freezeFrame);
+  return Object.freeze(value);
+}
+
 /* Compute (x, y) layout for a tree using a simple level-by-level
    horizontal split. Returns the depth. */
 function layoutTree(root, w, h, topPad=40, botPad=40) {
@@ -1868,7 +1943,9 @@ class Player {
     this.idx = 0;
     this.timer = null;
     this.onEnd = opts.onEnd;
+    this.onForwardEnd = opts.onForwardEnd;
     this.onIdxChange = opts.onIdxChange;
+    this.onPlayChange = opts.onPlayChange;
   }
   reset(steps) {
     this.stop();
@@ -1878,17 +1955,32 @@ class Player {
     if (this.onIdxChange) this.onIdxChange(this.idx);
   }
   step() {
-    if (this.idx + 1 >= this.steps.length) { this.stop(); return false; }
+    this.stop();
+    return this.advance();
+  }
+  advance() {
+    if (this.idx + 1 >= this.steps.length) return false;
     this.idx++;
     this.apply(this.steps[this.idx], this.idx);
     if (this.onIdxChange) this.onIdxChange(this.idx);
-    return true;
+    if (this.idx === this.steps.length - 1 && this.onForwardEnd) this.onForwardEnd(this.steps[this.idx]);
+    return this.idx + 1 < this.steps.length;
+  }
+  prev() { this.seek(this.idx - 1); }
+  seek(index) {
+    this.stop();
+    if (!this.steps.length) return;
+    this.idx = Math.max(0, Math.min(this.steps.length - 1, index));
+    this.apply(this.steps[this.idx], this.idx);
+    if (this.onIdxChange) this.onIdxChange(this.idx);
   }
   play() {
     if (this.timer) return;
+    if (this.idx >= this.steps.length - 1) this.seek(0);
+    if (this.onPlayChange) this.onPlayChange(true);
     const tick = () => {
-      if (!this.step()) {
-        this.timer = null;
+      if (!this.advance()) {
+        this.stop();
         if (this.onEnd) this.onEnd();
         return;
       }
@@ -1898,8 +1990,42 @@ class Player {
   }
   stop() {
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    if (this.onPlayChange) this.onPlayChange(false);
   }
   setDelay(d) { this.delay = d; }
+}
+
+/* Give every frame-based tree demo the same replay contract without making
+   the individual renderers share mutable model state. */
+function equipPlayerTimeline(player, ids, playLabel) {
+  const counter = $(ids.counter);
+  const scrubber = $(ids.scrubber);
+  player.onIdxChange = (idx) => {
+    const total = Math.max(1, player.steps.length);
+    counter.textContent = `步驟 ${idx + 1} / ${total}`;
+    scrubber.max = Math.max(0, total - 1);
+    scrubber.value = idx;
+    scrubber.hidden = total < 8;
+  };
+  player.onPlayChange = (playing) => {
+    const btn = $(ids.play);
+    btn.textContent = playing ? '⏸ 暫停' : playLabel;
+    btn.classList.toggle('active', playing);
+  };
+  player.reset();
+}
+
+function bindPlayerTimeline(getPlayer, ids) {
+  $(ids.play).onclick = () => {
+    const player = getPlayer();
+    if (!player) return;
+    if (player.timer) player.stop(); else player.play();
+  };
+  $(ids.prev).onclick = () => { const p = getPlayer(); if (p) p.prev(); };
+  $(ids.next).onclick = () => { const p = getPlayer(); if (p) p.step(); };
+  $(ids.reset).onclick = () => { const p = getPlayer(); if (p) p.reset(); };
+  $(ids.scrubber).oninput = () => { const p = getPlayer(); if (p) p.seek(Number($(ids.scrubber).value)); };
+  $(ids.speed).onchange = () => { const p = getPlayer(); if (p) p.setDelay(Number($(ids.speed).value)); };
 }
 
 /* ============================================================
@@ -2067,11 +2193,9 @@ function initNodesRefs() {
   }
 
   const steps = buildSteps();
-  let stepIdx = 0;
-  let timer = null;
+  let player = null;
 
-  function applyStep(i) {
-    const s = steps[i];
+  function applyStep(s, i) {
     const root = s.tree();
     layoutTree(root, canvas.clientWidth, canvas.clientHeight, 35, 35);
     renderTree(canvas, root);
@@ -2087,50 +2211,17 @@ function initNodesRefs() {
     $('nrStatus').textContent = `Step ${i+1}/${steps.length}: ${s.msg}`;
   }
 
-  function reset() {
-    if (timer) { clearTimeout(timer); timer = null; }
-    $('nrPlay').classList.remove('active');
-    $('nrPlay').textContent = '▶ 自動播放';
-    stepIdx = 0;
-    applyStep(0);
-  }
+  player = new Player({steps, apply:applyStep, delay:Number($('nrSpeed').value)});
+  equipPlayerTimeline(player, {
+    play:'nrPlay', counter:'nrCounter', scrubber:'nrScrubber'
+  }, '▶ 自動播放');
+  bindPlayerTimeline(() => player, {
+    play:'nrPlay', prev:'nrPrev', next:'nrStep', reset:'nrReset',
+    scrubber:'nrScrubber', speed:'nrSpeed'
+  });
 
-  $('nrStep').onclick = () => {
-    if (stepIdx + 1 < steps.length) {
-      stepIdx++;
-      applyStep(stepIdx);
-    }
-  };
-
-  $('nrReset').onclick = reset;
-
-  $('nrPlay').onclick = () => {
-    if (timer) {
-      clearTimeout(timer); timer = null;
-      $('nrPlay').classList.remove('active');
-      $('nrPlay').textContent = '▶ 自動播放';
-      return;
-    }
-    if (stepIdx + 1 >= steps.length) reset();
-    $('nrPlay').classList.add('active');
-    $('nrPlay').textContent = '⏸ 暫停';
-    function tick() {
-      if (stepIdx + 1 < steps.length) {
-        stepIdx++;
-        applyStep(stepIdx);
-        timer = setTimeout(tick, 900);
-      } else {
-        timer = null;
-        $('nrPlay').classList.remove('active');
-        $('nrPlay').textContent = '▶ 自動播放';
-      }
-    }
-    timer = setTimeout(tick, 900);
-  };
-
-  reset();
-  _ensurePanelReady(canvas, () => applyStep(stepIdx));
-  return { resize: () => applyStep(stepIdx) };
+  _ensurePanelReady(canvas, () => player.apply(player.steps[player.idx], player.idx));
+  return { resize: () => player.apply(player.steps[player.idx], player.idx) };
 }
 
 /* ============================================================
@@ -2296,7 +2387,9 @@ function initParseTree() {
       apply: (frame) => applyFrame(frame),
       delay: parseInt($('parseSpeed').value, 10),
     });
-    player.reset();
+    equipPlayerTimeline(player, {
+      play:'parsePlay', counter:'parseCounter', scrubber:'parseScrubber'
+    }, '▶ 開始建構');
   }
 
   $('parseApply').onclick = regen;
@@ -2309,11 +2402,9 @@ function initParseTree() {
       regen();
     };
   });
-  $('parsePlay').onclick = () => { if (player) player.play(); };
-  $('parseStep').onclick = () => { if (player) player.step(); };
-  $('parseReset').onclick = () => { if (player) player.reset(); };
-  $('parseSpeed').addEventListener('input', () => {
-    if (player) player.setDelay(parseInt($('parseSpeed').value, 10));
+  bindPlayerTimeline(() => player, {
+    play:'parsePlay', prev:'parsePrev', next:'parseStep', reset:'parseReset',
+    scrubber:'parseScrubber', speed:'parseSpeed'
   });
   $('parseEvalBtn').onclick = () => {
     // jump to last step
@@ -2329,7 +2420,9 @@ function initParseTree() {
       player.apply(player.steps[player.idx], player.idx);
     } else regen();
   });
-  return { resize: regen };
+  return { resize: () => {
+    if (player && player.steps[player.idx]) player.apply(player.steps[player.idx], player.idx);
+  } };
 }
 
 /* ============================================================
@@ -2439,7 +2532,9 @@ function initTraversals() {
       apply: applyFrame,
       delay: parseInt($('travSpeed').value, 10),
     });
-    player.reset();
+    equipPlayerTimeline(player, {
+      play:'travPlay', counter:'travCounter', scrubber:'travScrubber'
+    }, '▶ 開始');
     // Update code panel to match traversal
     const codeMap = {
       preorder: `<span class="line" data-l="1"><span class="kw">def</span> <span class="fn">preorder</span>(tree):</span>
@@ -2487,11 +2582,9 @@ function initTraversals() {
       regen();
     };
   });
-  $('travPlay').onclick = () => { if (player) player.play(); };
-  $('travStep').onclick = () => { if (player) player.step(); };
-  $('travReset').onclick = () => { if (player) player.reset(); };
-  $('travSpeed').addEventListener('input', () => {
-    if (player) player.setDelay(parseInt($('travSpeed').value, 10));
+  bindPlayerTimeline(() => player, {
+    play:'travPlay', prev:'travPrev', next:'travStep', reset:'travReset',
+    scrubber:'travScrubber', speed:'travSpeed'
   });
 
   regen();
@@ -2749,18 +2842,32 @@ function initHeap() {
     setText($('heapIdx'), s.idx);
     setText($('heapPar'), s.par);
     hlLine($('heapCode'), s.line);
-    if (s.commit && s.finalArr) {
-      heapArr = s.finalArr.slice();
-      $('heapArrInput').value = heapArr.join(', ');
-    }
+  }
+
+  function updateHeapTimeline(idx) {
+    const total = player ? player.steps.length : 1;
+    $('heapCounter').textContent = `步驟 ${idx + 1} / ${total}`;
+    $('heapScrubber').max = Math.max(0, total - 1);
+    $('heapScrubber').value = idx;
+    $('heapScrubber').hidden = total < 8;
+  }
+  function setHeapPlaying(playing) {
+    $('heapPlay').textContent = playing ? '⏸ 暫停' : '▶ 開始';
+    $('heapPlay').classList.toggle('active', playing);
   }
 
   function regen(steps) {
     if (player) player.stop();
     player = new Player({
-      steps,
+      steps: steps.map(freezeFrame),
       apply: applyStep,
-      delay: parseInt($('heapSpeed').value, 10)
+      delay: parseInt($('heapSpeed').value, 10),
+      onIdxChange: updateHeapTimeline,
+      onPlayChange: setHeapPlaying,
+      onForwardEnd: (frame) => {
+        heapArr = frame.arr.slice();
+        $('heapArrInput').value = heapArr.join(', ');
+      }
     });
     player.reset();
   }
@@ -2783,9 +2890,14 @@ function initHeap() {
   // Wire up controls
   document.querySelectorAll('#heap .preset-btn[data-op]').forEach(btn => {
     btn.onclick = () => {
+      if (player) player.stop();
+      player = null;
       document.querySelectorAll('#heap .preset-btn[data-op]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentOp = btn.dataset.op;
+      setHeapPlaying(false);
+      $('heapCounter').textContent = '步驟 1 / 1';
+      $('heapScrubber').max = 0; $('heapScrubber').value = 0; $('heapScrubber').hidden = true;
       $('heapStatus').textContent = currentOp === 'insert' ? '輸入 key 後按「插入」或「開始」' :
                                      currentOp === 'delete' ? '按「開始」執行 delete-min' :
                                      '陣列當作未排序輸入，按「開始」做 heapify';
@@ -2794,21 +2906,24 @@ function initHeap() {
 
   $('heapInsertBtn').onclick = startOp;
   $('heapApplyArr').onclick = () => {
+    if (player) player.stop();
+    player = null;
     const raw = $('heapArrInput').value.split(/[\s,]+/).map(s=>parseInt(s,10)).filter(n=>!isNaN(n));
     heapArr = raw;
     renderHeap(heapArr, {});
+    setHeapPlaying(false);
+    $('heapCounter').textContent = '步驟 1 / 1';
+    $('heapScrubber').max = 0; $('heapScrubber').value = 0; $('heapScrubber').hidden = true;
     $('heapStatus').textContent = '已套用陣列。若要 heapify 修復，選擇「Heapify」並按「開始」';
   };
   $('heapPlay').onclick = () => {
-    if (player && player.idx > 0 && player.idx < player.steps.length - 1) {
-      player.play();
-    } else {
-      startOp();
-      if (player) player.play();
-    }
+    if (player && player.timer) { player.stop(); return; }
+    if (!player) startOp();
+    if (player) player.play(); // Player rewinds an existing trace instead of repeating the mutation.
   };
+  $('heapPrev').onclick = () => { if (player) player.prev(); };
   $('heapStep').onclick = () => {
-    if (!player || player.idx >= player.steps.length - 1) startOp();
+    if (!player) startOp();
     else player.step();
   };
   $('heapReset').onclick = () => {
@@ -2819,7 +2934,12 @@ function initHeap() {
     setText($('heapSwap'), '0'); setText($('heapCmp'), '0');
     setText($('heapIdx'), '—'); setText($('heapPar'), '—');
     hlLine($('heapCode'), null);
+    player = null;
+    setHeapPlaying(false);
+    $('heapCounter').textContent = '步驟 1 / 1';
+    $('heapScrubber').max = 0; $('heapScrubber').value = 0; $('heapScrubber').hidden = true;
   };
+  $('heapScrubber').addEventListener('input', () => { if (player) player.seek(Number($('heapScrubber').value)); });
   $('heapSpeed').addEventListener('input', () => {
     if (player) player.setDelay(parseInt($('heapSpeed').value, 10));
   });
@@ -2842,6 +2962,8 @@ function initBST() {
 
   let root = null;
   let player = null;
+  let lastOp = 'put';
+  let lastKey = 40;
 
   // Pseudo-code variants for put vs get; line numbers in genOpSteps refer to these.
   const codeTemplates = {
@@ -2897,27 +3019,23 @@ function initBST() {
     return r;
   }
 
-  function render(hlPath, currentNode, status) {
+  function render(viewRoot, pathIds, currentId, status) {
     const w = canvas.clientWidth || 600;
     const h = parseInt(canvas.style.height) || 380;
-    if (root) layoutTree(root, w, h, 38, 36);
-    renderTree(canvas, root);
+    if (viewRoot) layoutTree(viewRoot, w, h, 38, 36);
+    renderTree(canvas, viewRoot);
     clearHL(canvas);
-    if (hlPath) {
-      hlPath.forEach(n => {
-        if (n) setNodeClass(canvas, n.id, 'path');
-      });
+    if (pathIds) {
+      pathIds.forEach(id => setNodeClass(canvas, id, 'path'));
       // Edges along path
-      for (let i = 0; i < hlPath.length - 1; i++) {
-        if (hlPath[i] && hlPath[i+1]) {
-          setEdgeClass(canvas, hlPath[i].id, hlPath[i+1].id, 'path');
-        }
+      for (let i = 0; i < pathIds.length - 1; i++) {
+        setEdgeClass(canvas, pathIds[i], pathIds[i + 1], 'path');
       }
     }
-    if (currentNode) setNodeClass(canvas, currentNode.id, 'current');
+    if (currentId != null) setNodeClass(canvas, currentId, 'current');
     if (status != null) setText($('bstStatus'), status);
-    setText($('bstHeight'), treeHeight(root));
-    setText($('bstSize'), nodeCount(root));
+    setText($('bstHeight'), treeHeight(viewRoot));
+    setText($('bstSize'), nodeCount(viewRoot));
   }
 
   // Generate steps for a put or get operation
@@ -2930,53 +3048,72 @@ function initBST() {
   function genOpSteps(op, key) {
     const L = lineMap[op] || lineMap.put;
     const steps = [];
-    if (!root) {
+    let simRoot = treeFromSnapshot(snapshotTree(root));
+    const add = data => steps.push(freezeFrame({
+      tree:snapshotTree(simRoot), pathIds:[], currentId:null,
+      currentKey:'—', result:'—', cmp:0, line:null, ...data
+    }));
+    if (!simRoot) {
       if (op === 'put') {
-        steps.push({type:'init-empty', key, status:`空樹，建立 root = ${key}`, line:null});
-        steps.push({type:'commit-root', key, status:`插入完成 ✓`, line:null});
+        add({status:`空樹，準備建立 root = ${key}`, line:null, cmp:0});
+        simRoot = new TNode(key);
+        add({status:`插入 ${key} 完成 ✓`, line:null, cmp:0, pathIds:[simRoot.id], currentId:simRoot.id});
       } else {
-        steps.push({type:'noop', status:`空樹，找不到 ${key}`, result:'NOT FOUND', line:L.notFound});
+        add({status:`空樹，找不到 ${key}`, result:'NOT FOUND', line:L.notFound, cmp:0});
       }
       return steps;
     }
-    let cur = root;
+    let cur = simRoot;
     const path = [];
     let cmp = 0;
     while (cur) {
       path.push(cur);
       cmp++;
-      steps.push({type:'visit', node:cur, path:path.slice(), status:`比較 key=${key} 與 ${cur.key}`, line: key < cur.key ? L.visitLT : L.visitGTE, cmp});
+      add({status:`比較 key=${key} 與 ${cur.key}`, line:key < cur.key ? L.visitLT : L.visitGTE, cmp,
+        pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
       if (key === cur.key) {
         if (op === 'get') {
-          steps.push({type:'found', node:cur, path:path.slice(), status:`找到 ${key} ✓`, line:L.foundEq, result:'FOUND', cmp});
+          add({status:`找到 ${key} ✓`, line:L.foundEq, result:'FOUND', cmp,
+            pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
         } else {
-          steps.push({type:'dup', node:cur, path:path.slice(), status:`key=${key} 已存在，更新 value（不改結構）`, line:null, cmp});
+          add({status:`key=${key} 已存在，更新 value（不改結構）`, line:null, cmp,
+            pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
         }
         return steps;
       }
       if (key < cur.key) {
         if (cur.left) {
-          steps.push({type:'go-left', node:cur, path:path.slice(), status:`${key} < ${cur.key}，往左`, line:L.goLeft, cmp});
+          add({status:`${key} < ${cur.key}，往左`, line:L.goLeft, cmp,
+            pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
           cur = cur.left;
         } else {
           if (op === 'put') {
-            steps.push({type:'insert-left', node:cur, path:path.slice(), key, status:`${key} < ${cur.key} 且 left 為空，插入為左子`, line:L.insert_left, cmp});
-            steps.push({type:'commit', node:cur, path:path.slice(), key, side:'left', status:`插入 ${key} 完成 ✓`, line:null, cmp});
+            add({status:`${key} < ${cur.key} 且 left 為空，插入為左子`, line:L.insert_left, cmp,
+              pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
+            const child = new TNode(key); child.parent = cur; cur.left = child;
+            add({status:`插入 ${key} 完成 ✓`, line:null, cmp,
+              pathIds:path.concat([child]).map(n => n.id), currentId:child.id, currentKey:child.key});
           } else {
-            steps.push({type:'not-found', node:cur, path:path.slice(), status:`${key} 不在樹中`, line:L.notFound, result:'NOT FOUND', cmp});
+            add({status:`${key} 不在樹中`, line:L.notFound, result:'NOT FOUND', cmp,
+              pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
           }
           return steps;
         }
       } else {
         if (cur.right) {
-          steps.push({type:'go-right', node:cur, path:path.slice(), status:`${key} > ${cur.key}，往右`, line:L.goRight, cmp});
+          add({status:`${key} > ${cur.key}，往右`, line:L.goRight, cmp,
+            pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
           cur = cur.right;
         } else {
           if (op === 'put') {
-            steps.push({type:'insert-right', node:cur, path:path.slice(), key, status:`${key} > ${cur.key} 且 right 為空，插入為右子`, line:L.insert_right, cmp});
-            steps.push({type:'commit', node:cur, path:path.slice(), key, side:'right', status:`插入 ${key} 完成 ✓`, line:null, cmp});
+            add({status:`${key} > ${cur.key} 且 right 為空，插入為右子`, line:L.insert_right, cmp,
+              pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
+            const child = new TNode(key); child.parent = cur; cur.right = child;
+            add({status:`插入 ${key} 完成 ✓`, line:null, cmp,
+              pathIds:path.concat([child]).map(n => n.id), currentId:child.id, currentKey:child.key});
           } else {
-            steps.push({type:'not-found', node:cur, path:path.slice(), status:`${key} 不在樹中`, line:L.notFound, result:'NOT FOUND', cmp});
+            add({status:`${key} 不在樹中`, line:L.notFound, result:'NOT FOUND', cmp,
+              pathIds:path.map(n => n.id), currentId:cur.id, currentKey:cur.key});
           }
           return steps;
         }
@@ -2986,26 +3123,28 @@ function initBST() {
   }
 
   function applyStep(s) {
-    if (s.type === 'commit-root') {
-      root = new TNode(s.key);
-      render(null, null, s.status);
-    } else if (s.type === 'commit') {
-      const newN = new TNode(s.key);
-      newN.parent = s.node;
-      if (s.side === 'left') s.node.left = newN; else s.node.right = newN;
-      render(s.path.concat([newN]), newN, s.status);
-    } else if (s.type === 'init-empty') {
-      setText($('bstStatus'), s.status);
-    } else {
-      render(s.path || null, s.node || null, s.status);
-    }
-    if (s.cmp != null) setText($('bstCmp'), s.cmp);
-    if (s.node) setText($('bstCur'), s.node.key);
-    if (s.result) setText($('bstResult'), s.result);
+    const viewRoot = treeFromSnapshot(s.tree);
+    render(viewRoot, s.pathIds, s.currentId, s.status);
+    setText($('bstCmp'), s.cmp);
+    setText($('bstCur'), s.currentKey == null ? '—' : s.currentKey);
+    setText($('bstResult'), s.result);
     hlLine($('bstCode'), s.line);
   }
 
+  function updateBSTTimeline(idx) {
+    const total = player ? player.steps.length : 1;
+    $('bstCounter').textContent = `步驟 ${idx + 1} / ${total}`;
+    $('bstScrubber').max = Math.max(0, total - 1);
+    $('bstScrubber').value = idx;
+    $('bstScrubber').hidden = total < 8;
+  }
+  function setBSTPlaying(playing) {
+    $('bstPlay').textContent = playing ? '⏸ 暫停' : '▶ 播放';
+    $('bstPlay').classList.toggle('active', playing);
+  }
+
   function startOp(op, key) {
+    lastOp = op; lastKey = key;
     setCodePanel(op);
     setText($('bstOpName'), op === 'put' ? `put(${key})` : `get(${key})`);
     setText($('bstResult'), '—');
@@ -3013,23 +3152,31 @@ function initBST() {
     if (player) player.stop();
     const steps = genOpSteps(op, key);
     player = new Player({
-      steps,
+      steps: steps.map(freezeFrame),
       apply: applyStep,
-      delay: parseInt($('bstSpeed').value, 10)
+      delay: parseInt($('bstSpeed').value, 10),
+      onIdxChange: updateBSTTimeline,
+      onPlayChange: setBSTPlaying,
+      onForwardEnd: (frame) => { root = treeFromSnapshot(frame.tree); }
     });
     player.reset();
     player.play();
   }
 
   function rebuild() {
+    if (player) player.stop();
+    player = null;
     const raw = $('bstInitInput').value.split(/[\s,]+/).map(s=>parseInt(s,10)).filter(n=>!isNaN(n));
     root = buildBST(raw);
-    render(null, null, `已建立 BST（${raw.length} 個 keys）`);
+    render(root, null, null, `已建立 BST（${raw.length} 個 keys）`);
     setText($('bstOpName'), '—');
     setText($('bstResult'), '—');
     setText($('bstCmp'), '0');
     setText($('bstCur'), '—');
     hlLine($('bstCode'), null);
+    setBSTPlaying(false);
+    $('bstCounter').textContent = '步驟 1 / 1';
+    $('bstScrubber').max = 0; $('bstScrubber').value = 0; $('bstScrubber').hidden = true;
   }
 
   // Wire
@@ -3051,6 +3198,13 @@ function initBST() {
     rebuild();
   };
   $('bstStep').onclick = () => { if (player) player.step(); };
+  $('bstPrev').onclick = () => { if (player) player.prev(); };
+  $('bstPlay').onclick = () => {
+    if (player && player.timer) { player.stop(); return; }
+    if (!player) startOp(lastOp, lastKey);
+    else player.play();
+  };
+  $('bstScrubber').addEventListener('input', () => { if (player) player.seek(Number($('bstScrubber').value)); });
   $('bstReset').onclick = rebuild;
   $('bstSpeed').addEventListener('input', () => {
     if (player) player.setDelay(parseInt($('bstSpeed').value, 10));
@@ -3058,18 +3212,11 @@ function initBST() {
 
   rebuild();
   _ensurePanelReady(canvas, () => {
-    // Do not replay commit / commit-root frames here: they create TNode and mutate root.
     if (player && player.steps && player.steps[player.idx]) {
-      const s = player.steps[player.idx];
-      if (s.type === 'commit' && s.node && s.side) {
-        const child = s.node[s.side];
-        render(child ? s.path.concat([child]) : s.path, child || s.node, s.status ?? null);
-      } else {
-        render(s.path || null, s.node || null, s.status ?? null);
-      }
-    } else render(null, null, null);
+      applyStep(player.steps[player.idx]);
+    } else render(root, null, null, null);
   });
-  return { resize: () => render(null, null, null) };
+  return { resize: () => player ? applyStep(player.steps[player.idx]) : render(root, null, null, null) };
 }
 
 /* ============================================================
@@ -3109,108 +3256,102 @@ function initBSTDelete() {
     return 3;
   }
 
-  function render(hl) {
+  function render(viewRoot, hl) {
     hl = hl || {};
     const w = canvas.clientWidth || 600;
     const h = parseInt(canvas.style.height) || 360;
-    if (root) layoutTree(root, w, h, 38, 36);
-    renderTree(canvas, root);
+    if (viewRoot) layoutTree(viewRoot, w, h, 38, 36);
+    renderTree(canvas, viewRoot);
     clearHL(canvas);
-    if (hl.path) {
-      hl.path.forEach(n => { if (n) setNodeClass(canvas, n.id, 'path'); });
-      for (let i = 0; i < hl.path.length-1; i++) {
-        if (hl.path[i] && hl.path[i+1]) setEdgeClass(canvas, hl.path[i].id, hl.path[i+1].id, 'path');
+    if (hl.pathIds) {
+      hl.pathIds.forEach(id => setNodeClass(canvas, id, 'path'));
+      for (let i = 0; i < hl.pathIds.length-1; i++) {
+        setEdgeClass(canvas, hl.pathIds[i], hl.pathIds[i + 1], 'path');
       }
     }
-    if (hl.target) setNodeClass(canvas, hl.target.id, 'current');
-    if (hl.successor) setNodeClass(canvas, hl.successor.id, 'target');
-    if (hl.deleted) setNodeClass(canvas, hl.deleted.id, 'deleted');
+    if (hl.targetId != null) setNodeClass(canvas, hl.targetId, 'current');
+    if (hl.successorId != null) setNodeClass(canvas, hl.successorId, 'target');
+    if (hl.deletedId != null) setNodeClass(canvas, hl.deletedId, 'deleted');
   }
 
   function genDeleteSteps(key) {
     const steps = [];
-    if (!root) {
-      steps.push({status:'空樹，無法刪除', case:'—'});
+    let simRoot = treeFromSnapshot(snapshotTree(root));
+    const add = (data, hl={}) => steps.push(freezeFrame({tree:snapshotTree(simRoot), hl, ...data}));
+    const spliceNode = (node, child) => {
+      const p = node.parent;
+      if (p) {
+        if (p.left === node) p.left = child;
+        else p.right = child;
+        if (child) child.parent = p;
+      } else {
+        simRoot = child;
+        if (child) child.parent = null;
+      }
+      node.parent = null;
+    };
+    if (!simRoot) {
+      add({status:'空樹，無法刪除', case:'—', target:'—', succ:'—', phase:'—'});
       return steps;
     }
-    const { node: target, path } = findNode(root, key);
+    const { node: target, path } = findNode(simRoot, key);
     if (!target) {
-      steps.push({status:`key=${key} 不在樹中`, case:'—', hl:{path}});
+      add({status:`key=${key} 不在樹中`, case:'—', target:key, succ:'—', phase:'搜尋'}, {pathIds:path.map(n => n.id)});
       return steps;
     }
-    steps.push({status:`從 root 出發找 key=${key}`, hl:{path:[path[0]]}, case:'?', target:key, succ:'—', phase:'搜尋'});
+    add({status:`從 root 出發找 key=${key}`, case:'?', target:key, succ:'—', phase:'搜尋'}, {pathIds:[path[0].id]});
     for (let i = 1; i < path.length; i++) {
-      steps.push({status:`下移到節點 ${path[i].key}`, hl:{path:path.slice(0,i+1), target: i===path.length-1 ? path[i] : null}, case:'?', target:key, succ:'—', phase:'搜尋'});
+      add({status:`下移到節點 ${path[i].key}`, case:'?', target:key, succ:'—', phase:'搜尋'},
+        {pathIds:path.slice(0, i + 1).map(n => n.id), targetId:i === path.length - 1 ? path[i].id : null});
     }
     const c = classifyCase(target);
-    steps.push({status:`找到 target=${target.key}，分類為 Case ${c}`, hl:{path, target}, case:`Case ${c}`, target:target.key, succ:'—', phase:'分類'});
+    const originalTargetKey = target.key;
+    add({status:`找到 target=${target.key}，分類為 Case ${c}`, case:`Case ${c}`, target:target.key, succ:'—', phase:'分類'},
+      {pathIds:path.map(n => n.id), targetId:target.id});
     if (c === 1) {
-      steps.push({status:`葉節點：直接從 parent 把它的 link 設為 null`, hl:{path, deleted:target}, case:'Case 1', target:target.key, succ:'—', phase:'splice'});
-      steps.push({status:'刪除完成 ✓', commit:'remove-leaf', target, case:'Case 1', phase:'完成', succ:'—'});
+      add({status:'葉節點：直接從 parent 把它的 link 設為 null', case:'Case 1', target:target.key, succ:'—', phase:'splice'},
+        {pathIds:path.map(n => n.id), deletedId:target.id});
+      spliceNode(target, null);
+      add({status:'刪除完成 ✓', case:'Case 1', target:originalTargetKey, succ:'—', phase:'完成'});
     } else if (c === 2) {
       const child = target.left || target.right;
       const side = target.left ? 'left' : 'right';
-      steps.push({status:`只有一個子（${side}=${child.key}），把它「提升」上來取代 target`, hl:{path, target, successor:child}, case:'Case 2', target:target.key, succ:'—', phase:'lift'});
-      steps.push({status:'刪除完成 ✓', commit:'lift-child', target, child, case:'Case 2', phase:'完成', succ:'—'});
+      add({status:`只有一個子（${side}=${child.key}），把它「提升」上來取代 target`, case:'Case 2', target:target.key, succ:'—', phase:'lift'},
+        {pathIds:path.map(n => n.id), targetId:target.id, successorId:child.id});
+      spliceNode(target, child);
+      add({status:'刪除完成 ✓', case:'Case 2', target:originalTargetKey, succ:'—', phase:'完成'});
     } else {
-      steps.push({status:`兩個子節點 → 找 in-order successor（右子樹中最小）`, hl:{path, target}, case:'Case 3', target:target.key, succ:'?', phase:'找 successor'});
+      add({status:'兩個子節點 → 找 in-order successor（右子樹中最小）', case:'Case 3', target:target.key, succ:'?', phase:'找 successor'},
+        {pathIds:path.map(n => n.id), targetId:target.id});
       // Walk right subtree to find min
       let cur = target.right;
       const succPath = [target, cur];
-      steps.push({status:`進入右子樹 → ${cur.key}`, hl:{path, target, successor:cur}, case:'Case 3', target:target.key, succ:cur.key, phase:'找 successor'});
+      add({status:`進入右子樹 → ${cur.key}`, case:'Case 3', target:target.key, succ:cur.key, phase:'找 successor'},
+        {pathIds:path.map(n => n.id), targetId:target.id, successorId:cur.id});
       while (cur.left) {
         cur = cur.left;
         succPath.push(cur);
-        steps.push({status:`往左：→ ${cur.key}`, hl:{path, target, successor:cur}, case:'Case 3', target:target.key, succ:cur.key, phase:'找 successor'});
+        add({status:`往左：→ ${cur.key}`, case:'Case 3', target:target.key, succ:cur.key, phase:'找 successor'},
+          {pathIds:path.map(n => n.id), targetId:target.id, successorId:cur.id});
       }
       const succ = cur;
-      steps.push({status:`找到 successor = ${succ.key}（必為 case 1 或 case 2）`, hl:{path, target, successor:succ}, case:'Case 3', target:target.key, succ:succ.key, phase:'splice succ'});
-      steps.push({status:`把 successor 的 key=${succ.key} 拷貝到 target 位置`, hl:{path, target, successor:succ}, case:'Case 3', target:target.key, succ:succ.key, phase:'copy key', commit:'copy-key', target, succNode:succ});
-      steps.push({status:`從原位置 splice out successor（最多一個 right child）`, hl:{deleted:succ}, case:'Case 3', target:succ.key, succ:succ.key, phase:'splice succ'});
-      steps.push({status:'刪除完成 ✓', commit:'splice-succ', succNode:succ, case:'Case 3', phase:'完成', target:succ.key, succ:succ.key});
+      const succKey = succ.key;
+      add({status:`找到 successor = ${succKey}（必為 case 1 或 case 2）`, case:'Case 3', target:target.key, succ:succKey, phase:'splice succ'},
+        {pathIds:path.map(n => n.id), targetId:target.id, successorId:succ.id});
+      target.key = succKey;
+      add({status:`把 successor 的 key=${succKey} 拷貝到 target 位置`, case:'Case 3', target:originalTargetKey, succ:succKey, phase:'copy key'},
+        {pathIds:path.map(n => n.id), targetId:target.id, successorId:succ.id});
+      add({status:'從原位置 splice out successor（最多一個 right child）', case:'Case 3', target:originalTargetKey, succ:succKey, phase:'splice succ'},
+        {deletedId:succ.id});
+      spliceNode(succ, succ.right);
+      add({status:'刪除完成 ✓', case:'Case 3', phase:'完成', target:originalTargetKey, succ:succKey});
     }
     return steps;
   }
 
   function applyStep(s) {
-    function spliceNode(node, child) {
-      if (!node) return false;
-      const p = node.parent;
-      if (p) {
-        if (p.left === node) p.left = child;
-        else if (p.right === node) p.right = child;
-        else return false;
-        if (child) child.parent = p;
-      } else {
-        if (root !== node) return false;
-        root = child;
-        if (child) child.parent = null;
-      }
-      node.parent = null;
-      return true;
-    }
-
-    if (s.commit === 'remove-leaf') {
-      const t = s.target;
-      spliceNode(t, null);
-      render({});
-    } else if (s.commit === 'lift-child') {
-      const t = s.target, c = s.child;
-      spliceNode(t, c);
-      render({});
-    } else if (s.commit === 'copy-key') {
-      const succ = s.succNode || s.succ;
-      s.target.key = succ.key;
-      render({target: s.target, successor: succ});
-    } else if (s.commit === 'splice-succ') {
-      const succ = s.succNode || s.succ;
-      // succ has at most a right child
-      const child = succ.right;
-      spliceNode(succ, child);
-      render({});
-    } else {
-      render(s.hl || {});
-    }
+    const viewRoot = treeFromSnapshot(s.tree);
+    render(viewRoot, s.hl || {});
     if (s.status != null) $('delStatus').textContent = s.status;
     if (s.case != null) $('delCase').textContent = s.case;
     if (s.target != null) $('delTarget').textContent = s.target;
@@ -3218,48 +3359,74 @@ function initBSTDelete() {
     if (s.phase != null) $('delPhase').textContent = s.phase;
   }
 
+  function updateDeleteTimeline(idx) {
+    const total = player ? player.steps.length : 1;
+    $('delCounter').textContent = `步驟 ${idx + 1} / ${total}`;
+    $('delScrubber').max = Math.max(0, total - 1);
+    $('delScrubber').value = idx;
+    $('delScrubber').hidden = total < 8;
+  }
+  function setDeletePlaying(playing) {
+    $('delPlay').textContent = playing ? '⏸ 暫停' : '▶ 刪除';
+    $('delPlay').classList.toggle('active', playing);
+  }
+
   function rebuild() {
+    if (player) player.stop();
+    player = null;
     const raw = $('delInitInput').value.split(/[\s,]+/).map(s=>parseInt(s,10)).filter(n=>!isNaN(n));
     root = buildBST(raw);
-    render({});
+    render(root, {});
     $('delStatus').textContent = `已建立 BST（${raw.length} 個 keys）。選擇 key 並按「刪除」`;
     $('delCase').textContent = '—';
     $('delTarget').textContent = '—';
     $('delSucc').textContent = '—';
     $('delPhase').textContent = '—';
+    setDeletePlaying(false);
+    $('delCounter').textContent = '步驟 1 / 1';
+    $('delScrubber').max = 0; $('delScrubber').value = 0; $('delScrubber').hidden = true;
   }
 
-  function startDel() {
+  function startDel(autoplay=true) {
     const k = parseInt($('delKey').value, 10);
     if (isNaN(k)) return;
     if (player) player.stop();
     const steps = genDeleteSteps(k);
-    player = new Player({ steps, apply: applyStep, delay: 800 });
+    player = new Player({
+      steps:steps.map(freezeFrame), apply:applyStep, delay:Number($('delSpeed').value) || 1800,
+      onIdxChange:updateDeleteTimeline, onPlayChange:setDeletePlaying,
+      onForwardEnd:(frame) => { root = treeFromSnapshot(frame.tree); }
+    });
     player.reset();
-    player.play();
+    if (autoplay) player.play();
   }
 
   $('delApplyInit').onclick = rebuild;
-  $('delPlay').onclick = startDel;
-  $('delStep').onclick = () => { if (!player) startDel(); else player.step(); };
+  $('delPlay').onclick = () => {
+    if (player && player.timer) { player.stop(); return; }
+    if (!player) startDel();
+    else player.play();
+  };
+  $('delPrev').onclick = () => { if (player) player.prev(); };
+  $('delStep').onclick = () => { if (!player) startDel(false); else player.step(); };
   $('delReset').onclick = rebuild;
+  $('delSpeed').onchange = () => { if (player) player.setDelay(Number($('delSpeed').value)); };
+  $('delScrubber').oninput = () => { if (player) player.seek(Number($('delScrubber').value)); };
   document.querySelectorAll('#bst-delete .preset-btn[data-delk]').forEach(btn => {
     btn.onclick = () => {
       $('delKey').value = btn.dataset.delk;
       rebuild();
-      setTimeout(startDel, 50);
+      startDel();
     };
   });
 
   rebuild();
   _ensurePanelReady(canvas, () => {
-    // Do not call player.apply(): commit steps mutate root, and replaying them
-    // during resize can delete or reconnect nodes twice.
     if (player && player.steps && player.steps[player.idx]) {
-      render(player.steps[player.idx].hl || {});
-    } else render({});
+      applyStep(player.steps[player.idx]);
+    } else render(root, {});
   });
-  return { resize: () => render({}) };
+  return { resize: () => player ? applyStep(player.steps[player.idx]) : render(root, {}) };
 }
 
 /* ============================================================
@@ -3290,12 +3457,14 @@ function initBSTAnalysis() {
     return count > 0 ? (total / count) : 0;
   }
 
+  let sampleSeed = 6151;
+  function rngForSeed(seed){let s=seed>>>0;return()=>((s=(s*1664525+1013904223)>>>0)/4294967296);}
   function regen() {
     const n = parseInt($('bstAnalN').value, 10) || 10;
     // Random distinct integers between 1 and 99
-    const arr = [];
+    const arr = [], rand=rngForSeed(sampleSeed);
     while (arr.length < n) {
-      const x = Math.floor(Math.random()*99) + 1;
+      const x = Math.floor(rand()*99) + 1;
       if (!arr.includes(x)) arr.push(x);
     }
     const sortedArr = arr.slice().sort((a,b)=>a-b);
@@ -3315,7 +3484,7 @@ function initBSTAnalysis() {
     $('bstSortedH').textContent = treeHeight(sRoot);
   }
 
-  $('bstAnalRegen').onclick = regen;
+  $('bstAnalRegen').onclick = () => { sampleSeed += 97; regen(); };
   regen();
   _ensurePanelReady(cRand, regen);
   _ensurePanelReady(cSorted, regen);
@@ -3404,21 +3573,21 @@ function initAVL() {
   function genSteps() {
     const c = cases[currentCase];
     const steps = [];
-    steps.push({tree: c.buildBefore(), status: c.narrate[0], phase:'BEFORE', bf:'+2 / -2'});
-    steps.push({tree: c.buildBefore(), status: c.narrate[1], phase:'分類', bf:'判斷'});
+    steps.push({tree: snapshotTree(c.buildBefore()), status: c.narrate[0], phase:'BEFORE', bf:'+2 / -2'});
+    steps.push({tree: snapshotTree(c.buildBefore()), status: c.narrate[1], phase:'分類', bf:'判斷'});
     if (c.mid) {
-      steps.push({tree: c.mid(), status: c.narrate[2], phase:'第一次旋轉', bf:'中繼'});
-      steps.push({tree: c.buildAfter(), status: c.narrate[3], phase:'完成', bf:'0'});
+      steps.push({tree: snapshotTree(c.mid()), status: c.narrate[2], phase:'第一次旋轉', bf:'中繼'});
+      steps.push({tree: snapshotTree(c.buildAfter()), status: c.narrate[3], phase:'完成', bf:'0'});
     } else {
-      steps.push({tree: c.buildAfter(), status: c.narrate[2], phase:'旋轉', bf:'進行中'});
-      steps.push({tree: c.buildAfter(), status: c.narrate[3], phase:'更新', bf:'0'});
-      steps.push({tree: c.buildAfter(), status: c.narrate[4], phase:'完成', bf:'0'});
+      steps.push({tree: snapshotTree(c.buildAfter()), status: c.narrate[2], phase:'旋轉', bf:'進行中'});
+      steps.push({tree: snapshotTree(c.buildAfter()), status: c.narrate[3], phase:'更新', bf:'0'});
+      steps.push({tree: snapshotTree(c.buildAfter()), status: c.narrate[4], phase:'完成', bf:'0'});
     }
     return steps;
   }
 
   function applyStep(s) {
-    render(s.tree, s.status);
+    render(treeFromSnapshot(s.tree), s.status);
     if (s.phase != null) $('avlPhase').textContent = s.phase;
     if (s.bf != null) $('avlBf').textContent = s.bf;
   }
@@ -3431,11 +3600,13 @@ function initAVL() {
     $('avlBf').textContent = '—';
     if (player) player.stop();
     player = new Player({
-      steps: genSteps(),
+      steps: genSteps().map(freezeFrame),
       apply: applyStep,
       delay: parseInt($('avlSpeed').value, 10)
     });
-    player.reset();
+    equipPlayerTimeline(player, {
+      play:'avlPlay', counter:'avlCounter', scrubber:'avlScrubber'
+    }, '▶ 執行旋轉');
   }
 
   document.querySelectorAll('#avl .preset-btn[data-avlcase]').forEach(btn => {
@@ -3446,11 +3617,9 @@ function initAVL() {
       regen();
     };
   });
-  $('avlPlay').onclick = () => { if (player) player.play(); };
-  $('avlStep').onclick = () => { if (player) player.step(); };
-  $('avlReset').onclick = regen;
-  $('avlSpeed').addEventListener('input', () => {
-    if (player) player.setDelay(parseInt($('avlSpeed').value, 10));
+  bindPlayerTimeline(() => player, {
+    play:'avlPlay', prev:'avlPrev', next:'avlStep', reset:'avlReset',
+    scrubber:'avlScrubber', speed:'avlSpeed'
   });
 
   regen();
@@ -3459,7 +3628,9 @@ function initAVL() {
       player.apply(player.steps[player.idx], player.idx);
     } else regen();
   });
-  return { resize: regen };
+  return { resize: () => {
+    if (player && player.steps[player.idx]) player.apply(player.steps[player.idx], player.idx);
+  } };
 }
 
 /* ============================================================

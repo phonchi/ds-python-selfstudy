@@ -10,7 +10,7 @@ s = PAGE.read_text()
 s = ensure_style(s)
 PDS = "import sys; sys.path.insert(0, '/home/phonchi/ds_cpp/_python_backup/Slides/pythonds3')\n"
 
-C_NODE = """from pythonds3.basic.linked_list import Node
+C_NODE = """from pythonds3.basic.linked_list import LinkedListNode as Node
 
 temp = Node(93)
 print(temp.data)

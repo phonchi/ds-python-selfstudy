@@ -63,7 +63,9 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
+@media(max-width:600px){#types .viz-layout>div{overflow:hidden;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -554,8 +556,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 <span class="line"><span class="fn">print</span>(7 // 3)        <span class="com"># 2，// 才是整數除法（向下取整）</span></span>
 <span class="line"><span class="fn">print</span>(7 % 3)         <span class="com"># 1，取餘數</span></span>
 <span class="line"><span class="fn">print</span>(2 ** 100)      <span class="com"># 1267650600228229401496703205376：精確！</span></span></div>
-        <div class="status-banner" id="typeStatus"><span class="status-icon">›</span><span class="status-text">點下面的型別卡，看各型別的個性與地雷。</span></div>
-        <div class="controls-bar" id="typeBtns"></div>
+        <div class="status-banner" id="typeStatus"><span class="status-icon">›</span><span class="status-text">四種原子值並排比較；這裡沒有需要播放的狀態。</span></div>
         <div class="mono" id="typeVis" style="font-size:.88rem;line-height:1.9;min-height:56px;padding:.4rem .2rem;"></div>
       </div>
     </div>
@@ -725,7 +726,7 @@ True</pre></div>
   </table></div>
   <div class="viz-panel" style="margin-top:.8rem;">
     <div class="status-banner" id="colStatus"><span class="status-icon">›</span><span class="status-text">跑一段 list 示範。</span></div>
-    <div class="controls-bar"><button class="btn" onclick="colDemo()">▶ append ×3 → my_list[1] → pop()</button></div>
+        <div class="controls-bar"><span class="mono" style="font-size:.78rem;color:var(--muted);">固定 trace：操作、回傳值與操作後狀態</span></div>
     <div class="bq-row" id="colVis" style="min-height:64px;"></div>
   </div>
   <p style="font-size:.9rem;color:var(--muted);margin-top:.6rem;">冷知識：<code>54 + 21</code> 底層其實是
@@ -1646,26 +1647,61 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
-    this.frames = frames; this.apply = apply;
-    this.delayInput = delayInput; this.i = -1; this.timer = null;
-    this.onDone = onDone || (()=>{});
+  constructor({frames, apply, delayInput, delay=1800, onDone, onIndex}) {
+    this.frames = frames || []; this.apply = apply;
+    this.delayInput = delayInput; this.delay = delay; this.i = 0; this.timer = null;
+    this.onDone = onDone || (()=>{}); this.onIndex = onIndex || (()=>{});
+    this.progress = null; this.counter = null;
+    if (delayInput && delayInput.closest('.controls-bar')) {
+      const bar = delayInput.closest('.controls-bar');
+      bar.querySelectorAll('.player-progress,.player-counter').forEach(x=>x.remove());
+      this.counter = document.createElement('span'); this.counter.className='player-counter mono';
+      this.counter.style.fontSize='.72rem'; bar.appendChild(this.counter);
+      if (this.frames.length >= 8) {
+        this.progress=document.createElement('input'); this.progress.type='range';
+        this.progress.className='player-progress'; this.progress.min=0; this.progress.max=this.frames.length-1; this.progress.value=0;
+        this.progress.style.cssText='flex:1 1 120px;min-width:90px;';
+        this.progress.oninput=()=>this.seek(this.progress.value); bar.appendChild(this.progress);
+      }
+    }
+  }
+  currentDelay() {
+    return this.delayInput ? parseInt(this.delayInput.value, 10) : this.delay;
+  }
+  render() {
+    if (!this.frames.length) return;
+    this.apply(this.frames[this.i]); this.onIndex(this.i, this.frames.length);
+    if (this.counter) this.counter.textContent=(this.i+1)+'/'+this.frames.length;
+    if (this.progress) this.progress.value=this.i;
   }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
+    this.stop();
+    if (this.i + 1 >= this.frames.length) { this.onDone(); return false; }
+    this.i += 1; this.render(); return true;
+  }
+  prev() {
+    this.stop();
+    if (this.i <= 0) return false;
+    this.i -= 1; this.render(); return true;
+  }
+  seek(i) {
+    this.stop();
+    this.i = Math.max(0, Math.min(this.frames.length - 1, Number(i) || 0));
+    this.render();
   }
   play() {
-    this.stop();
+    if (this.timer) { this.stop(); return; }
+    if (!this.frames.length) return;
+    if (this.i >= this.frames.length - 1) { this.i = 0; this.render(); }
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.render();
+      this.timer = setTimeout(tick, this.currentDelay());
     };
-    tick();
+    this.timer = setTimeout(tick, this.currentDelay());
   }
   stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  reset() { this.stop(); this.i = 0; this.render(); }
 }
 
 function setStatus(id, html) {
@@ -1740,14 +1776,10 @@ function typeShow(name) {
   setStatus('typeStatus', `<strong>${name}</strong>：${t.note}`);
 }
 (function initTypes(){
-  const bar = $('typeBtns');
-  Object.keys(TYPES).forEach(name => {
-    const b = document.createElement('button');
-    b.className = 'btn'; b.textContent = name;
-    b.onclick = () => typeShow(name);
-    bar.appendChild(b);
-  });
-  typeShow('int');
+  $('typeVis').innerHTML = '<table class="cmp-table" style="width:100%;font-size:.78rem;">'
+    + '<thead><tr><th>型別</th><th>例子</th><th>要留意</th></tr></thead><tbody>'
+    + Object.entries(TYPES).map(([name,t]) => `<tr><td>${name}</td><td>${t.demo}</td><td>${t.note}</td></tr>`).join('')
+    + '</tbody></table>';
 })();
 
 /* ---------- P01 name binding ---------- */
@@ -1778,21 +1810,13 @@ nbStep(1);
 
 /* ---------- P02 list demo ---------- */
 function colDemo() {
-  const steps = [
-    {v: ['17'], msg: 'my_list.append(17)，長度變 1'},
-    {v: ['17','26'], msg: 'my_list.append(26)'},
-    {v: ['17','26','31'], msg: 'my_list.append(31)'},
-    {v: ['17','26','31'], hl: 1, msg: 'my_list[1] 直達 26，O(1)'},
-    {v: ['17','26'], msg: 'my_list.pop() 移除並「回傳」31：取值與移除一次完成'},
-  ];
-  let i = 0;
-  const t = setInterval(() => {
-    if (i >= steps.length) { clearInterval(t); return; }
-    const s = steps[i];
-    renderBoxQueue('colVis', s.v, {highlight: s.hl ?? -1});
-    setStatus('colStatus', s.msg);
-    i++;
-  }, 750);
+  $('colVis').innerHTML = '<table class="cmp-table" style="width:100%;font-size:.78rem;">'
+    + '<thead><tr><th>操作</th><th>回傳</th><th>操作後 list</th></tr></thead><tbody>'
+    + '<tr><td>append(17)</td><td>None</td><td>[17]</td></tr>'
+    + '<tr><td>append(26); append(31)</td><td>None</td><td>[17, 26, 31]</td></tr>'
+    + '<tr><td>my_list[1]</td><td>26</td><td>[17, 26, 31]（不變）</td></tr>'
+    + '<tr><td>pop()</td><td>31</td><td>[17, 26]</td></tr></tbody></table>';
+  setStatus('colStatus', '固定 trace：append 就地修改並回 None；索引不修改；pop 同時回傳與移除。');
 }
 
 /* ---------- P03 io formatter ---------- */
@@ -1845,11 +1869,12 @@ function fnDemo(mode) {
   } else {
     el.appendChild(mk('呼叫端 a', '[1]', '#5b7eb8'));
     el.appendChild(mk('函式內 lst（改綁後）', '[1, 99]（新物件）', '#8e44ad'));
-    setStatus('fnStatus', 'lst = lst + [9]：+ 造出全新 list，lst 改綁過去。呼叫端的 a 還指著舊物件，不受影響。');
+    setStatus('fnStatus', 'lst = lst + [99]：+ 造出全新 list，lst 改綁過去。呼叫端的 a 還指著舊物件，不受影響。');
     hlLine('fnCode', 8);
   }
 }
 fnDemo('rebind');
+colDemo();
 
 /* ---------- P07 fraction ---------- */
 function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }

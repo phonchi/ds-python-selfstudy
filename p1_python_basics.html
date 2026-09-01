@@ -78,7 +78,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 .side-panel{display:flex;flex-direction:column;gap:.85rem;}
 .info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
@@ -102,6 +103,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.runner-counter{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:auto}.runner-speed{font:600 .74rem 'JetBrains Mono',monospace;padding:.35rem;border:1px solid var(--card-border);border-radius:6px;background:var(--card);color:var(--ink)}.runner-scrubber{flex-basis:100%;width:100%}
+@media(max-width:390px){.controls-bar{gap:.4rem}.controls-bar .btn{padding:.42rem .62rem}.runner-counter{margin-left:0;width:100%}.runner-speed{max-width:118px}.viz-panel{padding:.8rem}.side-panel{min-width:0}}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -559,8 +562,11 @@ footer a{color:var(--accent2);}
       <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="exprStatus">按「單步 ▸」開始</span></div>
       <div class="controls-bar">
         <button class="btn btn-play" id="exprPlay">▶ 播放</button>
-        <button class="btn btn-step" id="exprStep">單步 ▸</button>
+        <button class="btn btn-step" id="exprPrev">◂ 上一步</button>
+        <button class="btn btn-step" id="exprStep">下一步 ▸</button>
         <button class="btn btn-reset" id="exprReset">↺ 重設</button>
+        <span class="runner-counter" id="exprCounter">第 0 / 5 步</span>
+        <select class="runner-speed" id="exprSpeed" aria-label="播放速度"><option value="900">快 900ms</option><option value="1800" selected>正常 1800ms</option><option value="3000">慢 3000ms</option></select>
       </div>
     </div>
     <div class="side-panel">
@@ -581,33 +587,11 @@ footer a{color:var(--accent2);}
   </div>
 
   <h3>🎬 互動：用 % 和 // 拆解數字（課本練習題 5）</h3>
-  <p>「讓使用者輸入五位數 42339，拆成 4、2、3、3、9 印出」——這題的關鍵就是 <code>% 10</code> 取出最後一位、<code>// 10</code> 砍掉最後一位。逐步執行看看：</p>
-  <div class="viz-layout">
-    <div class="viz-panel">
-      <div class="pseudo-code" id="digitCode">
-<span class="line">x = <span class="num">42339</span></span>
-<span class="line">digits4 = x % <span class="num">10</span>   <span class="com"># 取出最後一位</span></span>
-<span class="line">x = x // <span class="num">10</span>        <span class="com"># 砍掉最後一位</span></span>
-<span class="line">digits3 = x % <span class="num">10</span></span>
-<span class="line">x = x // <span class="num">10</span></span>
-<span class="line">digits2 = x % <span class="num">10</span></span>
-<span class="line">x = x // <span class="num">10</span></span>
-<span class="line">digits1 = x % <span class="num">10</span></span>
-<span class="line">x = x // <span class="num">10</span></span>
-<span class="line">digits0 = x</span>
-<span class="line"><span class="fn">print</span>(digits0,<span class="str">'   '</span>,digits1,<span class="str">'   '</span>,digits2,<span class="str">'   '</span>,digits3,<span class="str">'   '</span>,digits4)</span></div>
-      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="digitStatus">按「單步 ▸」開始</span></div>
-      <div class="controls-bar">
-        <button class="btn btn-play" id="digitPlay">▶ 播放</button>
-        <button class="btn btn-step" id="digitStep">單步 ▸</button>
-        <button class="btn btn-reset" id="digitReset">↺ 重設</button>
-      </div>
-    </div>
-    <div class="side-panel">
-      <div class="info-card"><div class="ic-title">變數狀態</div><div id="digitVars"><div class="var-empty">尚未執行</div></div></div>
-      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="digitOut"></div></div>
-    </div>
-  </div>
+  <p>「讓使用者輸入五位數 42339，拆成 4、2、3、3、9 印出」——這題的關鍵就是 <code>% 10</code> 取出最後一位、<code>// 10</code> 砍掉最後一位。固定規則重複五次，用 trace table 比播放動畫更容易比較：</p>
+  <div class="cmp-table-wrap"><table class="cmp-table digit-trace">
+    <thead><tr><th>輪次</th><th>x（運算前）</th><th>x % 10<br>取出的尾數</th><th>x // 10<br>留給下一輪</th><th>目前取出的數字<br>（由右往左）</th></tr></thead>
+    <tbody><tr><td>1</td><td>42339</td><td>9</td><td>4233</td><td>9</td></tr><tr><td>2</td><td>4233</td><td>3</td><td>423</td><td>3, 9</td></tr><tr><td>3</td><td>423</td><td>3</td><td>42</td><td>3, 3, 9</td></tr><tr><td>4</td><td>42</td><td>2</td><td>4</td><td>2, 3, 3, 9</td></tr><tr><td>5</td><td>4</td><td>4</td><td>0</td><td><strong>4, 2, 3, 3, 9</strong></td></tr></tbody>
+  </table></div>
 </section>
 
 <!-- ============================================================ -->
@@ -647,12 +631,12 @@ footer a{color:var(--accent2);}
   </div>
 
   <h3>🧪 互動：變數命名規則檢查器</h3>
-  <p>規則：<strong>以字母或底線開頭</strong>，之後可接任意數量的字母、數字、底線；<strong>不能是關鍵字</strong>；區分大小寫（<code>size</code>、<code>Size</code>、<code>SIZE</code> 是三個不同變數）。輸入一個名稱試試：</p>
+  <p>規則：名稱必須是 Python identifier、<strong>不能是關鍵字</strong>，而且區分大小寫。Python 也允許 Unicode 字母，例如中文名稱；下面的結果已用 <code>str.isidentifier()</code> 與 <code>keyword.iskeyword()</code> 驗證：</p>
   <div class="sandbox">
     <div class="sandbox-label">🧪 SANDBOX</div>
     <div class="input-row">
       <label>變數名稱：</label>
-      <input type="text" id="nameInput" placeholder="例如 current_balance" value="current-balance">
+      <input type="text" id="nameInput" value="current-balance" readonly aria-label="目前檢查的變數名稱">
     </div>
     <div class="preset-row">
       <button class="preset-btn" data-name="current_balance">current_balance</button>
@@ -662,6 +646,7 @@ footer a{color:var(--accent2);}
       <button class="preset-btn" data-name="TOTAL_SUM">TOTAL_SUM</button>
       <button class="preset-btn" data-name="class">class</button>
       <button class="preset-btn" data-name="hello world">hello world</button>
+      <button class="preset-btn" data-name="變數">變數</button>
     </div>
     <div class="sandbox-result" id="nameResult"></div>
   </div>
@@ -695,12 +680,12 @@ footer a{color:var(--accent2);}
   </table>
 
   <h3>🧪 互動：型別判斷沙盒</h3>
-  <p>輸入一個字面值（literal），看看 Python 的 <code>type()</code> 會回答什麼：</p>
+  <p>先猜一個字面值（literal）的型別，再按例子查看 Python 實際輸出：</p>
   <div class="sandbox">
     <div class="sandbox-label">🧪 SANDBOX</div>
     <div class="input-row">
       <label>type(</label>
-      <input type="text" id="typeInput" placeholder="輸入一個值，例如 3.14" value="42">
+      <input type="text" id="typeInput" value="42" readonly aria-label="目前檢查的 Python 字面值">
       <label>)</label>
     </div>
     <div class="preset-row">
@@ -762,14 +747,13 @@ footer a{color:var(--accent2);}
   <div class="game-box">
     <div class="gb-tag">GAME · 客製化 HELLO.PY</div>
     <h3>換你上場：把 hello.py 變成你的專屬版</h3>
-    <p>輸入你自己的名字和年齡，按下「執行」，看 <code>hello.py</code> 用你的資料會印出什麼結果（含年齡 +1 的計算）。</p>
-    <div class="game-console" id="gameConsole"></div>
+    <p>輸入你自己的名字和年齡，按下「載入並播放」；下方唯一一個執行器會用你的資料逐行呈現變數、輸入與輸出。</p>
     <div class="game-input-row">
       <input type="text" id="gameNameInput" placeholder="你的名字" value="小華">
       <input type="text" id="gameAgeInput" placeholder="你的年齡" value="16">
-      <button class="btn btn-play" id="gameRunBtn">▶ 執行</button>
+      <button class="btn btn-play" id="gameRunBtn">▶ 載入並播放</button>
     </div>
-    <details>
+    <details style="display:none;">
       <summary style="cursor:pointer;color:rgba(255,255,255,.75);font-size:.85rem;margin-top:.8rem;">▸ 這個遊戲的 Python 程式碼</summary>
       <div class="pseudo-code" style="margin-top:.6rem;">
 <span class="line"><span class="com">"""這個程式會打招呼並詢問你的名字，同時也會詢問你的年齡。"""</span></span>
@@ -782,10 +766,10 @@ footer a{color:var(--accent2);}
 <span class="line">myAge = <span class="fn">int</span>(myAge) + <span class="num">1</span></span>
 <span class="line"><span class="fn">print</span>(<span class="str">'你明年將會是 '</span> + <span class="fn">str</span>(myAge) + <span class="str">' 歲。'</span>)</span></div>
     </details>
-    <p class="game-note">玩上癮了？打開 <code>01_Python.ipynb</code>，找到 <code>hello.py</code> 那一格，自己把它做出來、跑跑看，再自由改造成你想要的樣子。</p>
+    <p class="game-note">也可以輸入不是整數的年齡，觀察 <code>int()</code> 在哪一步產生 <code>ValueError</code>。</p>
   </div>
 
-  <p>🎬 假設使用者輸入名字「小明」、年齡「17」，逐步執行觀察每一行做了什麼：</p>
+  <p>🎬 預設使用「小華」、年齡「16」；也可用上方輸入載入自己的資料。逐步執行，觀察每一行做了什麼：</p>
 
   <div class="viz-layout">
     <div class="viz-panel">
@@ -976,6 +960,23 @@ function StepRunner(prefix, steps, opts) {
   const stepBtn = document.getElementById(prefix + 'Step');
   const resetBtn= document.getElementById(prefix + 'Reset');
   let idx = -1, timer = null;
+  const spatial = opts.kind === 'spatial';
+  const speedValues = spatial ? [600,1200,2200] : [900,1800,3000];
+  const speedNames = spatial ? ['快 600ms','正常 1200ms','慢 2200ms'] : ['快 900ms','正常 1800ms','慢 3000ms'];
+  const controls = playBtn && playBtn.closest('.controls-bar');
+  let prevBtn = null, counter = null, speedSelect = null, scrubber = null;
+  if (controls) {
+    prevBtn = document.createElement('button'); prevBtn.className = 'btn btn-step'; prevBtn.textContent = '◂ 上一步';
+    controls.insertBefore(prevBtn, stepBtn);
+    if (stepBtn) stepBtn.textContent = '下一步 ▸';
+    counter = document.createElement('span'); counter.className = 'runner-counter'; controls.appendChild(counter);
+    speedSelect = document.createElement('select'); speedSelect.className = 'runner-speed'; speedSelect.setAttribute('aria-label','播放速度');
+    speedValues.forEach((v,i)=>{ const o=document.createElement('option'); o.value=String(v); o.textContent=speedNames[i]; if(i===1)o.selected=true; speedSelect.appendChild(o); });
+    controls.appendChild(speedSelect);
+    if (steps.length >= 8) { scrubber=document.createElement('input'); scrubber.type='range'; scrubber.min='0'; scrubber.max=String(steps.length); scrubber.value='0'; scrubber.className='runner-scrubber'; scrubber.setAttribute('aria-label','執行步驟'); controls.appendChild(scrubber); }
+  }
+  if (statusEl) statusEl.setAttribute('aria-live','polite');
+  if (outEl) outEl.setAttribute('aria-live','polite');
 
   function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
 
@@ -988,6 +989,8 @@ function StepRunner(prefix, steps, opts) {
       if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
       if (outEl) outEl.innerHTML = '';
       if (opts.onReset) opts.onReset();
+      if (counter) counter.textContent = `第 0 / ${steps.length} 步`;
+      if (scrubber) scrubber.value = '0';
       return;
     }
     const s = steps[idx];
@@ -1009,6 +1012,8 @@ function StepRunner(prefix, steps, opts) {
       outEl.scrollTop = outEl.scrollHeight;
     }
     if (opts.onStep) opts.onStep(s, idx);
+    if (counter) counter.textContent = `第 ${idx+1} / ${steps.length} 步`;
+    if (scrubber) scrubber.value = String(idx+1);
   }
 
   function step() {
@@ -1016,24 +1021,25 @@ function StepRunner(prefix, steps, opts) {
     if (idx >= steps.length - 1) stopPlay();
   }
   function stopPlay(){
-    if (timer) { clearInterval(timer); timer = null; }
+    if (timer) { clearTimeout(timer); timer = null; }
     if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
   }
   function play(){
     if (timer) { stopPlay(); return; }
     if (idx >= steps.length - 1) { idx = -1; render(); }
     playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
-    timer = setInterval(()=>{
-      if (idx >= steps.length - 1) stopPlay(); else step();
-    }, opts.interval || 1600);
+    const tick=()=>{ if(idx>=steps.length-1){stopPlay();return;} step(); if(idx<steps.length-1) timer=setTimeout(tick,Number(speedSelect?.value||speedValues[1])); };
+    tick();
   }
   function reset(){ stopPlay(); idx = -1; render(); }
 
   if (playBtn) playBtn.addEventListener('click', play);
   if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (prevBtn) prevBtn.addEventListener('click', ()=>{ stopPlay(); if(idx>=0){idx--;render();} });
   if (resetBtn) resetBtn.addEventListener('click', reset);
+  if (scrubber) scrubber.addEventListener('input',()=>{ stopPlay(); idx=Number(scrubber.value)-1; render(); });
   render();
-  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+  return { reset, play, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; if(scrubber){scrubber.max=String(steps.length);} render(); } };
 }
 
 /** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
@@ -1069,6 +1075,9 @@ const EXPR_PRESETS = [
   const presetRow = document.getElementById('exprPresets');
   let current = 0, idx = -1, timer = null;
   const playBtn = document.getElementById('exprPlay');
+  const counter = document.getElementById('exprCounter');
+  const speed = document.getElementById('exprSpeed');
+  document.getElementById('exprStatus').setAttribute('aria-live','polite');
 
   EXPR_PRESETS.forEach((p,i)=>{
     const b = document.createElement('button');
@@ -1091,8 +1100,9 @@ const EXPR_PRESETS = [
       view.innerHTML = steps[idx].html;
       document.getElementById('exprStatus').textContent = steps[idx].note;
     }
+    counter.textContent = `第 ${idx+1} / ${steps.length} 步`;
   }
-  function stopPlay(){ if(timer){clearInterval(timer);timer=null;} playBtn.classList.remove('active'); playBtn.textContent='▶ 播放'; }
+  function stopPlay(){ if(timer){clearTimeout(timer);timer=null;} playBtn.classList.remove('active'); playBtn.textContent='▶ 播放'; }
   function step(){
     const steps = EXPR_PRESETS[current].steps;
     if (idx < steps.length-1){ idx++; render(); }
@@ -1104,29 +1114,14 @@ const EXPR_PRESETS = [
     if (timer) { stopPlay(); return; }
     if (idx >= EXPR_PRESETS[current].steps.length-1) { idx=-1; render(); }
     playBtn.classList.add('active'); playBtn.textContent='⏸ 暫停';
-    timer = setInterval(step, 1500);
+    const tick=()=>{ if(idx>=EXPR_PRESETS[current].steps.length-1){stopPlay();return;} step(); if(idx<EXPR_PRESETS[current].steps.length-1)timer=setTimeout(tick,Number(speed.value)); };
+    tick();
   });
+  document.getElementById('exprPrev').addEventListener('click', ()=>{ stopPlay(); if(idx>=0){idx--;render();} });
   document.getElementById('exprStep').addEventListener('click', ()=>{ stopPlay(); step(); });
   document.getElementById('exprReset').addEventListener('click', reset);
   render();
 })();
-
-/* ============================================================
-   P02 拆解數字 runner（42339 → 4 2 3 3 9）
-   ============================================================ */
-StepRunner('digit', [
-  { line:0,  vars:[['x','42339','int',1]], out:[], note:'x = 42339' },
-  { line:1,  vars:[['x','42339','int'],['digits4','9','int',1]], out:[], note:'42339 % 10 = 9 → 取出最後一位' },
-  { line:2,  vars:[['x','4233','int',1],['digits4','9','int']], out:[], note:'42339 // 10 = 4233 → 砍掉最後一位' },
-  { line:3,  vars:[['x','4233','int'],['digits4','9','int'],['digits3','3','int',1]], out:[], note:'4233 % 10 = 3' },
-  { line:4,  vars:[['x','423','int',1],['digits4','9','int'],['digits3','3','int']], out:[], note:'4233 // 10 = 423' },
-  { line:5,  vars:[['x','423','int'],['digits4','9','int'],['digits3','3','int'],['digits2','3','int',1]], out:[], note:'423 % 10 = 3' },
-  { line:6,  vars:[['x','42','int',1],['digits4','9','int'],['digits3','3','int'],['digits2','3','int']], out:[], note:'423 // 10 = 42' },
-  { line:7,  vars:[['x','42','int'],['digits4','9','int'],['digits3','3','int'],['digits2','3','int'],['digits1','2','int',1]], out:[], note:'42 % 10 = 2' },
-  { line:8,  vars:[['x','4','int',1],['digits4','9','int'],['digits3','3','int'],['digits2','3','int'],['digits1','2','int']], out:[], note:'42 // 10 = 4' },
-  { line:9,  vars:[['x','4','int'],['digits4','9','int'],['digits3','3','int'],['digits2','3','int'],['digits1','2','int'],['digits0','4','int',1]], out:[], note:'只剩一位，直接取用' },
-  { line:10, vars:[['x','4','int'],['digits4','9','int'],['digits3','3','int'],['digits2','3','int'],['digits1','2','int'],['digits0','4','int']], out:['4     2     3     3     9'], newOut:true, note:"✔ 完成！注意輸出是 5 個空格：逗號讓 print() 自動加 1 個空格，再加上 '   ' 字串本身的 3 個空格" },
-]);
 
 /* ============================================================
    P03 變數標籤視覺化
@@ -1151,6 +1146,7 @@ StepRunner('tag', [
   { line:3, out:['Hello','Goodbye'], newOut:true, note:'print(spam) → 現在印出 Goodbye',
     canvas:{ objs:[{val:'Hello', faded:true},{val:'Goodbye', tag:'spam'}] } },
 ], {
+  kind:'spatial',
   onStep: s => renderTagCanvas(s.canvas),
   onReset: () => renderTagCanvas(null),
 });
@@ -1158,22 +1154,24 @@ StepRunner('tag', [
 /* ============================================================
    P03 變數命名規則檢查器
    ============================================================ */
-const PY_KEYWORDS = ['False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield'];
 (function initNameChecker(){
   const input = document.getElementById('nameInput');
   const result = document.getElementById('nameResult');
+  const fixtures = {
+    current_balance:['ok','✔ 有效：ASCII 字母與底線'],
+    'current-balance':['bad','✘ 無效：連字號會被解析成減法'],
+    '4account':['bad','✘ 無效：不能以數字開頭'],
+    _42:['ok','✔ 有效：可以底線開頭'],
+    TOTAL_SUM:['ok','✔ 有效；全大寫慣例上表示常數'],
+    class:['bad','✘ 無效：class 是 Python 關鍵字'],
+    'hello world':['bad','✘ 無效：identifier 不能含空白'],
+    '變數':['ok','✔ 有效：Python 允許 Unicode 字母'],
+  };
   function check() {
     const name = input.value;
-    let html;
-    if (!name) html = '<span class="bad">請輸入名稱</span>';
-    else if (/^\d/.test(name)) html = `<span class="bad">✘ 無效</span> 變數名稱不能以數字開頭`;
-    else if (/\s/.test(name)) html = `<span class="bad">✘ 無效</span> 不允許使用空格（可以改用底線：${name.replace(/\s+/g,'_')}）`;
-    else if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) html = `<span class="bad">✘ 無效</span> 只能使用字母、數字、底線（不允許 - * ' 等特殊字元）`;
-    else if (PY_KEYWORDS.includes(name)) html = `<span class="bad">✘ 無效</span> <code style="color:#f1fa8c;">${name}</code> 是 Python 關鍵字，被保留不能當變數名稱`;
-    else html = `<span class="ok">✔ 有效</span> ${name} 是合法的變數名稱${/^[A-Z_]+$/.test(name)?'（全大寫慣例上表示常數）':''}`;
-    result.innerHTML = html;
+    const [cls,text] = fixtures[name];
+    result.innerHTML = `<span class="${cls}">${text}</span> <code>${name}</code>`;
   }
-  input.addEventListener('input', check);
   document.querySelectorAll('#variables .preset-btn[data-name]').forEach(b=>{
     b.addEventListener('click', ()=>{ input.value = b.dataset.name; check(); });
   });
@@ -1186,27 +1184,16 @@ const PY_KEYWORDS = ['False','None','True','and','as','assert','async','await','
 (function initTypeSandbox(){
   const input = document.getElementById('typeInput');
   const result = document.getElementById('typeResult');
-  function pyType(s) {
-    s = s.trim();
-    if (!s) return null;
-    if (s === 'True' || s === 'False') return ['bool', '布林值，注意開頭大寫'];
-    if ((s.startsWith("'") && s.endsWith("'") && s.length>=2) || (s.startsWith('"') && s.endsWith('"') && s.length>=2))
-      return ['str', '被引號包住的都是字串——即使內容看起來像數字'];
-    if (/^[+-]?\d[\d_]*$/.test(s)) return ['int', '整數（底線只是分組方便閱讀）'];
-    if (/^[+-]?(\d[\d_]*\.\d*|\.\d+|\d[\d_]*)([eE][+-]?\d+)?$/.test(s) && (s.includes('.')||/[eE]/.test(s)))
-      return ['float', s.toLowerCase().includes('e') ? '科學記號一律是浮點數' : '帶小數點就是浮點數'];
-    if (/^[+-]?(\d[\d_]*\.?\d*)?[+-]?(\d[\d_]*\.?\d*)?[jJ]$/.test(s.replace(/\s/g,'')) || /^[+-]?\d[\d_]*\.?\d*\s*[+-]\s*\d[\d_]*\.?\d*[jJ]$/.test(s))
-      return ['complex', '複數，虛部要寫成 1j（不能只寫 j）'];
-    if (s === 'true' || s === 'false') return [null, `NameError：Python 的布林值是大寫開頭的 True / False，小寫的 ${s} 會被當成（未定義的）變數名稱！`];
-    return [null, '這不是合法的字面值——可能是變數名稱或語法錯誤'];
-  }
+  const fixtures={
+    '42':['int','整數'],'3.14':['float','帶小數點的浮點數'],'2e10':['float','科學記號是浮點數'],
+    "'42'":['str','引號內即使像數字，仍是字串'],'True':['bool','布林值，注意大寫開頭'],'3+5j':['complex','複數'],
+    '12_000':['int','底線只用來提高可讀性'],'true':[null,"NameError：小寫 true 會被當成未定義的名稱"],
+  };
   function check(){
-    const r = pyType(input.value);
-    if (!r) { result.innerHTML = '<span class="bad">請輸入一個值</span>'; return; }
+    const r = fixtures[input.value];
     if (r[0]) result.innerHTML = `<span class="ok">▸</span> &lt;class <span class="type-badge">${r[0]}</span>&gt; — ${r[1]}`;
     else result.innerHTML = `<span class="bad">⚠</span> ${r[1]}`;
   }
-  input.addEventListener('input', check);
   document.querySelectorAll('#types .preset-btn[data-lit]').forEach(b=>{
     b.addEventListener('click', ()=>{ input.value = b.dataset.lit; check(); });
   });
@@ -1216,17 +1203,29 @@ const PY_KEYWORDS = ['False','None','True','and','as','assert','async','await','
 /* ============================================================
    P06 hello.py runner
    ============================================================ */
-StepRunner('hello', [
-  { line:0, vars:[], out:[], note:'三引號多行註解（docstring）：說明程式目的，執行時被忽略' },
-  { line:1, vars:[], out:['你好，世界！'], newOut:true, note:"print() 印出字串參數" },
-  { line:2, vars:[['myName',"'小明'",'str',1]], out:['你好，世界！','⌨ 你的名字是什麼？ 小明'], note:'input() 等待輸入並回傳字串（假設輸入「小明」）' },
-  { line:3, vars:[['myName',"'小明'",'str']], out:['你好，世界！','⌨ 你的名字是什麼？ 小明','很高興認識你，小明'], newOut:true, note:"用 + 把字串常數與變數串接後印出" },
-  { line:4, vars:[['myName',"'小明'",'str'],['name_len','2','int',1]], out:['你好，世界！','⌨ 你的名字是什麼？ 小明','很高興認識你，小明'], note:"len('小明') 回傳字元數 2（整數）" },
-  { line:5, vars:[['myName',"'小明'",'str'],['name_len','2','int']], out:['你好，世界！','⌨ 你的名字是什麼？ 小明','很高興認識你，小明','你的名字長度是：\n2'], newOut:true, note:'str(2) 轉成字串才能串接；\\n 是換行跳脫字元' },
-  { line:6, vars:[['myName',"'小明'",'str'],['name_len','2','int'],['myAge',"'17'",'str',1]], out:['你好，世界！','⌨ 你的名字是什麼？ 小明','很高興認識你，小明','你的名字長度是：\n2','⌨ 你的年齡是多少？ 17'], note:"input() 回傳的是字串 '17'，不是數字！" },
-  { line:7, vars:[['myName',"'小明'",'str'],['name_len','2','int'],['myAge','18','int',1]], out:['你好，世界！','⌨ 你的名字是什麼？ 小明','很高興認識你，小明','你的名字長度是：\n2','⌨ 你的年齡是多少？ 17'], note:"int('17') + 1 = 18 → myAge 現在指向整數 18" },
-  { line:8, vars:[['myName',"'小明'",'str'],['name_len','2','int'],['myAge','18','int']], out:['你好，世界！','⌨ 你的名字是什麼？ 小明','很高興認識你，小明','你的名字長度是：\n2','⌨ 你的年齡是多少？ 17','你明年將會是 18 歲。'], newOut:true, note:'✔ str(18) 轉回字串、串接後印出。程式結束！' },
-]);
+function helloSteps(name, ageRaw) {
+  const qn=`'${name}'`, qa=`'${ageRaw}'`, n=name.length;
+  const base=['你好，世界！',`⌨ 你的名字是什麼？ ${name}`,`很高興認識你，${name}`];
+  const outLen=[...base,`你的名字長度是：\n${n}`], outAge=[...outLen,`⌨ 你的年齡是多少？ ${ageRaw}`];
+  const steps=[
+    {line:0,vars:[],out:[],note:'三引號字串說明程式目的；這一行不產生畫面輸出'},
+    {line:1,vars:[],out:['你好，世界！'],newOut:true,note:'print() 印出字串參數'},
+    {line:2,vars:[['myName',qn,'str',1]],out:base.slice(0,2),note:`input() 回傳字串 ${qn}`},
+    {line:3,vars:[['myName',qn,'str']],out:base,newOut:true,note:'用 + 串接字串與 myName'},
+    {line:4,vars:[['myName',qn,'str'],['name_len',String(n),'int',1]],out:base,note:`len(${qn}) = ${n}`},
+    {line:5,vars:[['myName',qn,'str'],['name_len',String(n),'int']],out:outLen,newOut:true,note:`str(${n}) 轉成字串後才能串接`},
+    {line:6,vars:[['myName',qn,'str'],['name_len',String(n),'int'],['myAge',qa,'str',1]],out:outAge,note:`input() 先回傳字串 ${qa}`},
+  ];
+  if (!/^[+-]?\d+$/.test(ageRaw.trim())) {
+    steps.push({line:7,vars:[['myName',qn,'str'],['name_len',String(n),'int'],['myAge',qa,'str']],out:[...outAge,`ValueError: invalid literal for int(): ${qa}`],newOut:true,note:`int(${qa}) 無法轉成整數，程式在這一行停止`});
+    return steps;
+  }
+  const next=Number(ageRaw)+1;
+  steps.push({line:7,vars:[['myName',qn,'str'],['name_len',String(n),'int'],['myAge',String(next),'int',1]],out:outAge,note:`int(${qa}) + 1 = ${next}`});
+  steps.push({line:8,vars:[['myName',qn,'str'],['name_len',String(n),'int'],['myAge',String(next),'int']],out:[...outAge,`你明年將會是 ${next} 歲。`],newOut:true,note:'轉回字串、串接並印出；程式結束'});
+  return steps;
+}
+const helloRunner=StepRunner('hello', helloSteps('小華','16'));
 
 /* ============================================================
    P06 hello.py 個人化小遊戲
@@ -1235,50 +1234,16 @@ StepRunner('hello', [
   const nameInput = document.getElementById('gameNameInput');
   const ageInput  = document.getElementById('gameAgeInput');
   const runBtn    = document.getElementById('gameRunBtn');
-  const consoleEl = document.getElementById('gameConsole');
-  if (!runBtn || !consoleEl) return;
-
-  function addLine(text, cls) {
-    const div = document.createElement('div');
-    if (cls) div.className = cls;
-    div.textContent = text;
-    consoleEl.appendChild(div);
-    consoleEl.scrollTop = consoleEl.scrollHeight;
-  }
-
-  function showIntro() {
-    consoleEl.innerHTML = '';
-    addLine('❯ 輸入你的名字與年齡，按「▶ 執行」看看 hello.py 用你的資料會印出什麼', 'g-sys');
-  }
+  if (!runBtn) return;
 
   function run() {
     const name = (nameInput.value || '').trim() || '小華';
     const ageRaw = (ageInput.value || '').trim() || '16';
-    const age = parseInt(ageRaw, 10);
-    consoleEl.innerHTML = '';
-    const queue = [
-      ['你好，世界！', 'g-sys'],
-      ['⌨ 你的名字是什麼？ ' + name, 'g-me'],
-      ['很高興認識你，' + name, 'g-sys'],
-      ['你的名字長度是：', 'g-sys'],
-      [String(name.length), 'g-sys'],
-      ['⌨ 你的年齡是多少？ ' + ageRaw, 'g-me'],
-    ];
-    if (Number.isNaN(age)) {
-      queue.push(['✘ ValueError：int() 無法把 "' + ageRaw + '" 轉成整數 —— 年齡請輸入數字！', 'g-lose']);
-    } else {
-      queue.push(['你明年將會是 ' + (age + 1) + ' 歲。', 'g-win']);
-    }
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i >= queue.length) { clearInterval(timer); return; }
-      const item = queue[i++];
-      addLine(item[0], item[1]);
-    }, 450);
+    helloRunner.setSteps(helloSteps(name,ageRaw));
+    helloRunner.play();
   }
 
   runBtn.addEventListener('click', run);
-  showIntro();
 })();
 
 /* ============================================================

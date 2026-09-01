@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -717,12 +718,15 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div>
       <div class="viz-panel">
         <div id="exStage" style="min-height:170px;"></div>
-        <div class="status-banner" id="exStatus"><span class="status-icon">›</span><span class="status-text">選一種情況，看 try / except / else / finally 各自什麼時候跑。</span></div>
+        <div class="status-banner" id="exStatus" aria-live="polite"><span class="status-icon">›</span><span class="status-text">選一種情況，再按「下一步」。</span></div>
         <div class="controls-bar">
-          <button class="btn btn-play" onclick="exStart('ok')">▶ 檔案存在</button>
-          <button class="btn btn-play" onclick="exStart('missing')">▶ 檔案不存在</button>
-          <button class="btn btn-step" onclick="exPlayer &amp;&amp; exPlayer.step()">→ 單步</button>
+          <select id="exMode" onchange="exLoad()" aria-label="執行情境"><option value="ok">檔案存在</option><option value="missing">檔案不存在</option></select>
+          <button class="btn btn-step" onclick="exPlayer &amp;&amp; exPlayer.prev()">← 上一步</button>
+          <button class="btn btn-play" id="exPlay" onclick="exPlayer &amp;&amp; exPlayer.play()">▶ 播放</button>
+          <button class="btn btn-step" onclick="exPlayer &amp;&amp; exPlayer.step()">下一步 →</button>
           <button class="btn btn-reset" onclick="exReset()">⟲ 重設</button>
+          <select id="exSpeed" aria-label="播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select>
+          <span class="mono" id="exCounter">0 / 5</span>
         </div>
       </div>
     </div>
@@ -1031,26 +1035,33 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
+  constructor({frames, apply, delayInput, playButton, counter, onDone, onReset}) {
     this.frames = frames; this.apply = apply;
     this.delayInput = delayInput; this.i = -1; this.timer = null;
+    this.playButton = playButton; this.counter = counter;
     this.onDone = onDone || (()=>{});
+    this.onReset = onReset || (()=>{});
+    this.updateMeta();
   }
+  updateMeta() { if (this.counter) this.counter.textContent = `${this.i + 1} / ${this.frames.length}`; }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
-  }
-  play() {
     this.stop();
+    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+    this.i += 1; this.apply(this.frames[this.i]); this.updateMeta();
+  }
+  prev() { this.stop(); if (this.i >= 0) { this.i -= 1; if (this.i >= 0) this.apply(this.frames[this.i]); else this.onReset(); this.updateMeta(); } }
+  play() {
+    if (this.timer) { this.stop(); return; }
+    if (this.playButton) this.playButton.textContent = '⏸ 暫停';
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.apply(this.frames[this.i]); this.updateMeta();
+      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 1800);
     };
     tick();
   }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } if (this.playButton) this.playButton.textContent = '▶ 播放'; }
+  reset() { this.stop(); this.i = -1; this.onReset(); this.updateMeta(); }
 }
 
 function setStatus(id, html) {
@@ -1174,31 +1185,34 @@ function exFrames(mode) {
   return f;
 }
 
-function exStart(mode) {
+function exLoad() {
   if (exPlayer) exPlayer.stop();
+  const mode = $('exMode').value;
   exPlayer = new Player({
     frames: exFrames(mode),
+    delayInput: $('exSpeed'), playButton: $('exPlay'), counter: $('exCounter'),
     apply: fr => {
       $('exStage').innerHTML = fr.html;
       hlLine('exCode', fr.line);
       setStatus('exStatus', fr.msg);
-    },
+    }, onReset: exResetView,
   });
-  exPlayer.play();
+  exResetView();
 }
 
-function exReset() {
-  if (exPlayer) exPlayer.stop();
-  exPlayer = null;
+function exResetView() {
   $('exStage').innerHTML =
     exBox('try', 'f = open(path)', 'skip') + exBox('except', 'return 0', 'skip') +
     exBox('else', 'return len(f.readlines())', 'skip') + exBox('finally', 'close_things()', 'skip');
   hlLine('exCode', null);
-  setStatus('exStatus', '選一種情況，看四個區塊各自什麼時候跑。');
+  setStatus('exStatus', '情境已載入；按「下一步」逐格查看，或按播放。');
+}
+function exReset() {
+  if (exPlayer) exPlayer.reset();
 }
 
 (function () {
-  if ($('exStage')) exReset();
+  if ($('exStage')) exLoad();
 })();
 
 </script>

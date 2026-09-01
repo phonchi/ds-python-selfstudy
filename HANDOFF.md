@@ -1,9 +1,9 @@
 # 接力文件（ds-python-selfstudy）
 
-姊妹站是 [`ds-cpp-selfstudy`](https://github.com/phonchi/ds-cpp-selfstudy)，兩站結構完全相同，
-`recursion.html` 的整個 `<head>`（1–332 行）除了 `<title>` 之外逐位元組一致。
-**改動任一站之前，先看另一站有沒有已經解過同一個問題** —— 那邊的 `HANDOFF.md` 記了八個坑，
-其中大半在這邊也成立。
+姊妹站是 [`ds-cpp-selfstudy`](https://github.com/phonchi/ds-cpp-selfstudy)，兩站沿用同一套設計語彙，
+但 Python 站經過播放器與窄螢幕視覺稽核後，HTML／`<head>` 已不再逐位元組相同。
+**改動任一站之前，仍可先看另一站有沒有解過同一個問題**；共用修正要重新核對頁面結構，
+不要直接假設能整段覆蓋。
 
 ## 現況（2026-08-28 已上線）
 
@@ -25,6 +25,8 @@ P1–P6 的內容改寫自 [PythonForMath](https://github.com/phonchi/PythonForM
 | `tools/apply_zh.py` | 從 `data/` 重生各頁的 `const FLASHCARDS` 與 `<section id="bankquiz">` | 整段以邊界重生 |
 | `tools/inject_prereq_py.py` | 課前章與先備頁的尾段注入（導讀框、bankquiz 錨點、詞彙卡區、上下頁導覽、CSS/JS、補 MathJax） | `<!-- prereq-injected -->` 標記 |
 | `tools/check_links_py.py` | 錨點、站內連結、注入前置條件、C++ 殘留 | — |
+| `tools/check_visuals_py.py` | 20 頁視覺合約、速度級距、scrubber、錯誤敘述與 inline JavaScript 語法 | — |
+| `tools/browser_check_py.py` | Playwright 操作播放器，檢查 390 px 視覺／控制列與 runtime error | — |
 | `tools/inject_site_py.py`／`inject_quiz_py.py` | 九章正課頁的網站化注入，已全部注入完畢，重跑會 skip | `id="cards"`／`id="bankquiz"` |
 | `tools/enrich/enrich_lib_py.py` | `hl()` Python 上色、`card()` 範例卡、`run_py()` 實跑 | — |
 | `tools/build_py_zh.py` | 詞彙卡母檔的產生器，依賴 repo 外路徑，本機跑不動 | — |
@@ -39,6 +41,9 @@ python3 tools/inject_prereq_py.py
 # 在 tools/apply_zh.py 的 FC／BQ 登記並補上 data/ 母檔
 python3 tools/apply_zh.py
 python3 tools/check_links_py.py
+python3 tools/check_contrast.py
+python3 tools/check_visuals_py.py
+python3 tools/browser_check_py.py
 ```
 
 ## 踩過的坑
@@ -79,7 +84,19 @@ P1–P6 的來源 [phonchi/PythonForMath](https://github.com/phonchi/PythonForMa
   **這條是誤判，2026-08-29 查證後關閉**：那一頁根本沒有 `code{}` 規則，
   `<code>` 繼承 `th` 的白字，實際看得見。<br>
   但**同一類問題確實存在而且更嚴重**，已於同日全站修掉（見下方「深色底對比」）。
-- 全站在 375px 寬會橫向溢位 —— 既有特性，九章正課頁本來就這樣。
+- 既有正文／長程式碼仍可能採橫向捲動；2026-09-01 的視覺稽核已把 `.viz-layout` 與播放器控制列
+  在 390px 的非預期溢位修完，守門由 `browser_check_py.py` 負責。
+
+## 視覺稽核（2026-09-01）
+
+20 頁已依 Math208 notebook／PDF 與 pythonds 全面複查。原則不是減量，而是分清楚「能看見狀態
+或資料結構」和「只是會動」：前者保留並補齊控制，後者改成靜態圖表、合併或移到選做折疊區。
+逐頁 KEEP／REWORK／REMOVE／ADD 決策、兩組速度級距與 immutable replay 合約記在
+`tools/VISUAL_AUDIT.md`。
+
+維護播放器時至少確認：初態停留一個完整 delay；Step 會先 pause；8 frames 以上有 counter 與
+scrubber；seek／reset／resize 不會再次 commit mutation；文字 trace 用 900／1800／3000 ms，
+比較／交換／空間移動用 600／1200／2200 ms。
 
 ---
 

@@ -41,6 +41,10 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--paper);color:var(--i
 /* Hero mini-graph illustration */
 .hero-graph{position:absolute;right:5%;top:50%;transform:translateY(-50%);opacity:.18;pointer-events:none;}
 @media(max-width:900px){.hero-graph{display:none;}}
+.page-intro{max-width:1100px;margin:0 auto;padding:3.2rem 2rem 1.5rem;border-bottom:1px solid var(--card-border);}
+.page-intro .chapter-tag{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent2);letter-spacing:.2em;margin-bottom:.55rem;}
+.page-intro h1{font-family:'Noto Serif TC',serif;font-size:clamp(1.8rem,4vw,2.65rem);line-height:1.35;margin:0 0 .65rem;color:var(--ink);}
+.page-intro p{margin:0;color:var(--muted);font-size:1.02rem;}
 
 /* Layout */
 .container{max-width:1180px;margin:0 auto;padding:3rem 1.5rem;}
@@ -63,7 +67,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -328,6 +333,12 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 .expected-out pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.55;white-space:pre-wrap;margin:0;}
 .warn-box{background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.25);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:.6rem 1rem;margin:.8rem 0;font-size:.9rem;}
 .warn-box b{color:var(--accent);}
+.runtime-map{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:.6rem;margin:1.3rem 0;padding:1rem;background:var(--paper);border:1px solid var(--card-border);border-radius:12px;}
+.runtime-map>div{display:flex;flex-direction:column;gap:.3rem;padding:.7rem;background:var(--card);border:1px solid var(--card-border);border-top:4px solid var(--accent3);border-radius:8px;min-width:0;}
+.runtime-map span{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent3);font-weight:700}.runtime-map code{overflow-wrap:anywhere}.runtime-map>b{color:var(--accent2)}
+.runtime-map>p{grid-column:1/-1;margin:0;padding:.65rem .8rem;border-left:4px solid var(--accent);background:rgba(192,57,43,.06);font-size:.86rem;}
+.verify-list{columns:2;padding-left:1.4rem}.verify-list li{margin:.45rem 0;break-inside:avoid}
+@media(max-width:700px){.runtime-map{grid-template-columns:1fr}.runtime-map>b{transform:rotate(90deg);text-align:center}.verify-list{columns:1}}
 </style>
 <!-- prereq-injected -->
 <style>
@@ -460,27 +471,11 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   <a href="#top" class="fn-top" title="回到頂端"><span class="fn-num">↑ TOP</span></a>
 </nav>
 
-<div class="hero" id="top">
-  <div class="hero-grid"></div>
-  <svg class="hero-graph" width="300" height="260" viewBox="0 0 300 260">
-  <g stroke="#fff" stroke-width="2.5" fill="none" opacity=".85">
-    <rect x="45" y="45" width="210" height="150" rx="10"/>
-    <line x1="45" y1="78" x2="255" y2="78"/>
-    <circle cx="62" cy="61" r="5"/><circle cx="80" cy="61" r="5"/><circle cx="98" cy="61" r="5"/>
-    <line x1="70" y1="105" x2="150" y2="105"/>
-    <line x1="70" y1="130" x2="200" y2="130"/>
-    <line x1="70" y1="155" x2="120" y2="155"/>
-    <line x1="120" y1="195" x2="120" y2="215"/><line x1="90" y1="215" x2="210" y2="215"/>
-  </g>
-</svg>
-  <div class="hero-content">
-    <div class="chapter-tag">CHAPTER 00B</div>
-    <h1><span class="green">課前準備</span>與環境安裝</h1>
-    <div class="subtitle">三條路擇一，二十分鐘之內讓你能跑本課程的每一份 notebook。</div>
-    <div class="big-formula">Colab｜Anaconda｜VS Code｜pythonds3｜jupyterquiz｜jupytercards</div>
-    <div class="scroll-hint">向下捲動開始<span>↓</span></div>
-  </div>
-</div>
+<header class="page-intro" id="top">
+  <div class="chapter-tag">CHAPTER 00B</div>
+  <h1>課前準備與環境安裝</h1>
+  <p>從 Colab、Anaconda 或 VS Code 擇一；目標不是「裝過」，而是能重現 notebook 的完整執行生命週期。</p>
+</header>
 
 <div class="container">
 <div class="study-guide">
@@ -546,10 +541,10 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
   </div>
 
   <div class="deck-extra">
-    <div class="dx-label">每次開新的 Colab session 都要先跑這一格</div>
+    <div class="dx-label">拿到新的 Colab VM 時，先跑這一格</div>
     <div class="pseudo-code" style="font-size:.85rem;"><span class="line"><span class="com"># 安裝本課程需要的三個套件（Colab 已內建 matplotlib）</span></span>
 <span class="line">!pip install -q pythonds3 jupyterquiz jupytercards</span></div>
-    <p class="dx-note">⚠️ <strong>Colab 的 runtime 一旦重開（閒置太久、或你自己選了「重新啟動」），裝好的套件會消失。</strong>它本來就這樣設計的。每次重連都重跑一次這一格就好，只要幾秒鐘。建議把它固定放在每份 notebook 的第一格。</p>
+    <p class="dx-note">⚠️ <strong>「重新啟動工作階段／kernel」與「中斷連線並刪除執行階段」不同。</strong>前者會清掉 Python 變數與匯入狀態，但同一台 VM 裡的檔案與用 <code>pip</code> 裝的套件通常仍在；後者或系統回收 VM 後，<code>/content</code> 的檔案與臨時安裝才會消失。建議把安裝指令固定放在 notebook 前面：<code>import</code> 失敗時再重跑即可。</p>
   </div>
 
   <div class="info-box green">
@@ -557,6 +552,16 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
     <div class="pseudo-code" style="font-size:.82rem;margin:.5rem 0;"><span class="line"><span class="kw">from</span> google.colab <span class="kw">import</span> drive</span>
 <span class="line">drive.mount(<span class="str">'/content/drive'</span>)</span></div>
     <p style="margin-bottom:0;font-size:.88rem;">執行後會跳出授權視窗，同意之後檔案就在 <code>/content/drive/MyDrive/</code> 底下。第 08 章讀字梯字典檔時會用到類似的做法。</p>
+  </div>
+
+  <div class="runtime-map" aria-label="Colab notebook 與 runtime 的關係">
+    <div><span>CELL 1</span><strong>安裝套件</strong><code>!pip install ...</code></div>
+    <b aria-hidden="true">→</b>
+    <div><span>CELL 2</span><strong>匯入套件</strong><code>import pythonds3</code></div>
+    <b aria-hidden="true">→</b>
+    <div><span>CELL 3+</span><strong>執行課程程式</strong><code>Stack() / Graph()</code></div>
+    <p><strong>Restart session / kernel：</strong>清除 Python 記憶體中的變數、匯入與執行狀態；同一台 VM 的 <code>/content</code> 檔案和 <code>pip</code> 安裝通常仍在。先從匯入與初始化的 cell 重跑；若 <code>import</code> 失敗，再跑 Cell 1。</p>
+    <p><strong>Disconnect and delete runtime，或 VM 被回收／換新：</strong>VM 的暫存檔案與臨時安裝會消失，需從 Cell 1 重跑。存於 Google Drive 的 notebook 與 Drive 檔案不受影響；未另存到 Drive 的 <code>/content</code> 檔案則不保證保留。</p>
   </div>
 </section>
 
@@ -636,13 +641,11 @@ Stack  pop/peek/size -> 7 42 1
     <p class="dx-note">版本號跟你的不一樣沒關係，Python 3.9 以上都可以。重點是<strong>六行 import 全部沒噴錯</strong>，而且第三行印出 <code>7 42 1</code> —— 那代表 <code>pythonds3</code> 的 Stack 真的能用。</p>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">六行 import 沒噴錯</div></div>
-    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">印出 7 42 1</div></div>
-    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">能新增並執行儲存格</div></div>
-    <div class="stat-tile"><div class="stat-value">✓</div><div class="stat-label">檔案存得起來</div></div>
-  </div>
-  <p style="margin-top:1rem;">四項都打勾就可以往下走了。接下來去 <a href="introduction.html">第 01 章 · Python 導論</a>；若對 Python 本身還不熟，先掃 <a href="index.html#prereq">先備頁 P1–P9</a>（選讀，不評分）。</p>
+  <ul class="verify-list">
+    <li>六行 import 都沒有錯誤。</li><li>Stack 測試印出 <code>7 42 1</code>。</li>
+    <li>能新增並執行儲存格。</li><li>Notebook 能儲存、關閉後再開啟。</li>
+  </ul>
+  <p>四項都完成就可以往下走了。接下來去 <a href="introduction.html">第 01 章 · Python 導論</a>；若對 Python 本身還不熟，先掃 <a href="index.html#prereq">先備頁 P1–P9</a>（選讀，不評分）。</p>
 </section>
 
 <section id="learnmode">
@@ -682,7 +685,7 @@ Stack  pop/peek/size -> 7 42 1
     <tbody>
       <tr>
         <td class="mono" style="font-size:.82rem;">ModuleNotFoundError:<br>No module named 'pythonds3'</td>
-        <td>① 在 Colab：runtime 重開過了，重跑安裝那一格。② 在本機：套件名稱是 <code>pythonds3</code> 不是 <code>pythonds</code>。③ VS Code：右上角的 kernel 選錯環境了。</td>
+        <td>① 在 Colab：目前的 VM 沒裝套件（常見於 runtime 被刪除、回收或換新），重跑安裝那一格。② 在本機：套件名稱是 <code>pythonds3</code> 不是 <code>pythonds</code>。③ VS Code：右上角的 kernel 選錯環境了。單純 Restart session / kernel 通常不會移除同一台 VM 上已安裝的套件。</td>
       </tr>
       <tr>
         <td class="mono" style="font-size:.82rem;">turtle 在 Colab<br>畫不出東西</td>
@@ -768,67 +771,8 @@ function hlLine(rootId, n) {
   }
 }
 
-/* step player: frames = [{...}], apply(frame) renders */
-class Player {
-  constructor({frames, apply, delayInput, onDone}) {
-    this.frames = frames; this.apply = apply;
-    this.delayInput = delayInput; this.i = -1; this.timer = null;
-    this.onDone = onDone || (()=>{});
-  }
-  step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
-  }
-  play() {
-    this.stop();
-    const tick = () => {
-      if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
-    };
-    tick();
-  }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
-}
-
 function setStatus(id, html) {
   const el = $(id); if (el) el.querySelector('.status-text').innerHTML = html;
-}
-
-/* vertical box stack renderer (DOM) */
-function renderBoxStack(containerId, items, opts={}) {
-  const el = $(containerId); if (!el) return;
-  const hl = opts.highlight ?? -1;   // index from top (0 = top)
-  el.innerHTML = '';
-  const label = document.createElement('div');
-  label.className = 'bs-toplabel';
-  label.textContent = items.length ? 'top ↓' : '(empty)';
-  el.appendChild(label);
-  items.slice().reverse().forEach((v, idx) => {
-    const d = document.createElement('div');
-    d.className = 'bs-item' + (idx === hl ? ' bs-hl' : '');
-    d.textContent = v;
-    el.appendChild(d);
-  });
-}
-
-/* horizontal queue renderer: front at left */
-function renderBoxQueue(containerId, items, opts={}) {
-  const el = $(containerId); if (!el) return;
-  el.innerHTML = '';
-  const front = document.createElement('div');
-  front.className = 'bq-label'; front.textContent = items.length ? 'front →' : '(empty)';
-  el.appendChild(front);
-  items.forEach((v, idx) => {
-    const d = document.createElement('div');
-    d.className = 'bq-item' + (idx === (opts.highlight ?? -1) ? ' bs-hl' : '');
-    d.textContent = v;
-    el.appendChild(d);
-  });
-  const rear = document.createElement('div');
-  rear.className = 'bq-label'; rear.textContent = items.length ? '← rear' : '';
-  el.appendChild(rear);
 }
 
 /* floating nav scroll spy */
@@ -850,7 +794,7 @@ function renderBoxQueue(containerId, items, opts={}) {
 
 </script>
 <script>
-const FLASHCARDS = [{"front": "直譯器（Interpreter）", "back": "逐行讀取並執行程式碼的程式。你電腦上的 python 指令就是直譯器；Colab 則是把直譯器放在 Google 的機器上，你透過瀏覽器操作它。"}, {"front": "Jupyter 筆記本（Jupyter Notebook）", "back": "把說明文字、程式碼與執行結果放在同一份 .ipynb 檔案裡的互動式格式。以「儲存格（cell）」為單位執行，適合邊讀邊試，本課程全程使用。"}, {"front": "儲存格（Cell）", "back": "Notebook 的最小執行單位，分成程式碼與文字兩種。按 Shift + Enter 執行目前的儲存格並跳到下一格。"}, {"front": "執行階段（Runtime）", "back": "實際跑你程式的那個行程與它的記憶體狀態。Colab 的 runtime 閒置太久會被回收，屆時已安裝的套件與變數都會消失，需要重跑安裝與初始化的儲存格。"}, {"front": "套件管理工具（Package Manager, pip / conda）", "back": "負責下載、安裝與升級第三方套件的工具。本課程用它安裝 pythonds3、jupyterquiz 與 jupytercards。在 notebook 裡要在指令前加驚嘆號，例如 !pip install。"}, {"front": "虛擬環境（Virtual Environment）", "back": "一個彼此隔離的套件安裝空間，例如 conda create -n ds 或 python -m venv。用意是讓不同專案各自持有自己的套件版本，不會互相破壞。"}, {"front": "核心（Kernel）", "back": "Notebook 背後負責執行程式碼的直譯器行程。VS Code 或 Jupyter 裡「明明裝了套件卻說找不到」，最常見的原因就是選到了另一個環境的 kernel。"}, {"front": "pythonds3", "back": "教科書 Problem Solving with Algorithms and Data Structures using Python 的配套套件，提供 Stack、Queue、Deque、BinaryTree、Graph、PriorityQueue 等現成實作，本課程全程使用。"}, {"front": "海龜繪圖（Turtle Graphics）", "back": "Python 標準函式庫的繪圖模組，第 06 章用它畫螺旋與碎形樹。它需要本機視窗，因此在 Colab 這類雲端環境無法使用。"}, {"front": "學習模式（Learn Mode）", "back": "Colab 內建 Gemini 的一種對話模式：改成一步步引導與反問，而不是直接給出完整解答。目的是加速學習迴圈而不是繞過它。"}];
+const FLASHCARDS = [{"front": "直譯器（Interpreter）", "back": "逐行讀取並執行程式碼的程式。你電腦上的 python 指令就是直譯器；Colab 則是把直譯器放在 Google 的機器上，你透過瀏覽器操作它。"}, {"front": "Jupyter 筆記本（Jupyter Notebook）", "back": "把說明文字、程式碼與執行結果放在同一份 .ipynb 檔案裡的互動式格式。以「儲存格（cell）」為單位執行，適合邊讀邊試，本課程全程使用。"}, {"front": "儲存格（Cell）", "back": "Notebook 的最小執行單位，分成程式碼與文字兩種。按 Shift + Enter 執行目前的儲存格並跳到下一格。"}, {"front": "執行階段（Runtime）", "back": "實際跑程式的行程、記憶體狀態與所在 VM。Restart session / kernel 會清掉 Python 變數與匯入，但同一台 VM 的檔案與 pip 安裝通常還在；Disconnect and delete runtime 或 VM 被回收／換新時，暫存檔案與臨時安裝才會消失。"}, {"front": "套件管理工具（Package Manager, pip / conda）", "back": "負責下載、安裝與升級第三方套件的工具。本課程用它安裝 pythonds3、jupyterquiz 與 jupytercards。在 notebook 裡要在指令前加驚嘆號，例如 !pip install。"}, {"front": "虛擬環境（Virtual Environment）", "back": "一個彼此隔離的套件安裝空間，例如 conda create -n ds 或 python -m venv。用意是讓不同專案各自持有自己的套件版本，不會互相破壞。"}, {"front": "核心（Kernel）", "back": "Notebook 背後負責執行程式碼的直譯器行程。VS Code 或 Jupyter 裡「明明裝了套件卻說找不到」，最常見的原因就是選到了另一個環境的 kernel。"}, {"front": "pythonds3", "back": "教科書 Problem Solving with Algorithms and Data Structures using Python 的配套套件，提供 Stack、Queue、Deque、BinaryTree、Graph、PriorityQueue 等現成實作，本課程全程使用。"}, {"front": "海龜繪圖（Turtle Graphics）", "back": "Python 標準函式庫的繪圖模組，第 06 章用它畫螺旋與碎形樹。它需要本機視窗，因此在 Colab 這類雲端環境無法使用。"}, {"front": "學習模式（Learn Mode）", "back": "Colab 內建 Gemini 的一種對話模式：改成一步步引導與反問，而不是直接給出完整解答。目的是加速學習迴圈而不是繞過它。"}];
 
 /* ===== Flashcards engine ===== */
 (function(){

@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -578,14 +579,14 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 
 <div class="deck-extra">
   <div class="dx-label">講義 04 · Node 的使用畫面</div>
-  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic.linked_list <span class="kw">import</span> Node</span>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> pythonds3.basic.linked_list <span class="kw">import</span> LinkedListNode <span class="kw">as</span> Node</span>
 <span class="line"> </span>
 <span class="line">temp = Node(<span class="num">93</span>)</span>
 <span class="line"><span class="fn">print</span>(temp.data)</span>
 <span class="line"><span class="fn">print</span>(temp.next)   <span class="com"># 還沒接上任何人：None</span></span>
 <span class="line"> </span></div>
-  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>    from pythonds3.basic.linked_list import Node
-ImportError: cannot import name &#x27;Node&#x27; from &#x27;pythonds3.basic.linked_list&#x27; (/home/phonchi/ds_cpp/_python_backup/Slides/pythonds3/pythonds3/basic/linked_list.py)</pre></div>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>93
+None</pre></div>
   <p class="dx-note"><span id="dx-node"></span>data 和 next 都是 property：底層其實是 get_data() / set_data()，但用起來像普通屬性。next 是 None：Python 用 None 扮演「沒有下一個」的角色。</p>
 </div>
 </section>
@@ -603,11 +604,13 @@ ImportError: cannot import name &#x27;Node&#x27; from &#x27;pythonds3.basic.link
         <div class="status-banner" id="ullStatus"><span class="status-icon">›</span><span class="status-text">初始串列 31→77→17→93（head 在左）。試試 add / search / remove。</span></div>
         <div class="controls-bar">
           <input id="ullInput" type="number" class="mono" style="width:80px;padding:.35rem .5rem;border:1px solid var(--card-border);border-radius:6px;" value="54">
-          <button class="btn" onclick="ullAdd()">add</button>
-          <button class="btn" onclick="ullSearch()">search</button>
-          <button class="btn" onclick="ullRemove()">remove</button>
+          <button class="btn" onclick="ullAdd(this)">▶ add</button>
+          <button class="btn" onclick="ullSearch(this)">▶ search</button>
+          <button class="btn" onclick="ullRemove(this)">▶ remove</button>
           <button class="btn" onclick="ullReset()">重置</button>
-          <button class="btn" onclick="ullPlayer &amp;&amp; ullPlayer.step()">→ 單步</button>
+          <button class="btn" onclick="ullPlayer &amp;&amp; ullPlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="ullPlayer &amp;&amp; ullPlayer.step()">→ 下一步</button>
+          <select id="ullSpeed" class="mono"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
         </div>
       </div>
     </div>
@@ -634,7 +637,7 @@ ImportError: cannot import name &#x27;Node&#x27; from &#x27;pythonds3.basic.link
     </div>
   </div>
 
-  <h3 style="margin-top:1.5rem;">完整類別長什麼樣（pythonds3.basic.UnorderedList）</h3>
+  <h3 style="margin-top:1.5rem;">完整類別長什麼樣（講義 traversal 版）</h3>
   <p>動畫面板用的是簡化寫法；實際的類別透過 Node 的
   <code>get_next()／set_next()</code>（或 property 糖衣 <code>current.next</code>）操作。
   <code>size()</code>、<code>search()</code>、<code>remove()</code>
@@ -675,6 +678,9 @@ ImportError: cannot import name &#x27;Node&#x27; from &#x27;pythonds3.basic.link
     刪 head 是特殊情況：previous 還是 None，這時改的是 head 本身。
     講義留了一題思考：<strong>刪最後一個節點時，這兩個分支夠用嗎？</strong>（提示：夠。想想 current.get_next() 那時是什麼。）
   </div>
+  <div class="info-box" style="margin-top:.7rem;"><span class="info-label">套件版本差異</span>
+  講義版的 <code>size()</code> 逐節點計數，所以是 O(n)；目前課程附的 <code>pythonds3</code>
+  在基底類別維護 <code>_count</code>，因此套件版 <code>size()</code> 是 O(1)。兩者都正確，但不能混稱同一個實作。</div>
   
 <div class="quiz-box">
   <div class="quiz-label">QUIZ · add 的兩行順序</div>
@@ -736,9 +742,11 @@ True
         <div class="status-banner" id="ollStatus"><span class="status-icon">›</span><span class="status-text">初始 17→26→31→54→77→93。add(40) 會逐步找到 31 與 54 之間。</span></div>
         <div class="controls-bar">
           <input id="ollInput" type="number" class="mono" style="width:80px;padding:.35rem .5rem;border:1px solid var(--card-border);border-radius:6px;" value="40">
-          <button class="btn" onclick="ollAdd()">▶ add（動畫）</button>
-          <button class="btn" onclick="ollPlayer &amp;&amp; ollPlayer.step()">→ 單步</button>
+          <button class="btn" onclick="ollAdd(this)">▶ add（動畫）</button>
+          <button class="btn" onclick="ollPlayer &amp;&amp; ollPlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="ollPlayer &amp;&amp; ollPlayer.step()">→ 下一步</button>
           <button class="btn" onclick="ollReset()">重置</button>
+          <select id="ollSpeed" class="mono"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
         </div>
       </div>
     </div>
@@ -1039,26 +1047,73 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
-    this.frames = frames; this.apply = apply;
-    this.delayInput = delayInput; this.i = -1; this.timer = null;
-    this.onDone = onDone || (()=>{});
+  constructor({frames, apply, delayInput, delay=1800, onDone, onIndex, playButton}) {
+    this.frames = frames || []; this.apply = apply;
+    this.delayInput = delayInput; this.delay = delay; this.i = 0; this.timer = null;
+    this.onDone = onDone || (()=>{}); this.onIndex = onIndex || (()=>{});
+    this.progress = null; this.counter = null;
+    this.playButton = playButton || null;
+    this.playLabel = this.playButton ? this.playButton.textContent : '';
+    if (this.playButton) this.playButton.setAttribute('aria-pressed', 'false');
+    if (delayInput && delayInput.closest('.controls-bar')) {
+      const bar = delayInput.closest('.controls-bar');
+      bar.querySelectorAll('.player-progress,.player-counter').forEach(x=>x.remove());
+      this.counter = document.createElement('span'); this.counter.className='player-counter mono';
+      this.counter.style.fontSize='.72rem'; bar.appendChild(this.counter);
+      if (this.frames.length >= 8) {
+        this.progress=document.createElement('input'); this.progress.type='range';
+        this.progress.className='player-progress timeline-scrubber'; this.progress.min=0; this.progress.max=this.frames.length-1; this.progress.value=0;
+        this.progress.style.cssText='flex:1 1 120px;min-width:90px;';
+        this.progress.oninput=()=>this.seek(this.progress.value); bar.appendChild(this.progress);
+      }
+    }
+  }
+  currentDelay() {
+    return this.delayInput ? parseInt(this.delayInput.value, 10) : this.delay;
+  }
+  render() {
+    if (!this.frames.length) return;
+    this.apply(this.frames[this.i]); this.onIndex(this.i, this.frames.length);
+    if (this.counter) this.counter.textContent=(this.i+1)+'/'+this.frames.length;
+    if (this.progress) this.progress.value=this.i;
   }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
+    this.stop();
+    if (this.i + 1 >= this.frames.length) { this.onDone(); return false; }
+    this.i += 1; this.render(); return true;
+  }
+  prev() {
+    this.stop();
+    if (this.i <= 0) return false;
+    this.i -= 1; this.render(); return true;
+  }
+  seek(i) {
+    this.stop();
+    this.i = Math.max(0, Math.min(this.frames.length - 1, Number(i) || 0));
+    this.render();
   }
   play() {
-    this.stop();
+    if (this.timer) { this.stop(); return; }
+    if (!this.frames.length) return;
+    if (this.i >= this.frames.length - 1) { this.i = 0; this.render(); }
+    this.setPlaying(true);
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.render();
+      this.timer = setTimeout(tick, this.currentDelay());
     };
-    tick();
+    this.timer = setTimeout(tick, this.currentDelay());
   }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  setPlaying(playing) {
+    if (!this.playButton) return;
+    this.playButton.textContent = playing ? '⏸ 暫停' : this.playLabel;
+    this.playButton.setAttribute('aria-pressed', playing ? 'true' : 'false');
+  }
+  stop() {
+    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    this.setPlaying(false);
+  }
+  reset() { this.stop(); this.i = 0; this.render(); }
 }
 
 function setStatus(id, html) {
@@ -1174,64 +1229,87 @@ function nodeDemo(step) {
     setStatus('nodeStatus', '<code>temp.next</code> 是 None：這個節點還沒接上任何串列。');
   }
 }
+nodeDemo(1);
 
 /* ---------- P02 unordered ---------- */
 let ull = [31, 77, 17, 93];
 let ullPlayer = null;
-function ullRender(opts={}, msg) {
-  renderLinked('ullVis', ull, opts);
+function ullRender(opts={}, msg, items=ull) {
+  renderLinked('ullVis', items, opts);
   if (msg) setStatus('ullStatus', msg);
 }
-function ullAdd() {
+function ullAdd(button) {
   const v = parseInt($('ullInput').value || '54', 10);
+  const key = `add:${v}:${ull.join(',')}`;
+  if (ullPlayer && ullPlayer._key === key) { ullPlayer.play(); return; }
+  if (ullPlayer) ullPlayer.stop();
   const frames = [
+    {hl:-1, line:null, msg:`初態：head 仍指向 ${ull[0] ?? 'None'}，新節點尚未建立。`},
     {hl:-1, line:2, msg:`Node(${v})`},
     {hl:-1, line:3, msg:`temp.set_next(head)（新節點接住 ${ull[0] ?? 'None'} 開頭的整條串列）`},
     {act:'do', hl:0, line:4, msg:`head = temp → ${v} 成為新的第一個節點。O(1) 完工！`},
   ];
+  frames.forEach(f=>f.list=f.act==='do'?[v,...ull]:[...ull]);
   ullPlayer = new Player({frames, apply: f => {
     if (f.act === 'do' && !f.done) { ull.unshift(v); f.done = true; }
-    ullRender({hl:f.hl}, f.msg); hlLine('ullCode', f.line);
-  }});
+    ullRender({hl:f.hl}, f.msg, f.list); hlLine('ullCode', f.line);
+  }, delayInput:$('ullSpeed'), playButton:button});
+  ullPlayer._key = key;
   ullPlayer.reset(); ullPlayer.play();
 }
-function ullSearch() {
+function ullSearch(button) {
   const v = parseInt($('ullInput').value || '17', 10);
-  const frames = [];
+  const key = `search:${v}:${ull.join(',')}`;
+  if (ullPlayer && ullPlayer._key === key) { ullPlayer.play(); return; }
+  if (ullPlayer) ullPlayer.stop();
+  const frames = [{hl:-1,line:7,msg:`初態：從 head 準備搜尋 ${v}。`}];
   for (let i = 0; i < ull.length; i++) {
     frames.push({hl:i, line:9, msg:`current.data = ${ull[i]}，${ull[i] === v ? `等於 ${v} → <strong>找到 ✓</strong>` : `不是 ${v}，current = current.next`}`});
     if (ull[i] === v) break;
   }
   if (ull.indexOf(v) < 0) frames.push({hl:-1, line:11, msg:`current 走到 None → <strong>${v} 不在串列中 ✗</strong>`});
-  ullPlayer = new Player({frames, apply: f => { ullRender({hl:f.hl}, f.msg); hlLine('ullCode', f.line); }});
+  frames.forEach(f=>f.list=[...ull]);
+  ullPlayer = new Player({frames, apply: f => { ullRender({hl:f.hl}, f.msg, f.list); hlLine('ullCode', f.line); }, delayInput:$('ullSpeed'), playButton:button});
+  ullPlayer._key = key;
   ullPlayer.reset(); ullPlayer.play();
 }
-function ullRemove() {
+function ullRemove(button) {
   const v = parseInt($('ullInput').value || '17', 10);
   const idx = ull.indexOf(v);
   if (idx < 0) { ullRender({}, `${v} 不在串列裡，先 add 或換個值。`); return; }
-  const frames = [];
+  const key = `remove:${v}:${ull.join(',')}`;
+  if (ullPlayer && ullPlayer._key === key) { ullPlayer.play(); return; }
+  if (ullPlayer) ullPlayer.stop();
+  const frames = [{hl:-1,prevHl:-1,line:14,msg:`初態：previous=None，current=head，準備移除 ${v}。`}];
   for (let i = 0; i <= idx; i++)
     frames.push({hl:i, prevHl:i-1, line:15, msg:`current = ${ull[i]}${i===idx?'（就是它！）':'，previous 跟上'}`});
   frames.push({act:'do', hl:-1, line: idx===0?17:18,
     msg: idx===0 ? `previous 是 None → head = current.next。脫鉤的節點交給 GC。`
                  : `previous.next = current.next，${ull[idx-1]} 直接跳過 ${v}。脫鉤的節點交給 GC。`});
+  frames.forEach(f=>f.list=f.act==='do'?ull.filter((_,i)=>i!==idx):[...ull]);
   ullPlayer = new Player({frames, apply: f => {
     if (f.act === 'do' && !f.done) { ull.splice(idx,1); f.done = true; }
-    ullRender({hl:f.hl, prevHl:f.prevHl}, f.msg); hlLine('ullCode', f.line);
-  }});
+    ullRender({hl:f.hl, prevHl:f.prevHl}, f.msg, f.list); hlLine('ullCode', f.line);
+  }, delayInput:$('ullSpeed'), playButton:button});
+  ullPlayer._key = key;
   ullPlayer.reset(); ullPlayer.play();
 }
-function ullReset() { ull = [31,77,17,93]; ullRender({}, '已重置為 31→77→17→93。'); }
+function ullReset() {
+  if (ullPlayer) ullPlayer.reset();
+  ull = [31,77,17,93]; ullRender({}, '已重置為 31→77→17→93。');
+}
 ullRender();
 
 /* ---------- P03 ordered ---------- */
 let oll = [17, 26, 31, 54, 77, 93];
 let ollPlayer = null;
-function ollRender(opts={}, msg) { renderLinked('ollVis', oll, opts); if (msg) setStatus('ollStatus', msg); }
-function ollAdd() {
+function ollRender(opts={}, msg, items=oll) { renderLinked('ollVis', items, opts); if (msg) setStatus('ollStatus', msg); }
+function ollAdd(button) {
   const v = parseInt($('ollInput').value || '40', 10);
-  const frames = [];
+  const key = `add:${v}:${oll.join(',')}`;
+  if (ollPlayer && ollPlayer._key === key) { ollPlayer.play(); return; }
+  if (ollPlayer) ollPlayer.stop();
+  const frames = [{hl:-1,prevHl:-1,line:2,msg:`初態：previous=None，current=head，準備插入 ${v}。`}];
   let i = 0;
   while (i < oll.length && oll[i] < v) {
     frames.push({hl:i, line:4, msg:`current.data = ${oll[i]} < ${v}，繼續前進`});
@@ -1242,13 +1320,18 @@ function ollAdd() {
     msg: i < oll.length ? `current.data = ${oll[i]} ≥ ${v} → 插在 previous 與 current 之間` : `走到尾端 → 插在最後`});
   frames.push({act:'do', hl:at, line: at===0?7:9,
     msg: at===0 ? `插在最前：temp.next = head; head = temp` : `temp.next = current; previous.next = temp ✓`});
+  frames.forEach(f=>{ const x=[...oll]; if(f.act==='do')x.splice(at,0,v); f.list=x; });
   ollPlayer = new Player({frames, apply: f => {
     if (f.act === 'do' && !f.done) { oll.splice(at,0,v); f.done = true; }
-    ollRender({hl:f.hl}, f.msg); hlLine('ollCode', f.line);
-  }});
+    ollRender({hl:f.hl, prevHl:f.prevHl}, f.msg, f.list); hlLine('ollCode', f.line);
+  }, delayInput:$('ollSpeed'), playButton:button});
+  ollPlayer._key = key;
   ollPlayer.reset(); ollPlayer.play();
 }
-function ollReset() { oll = [17,26,31,54,77,93]; ollRender({}, '已重置。'); }
+function ollReset() {
+  if (ollPlayer) ollPlayer.reset();
+  oll = [17,26,31,54,77,93]; ollRender({}, '已重置。');
+}
 ollRender();
 
 /* ---------- P04 variants ---------- */

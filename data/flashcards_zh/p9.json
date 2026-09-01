@@ -5,7 +5,7 @@
 },
 {
 "front": "父類別／子類別（Superclass / Subclass）",
-"back": "被繼承的一方稱為父類別（基底類別），繼承別人的一方稱為子類別（衍生類別）。OrderedList 繼承 UnorderedList，前者是子類別。"
+"back": "被繼承的一方稱為父類別（基底類別），繼承別人的一方稱為子類別（衍生類別）。pythonds3 裡的 OrderedList 與 UnorderedList 都繼承 LinkedList，兩者是兄弟類別。"
 },
 {
 "front": "呼叫父類別（super()）",

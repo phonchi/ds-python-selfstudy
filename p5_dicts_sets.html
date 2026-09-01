@@ -78,7 +78,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 .side-panel{display:flex;flex-direction:column;gap:.85rem;}
 .info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
@@ -576,11 +577,14 @@ footer a{color:var(--accent2);}
 <span class="line">grade[<span class="str">'機率統計'</span>] = <span class="num">90</span>   <span class="com"># 鍵已存在 → 覆蓋舊值</span></span>
 <span class="line"><span class="kw">del</span> grade[<span class="str">'函數論'</span>]</span>
 <span class="line"><span class="fn">print</span>(grade)</span></div>
-      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="createStatus">按「單步 ▸」開始</span></div>
+      <div class="status-banner" aria-live="polite"><span class="status-icon">▸</span><span class="status-text" id="createStatus">按「下一步」開始</span></div>
       <div class="controls-bar">
+        <button class="btn btn-step" id="createPrev">← 上一步</button>
         <button class="btn btn-play" id="createPlay">▶ 播放</button>
-        <button class="btn btn-step" id="createStep">單步 ▸</button>
+        <button class="btn btn-step" id="createStep">下一步 →</button>
         <button class="btn btn-reset" id="createReset">↺ 重設</button>
+        <select id="createSpeed" aria-label="播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select>
+        <span class="mono" id="createCounter">0 / 7</span>
       </div>
     </div>
     <div class="side-panel">
@@ -614,29 +618,17 @@ footer a{color:var(--accent2);}
 
   <p>預設情況下，直接對字典做 <code>for k in grade:</code> 走訪的是<strong>鍵</strong>而不是值。搭配 <code>items()</code> 與多重指派，可以在同一個迴圈同時取得鍵和值：</p>
 
-  <h3>🎬 互動：用 items() 同時走訪鍵與值</h3>
-  <div class="viz-layout">
-    <div class="viz-panel">
-      <div class="kv-canvas" id="iterateCanvas"><span class="var-empty">按「單步 ▸」開始執行</span></div>
-      <div class="pseudo-code" id="iterateCode">
-<span class="line">grade = {<span class="str">'機率統計'</span>:<span class="num">85</span>, <span class="str">'函數論'</span>:<span class="num">80</span>, <span class="str">'程式語言'</span>:<span class="num">90</span>, <span class="str">'方程式論'</span>:<span class="num">95</span>}</span>
-<span class="line"><span class="kw">for</span> key, val <span class="kw">in</span> grade.items():</span>
-<span class="line">    <span class="fn">print</span>(key, val)</span></div>
-      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="iterateStatus">按「單步 ▸」開始</span></div>
-      <div class="controls-bar">
-        <button class="btn btn-play" id="iteratePlay">▶ 播放</button>
-        <button class="btn btn-step" id="iterateStep">單步 ▸</button>
-        <button class="btn btn-reset" id="iterateReset">↺ 重設</button>
-      </div>
-    </div>
-    <div class="side-panel">
-      <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="iterateOut"></div></div>
-      <div class="info-card">
-        <div class="ic-title">list(grade.items())</div>
-        <p style="font-size:.82rem;margin:0;">會得到一個元組串列：<br><code>[('機率統計',85), ('函數論',80), …]</code></p>
-      </div>
-    </div>
-  </div>
+  <h3>items() 每一輪實際交給你的內容</h3>
+  <p>這個迴圈每次只做同一件事：從 <code>dict_items</code> 取出一個二元組，再拆成 <code>key</code> 與 <code>val</code>。固定的四輪不需要動畫，並排比較反而更容易看出規律：</p>
+  <table class="cmp-table">
+    <thead><tr><th>輪次</th><th><code>items()</code> 交出的二元組</th><th><code>key</code></th><th><code>val</code></th><th>新增輸出</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>('機率統計', 85)</code></td><td>機率統計</td><td>85</td><td><code>機率統計 85</code></td></tr>
+      <tr><td>2</td><td><code>('函數論', 80)</code></td><td>函數論</td><td>80</td><td><code>函數論 80</code></td></tr>
+      <tr><td>3</td><td><code>('程式語言', 90)</code></td><td>程式語言</td><td>90</td><td><code>程式語言 90</code></td></tr>
+      <tr><td>4</td><td><code>('方程式論', 95)</code></td><td>方程式論</td><td>95</td><td><code>方程式論 95</code></td></tr>
+    </tbody>
+  </table>
 </section>
 
 <!-- ============================================================ -->
@@ -770,12 +762,16 @@ footer a{color:var(--accent2);}
 <span class="line">        person[<span class="str">'電話'</span>] = <span class="str">'0999-888-777'</span>   <span class="com"># 更新電話</span></span>
 <span class="line"><span class="kw">for</span> person <span class="kw">in</span> contacts:</span>
 <span class="line">    <span class="fn">print</span>(person[<span class="str">'姓名'</span>], person[<span class="str">'電話'</span>])</span></div>
-      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="nestedStatus">按「單步 ▸」開始</span></div>
+      <div class="status-banner" aria-live="polite"><span class="status-icon">▸</span><span class="status-text" id="nestedStatus">按「下一步」開始</span></div>
       <div class="controls-bar">
+        <button class="btn btn-step" id="nestedPrev">← 上一步</button>
         <button class="btn btn-play" id="nestedPlay">▶ 播放</button>
-        <button class="btn btn-step" id="nestedStep">單步 ▸</button>
+        <button class="btn btn-step" id="nestedStep">下一步 →</button>
         <button class="btn btn-reset" id="nestedReset">↺ 重設</button>
+        <select id="nestedSpeed" aria-label="播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select>
+        <span class="mono" id="nestedCounter">0 / 12</span>
       </div>
+      <input type="range" id="nestedSeek" min="0" max="12" value="0" step="1" aria-label="執行步驟" style="width:100%;">
     </div>
     <div class="side-panel">
       <div class="info-card"><div class="ic-title">輸出 Console</div><div class="console" id="nestedOut"></div></div>
@@ -786,7 +782,9 @@ footer a{color:var(--accent2);}
     </div>
   </div>
 
-  <div class="game-box" id="alienGame">
+  <details class="game-box" id="alienGame">
+    <summary style="cursor:pointer;font-weight:700;">選做：外星人隊伍（字典構成的串列）</summary>
+    <div style="margin-top:.8rem;">
     <div class="gb-tag">GAME · 取自課本「字典構成的串列」範例</div>
     <h3>👾 外星人隊伍：30 隻字典組成的艦隊</h3>
     <p>通訊錄是「一串聯絡人字典」，外星人隊伍也一樣：按「生成艦隊」用 <code>for</code> 迴圈造出 30 隻綠色慢速外星人，再按「升級前 3 隻」，看 <code>for + if</code> 怎麼只挑出前 3 隻動手腳。</p>
@@ -820,7 +818,8 @@ footer a{color:var(--accent2);}
     </details>
 
     <p class="game-note">🐛 抓蟲挑戰：課本這一格的原始碼其實把 <code>alien['顏色']</code> 打成了 <code>alien['顏色r']</code>——想想看這一字之差會發生什麼事？（提示：對不存在的鍵做指派會「新增」一個鍵，所以外星人的顏色永遠不會變黃！）打開 <code>052_Dictionaries.ipynb</code> 找到外星人範例驗證看看，順便試試把 <code>aliens[:3]</code> 換成 <code>aliens[3:6]</code>。</p>
-  </div>
+    </div>
+  </details>
 </section>
 
 <!-- ============================================================ -->
@@ -831,7 +830,9 @@ footer a{color:var(--accent2);}
 
   <p>解法是用<strong>字典</strong>把「已經算過的結果」快取（cache）起來——這個技巧叫做 <strong>memoization</strong>。下次遇到同樣的 n，直接從字典查表拿結果，不用重新計算：</p>
   <div class="pseudo-code" style="margin-bottom:1rem;">
-<span class="line"><span class="kw">def</span> <span class="fn">fibonacci</span>(n, memo={}):</span>
+<span class="line"><span class="kw">def</span> <span class="fn">fibonacci</span>(n, memo=<span class="kw">None</span>):</span>
+<span class="line">    <span class="kw">if</span> memo <span class="kw">is None</span>:</span>
+<span class="line">        memo = {}</span>
 <span class="line">    <span class="kw">if</span> n <span class="kw">in</span> memo:          <span class="com"># 查表：算過就直接回傳</span></span>
 <span class="line">        <span class="kw">return</span> memo[n]</span>
 <span class="line">    <span class="kw">if</span> n <= <span class="num">1</span>:</span>
@@ -1112,8 +1113,12 @@ function StepRunner(prefix, steps, opts) {
   const varsEl  = document.getElementById(prefix + 'Vars');
   const outEl   = document.getElementById(prefix + 'Out');
   const playBtn = document.getElementById(prefix + 'Play');
+  const prevBtn = document.getElementById(prefix + 'Prev');
   const stepBtn = document.getElementById(prefix + 'Step');
   const resetBtn= document.getElementById(prefix + 'Reset');
+  const speedEl = document.getElementById(prefix + 'Speed');
+  const counterEl = document.getElementById(prefix + 'Counter');
+  const seekEl = document.getElementById(prefix + 'Seek');
   let idx = -1, timer = null;
 
   function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
@@ -1123,54 +1128,62 @@ function StepRunner(prefix, steps, opts) {
       l.classList.toggle('active', idx>=0 && steps[idx].line===i);
     });
     if (idx < 0) {
-      if (statusEl) statusEl.textContent = '按「單步 ▸」開始';
+      if (statusEl) statusEl.textContent = '按「下一步」開始';
       if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
       if (outEl) outEl.innerHTML = '';
       if (opts.onReset) opts.onReset();
-      return;
-    }
-    const s = steps[idx];
-    if (statusEl) statusEl.textContent = s.note || '';
-    if (varsEl) {
-      if (s.vars && s.vars.length) {
-        varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
-          `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
-        ).join('') + '</table>';
-      } else {
-        varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+    } else {
+      const s = steps[idx];
+      if (statusEl) statusEl.textContent = s.note || '';
+      if (varsEl) {
+        if (s.vars && s.vars.length) {
+          varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
+            `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
+          ).join('') + '</table>';
+        } else {
+          varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+        }
       }
+      if (outEl) {
+        outEl.innerHTML = (s.out||[]).map((o,i)=>{
+          const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
+          return `<div class="${cls}">${o}</div>`;
+        }).join('');
+        outEl.scrollTop = outEl.scrollHeight;
+      }
+      if (opts.onStep) opts.onStep(s, idx);
     }
-    if (outEl) {
-      outEl.innerHTML = (s.out||[]).map((o,i)=>{
-        const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
-        return `<div class="${cls}">${o}</div>`;
-      }).join('');
-      outEl.scrollTop = outEl.scrollHeight;
-    }
-    if (opts.onStep) opts.onStep(s, idx);
+    if (counterEl) counterEl.textContent = `${idx + 1} / ${steps.length}`;
+    if (seekEl) seekEl.value = String(idx + 1);
   }
 
   function step() {
+    stopPlay();
     if (idx < steps.length - 1) { idx++; render(); }
-    if (idx >= steps.length - 1) stopPlay();
   }
+  function prev(){ stopPlay(); if (idx >= 0) { idx--; render(); } }
   function stopPlay(){
-    if (timer) { clearInterval(timer); timer = null; }
+    if (timer) { clearTimeout(timer); timer = null; }
     if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
   }
   function play(){
     if (timer) { stopPlay(); return; }
     if (idx >= steps.length - 1) { idx = -1; render(); }
     playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
-    timer = setInterval(()=>{
-      if (idx >= steps.length - 1) stopPlay(); else step();
-    }, opts.interval || 1600);
+    const tick = ()=>{
+      if (idx >= steps.length - 1) { stopPlay(); return; }
+      idx++; render();
+      timer = setTimeout(tick, speedEl ? parseInt(speedEl.value,10) : 1800);
+    };
+    tick();
   }
   function reset(){ stopPlay(); idx = -1; render(); }
 
   if (playBtn) playBtn.addEventListener('click', play);
-  if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (prevBtn) prevBtn.addEventListener('click', prev);
+  if (stepBtn) stepBtn.addEventListener('click', step);
   if (resetBtn) resetBtn.addEventListener('click', reset);
+  if (seekEl) seekEl.addEventListener('input', ()=>{ stopPlay(); idx = parseInt(seekEl.value,10) - 1; render(); });
   render();
   return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
 }
@@ -1211,32 +1224,6 @@ StepRunner('create', [
 ], {
   onStep: s => renderKV(createCanvas, s.canvas),
   onReset: () => renderKV(createCanvas, null),
-});
-
-/* ============================================================
-   P02 keys/values/items 走訪 runner
-   ============================================================ */
-const iterateCanvas = document.getElementById('iterateCanvas');
-const GRADE_PAIRS = [
-  {key:'機率統計', val:85}, {key:'函數論', val:80}, {key:'程式語言', val:90}, {key:'方程式論', val:95}
-];
-function gradeState(hlIndex) {
-  return { pairs: GRADE_PAIRS.map((p,i)=>({key:p.key, val:p.val, hl:i===hlIndex})) };
-}
-StepRunner('iterate', [
-  { line:0, out:[], note:'建立含 4 筆資料的字典 grade', canvas: gradeState(-1) },
-  { line:1, out:[], note:'迴圈開始：取出第 1 組 (機率統計, 85)', canvas: gradeState(0) },
-  { line:2, out:['機率統計 85'], newOut:true, note:'print(key, val) → 機率統計 85', canvas: gradeState(0) },
-  { line:1, out:['機率統計 85'], note:'取出第 2 組 (函數論, 80)', canvas: gradeState(1) },
-  { line:2, out:['機率統計 85','函數論 80'], newOut:true, note:'print(key, val) → 函數論 80', canvas: gradeState(1) },
-  { line:1, out:['機率統計 85','函數論 80'], note:'取出第 3 組 (程式語言, 90)', canvas: gradeState(2) },
-  { line:2, out:['機率統計 85','函數論 80','程式語言 90'], newOut:true, note:'print(key, val) → 程式語言 90', canvas: gradeState(2) },
-  { line:1, out:['機率統計 85','函數論 80','程式語言 90'], note:'取出第 4 組 (方程式論, 95)', canvas: gradeState(3) },
-  { line:2, out:['機率統計 85','函數論 80','程式語言 90','方程式論 95'], newOut:true, note:'print(key, val) → 方程式論 95', canvas: gradeState(3) },
-  { line:1, out:['機率統計 85','函數論 80','程式語言 90','方程式論 95'], note:'沒有更多項目 → 迴圈結束', canvas: gradeState(-1) },
-], {
-  onStep: s => renderKV(iterateCanvas, s.canvas),
-  onReset: () => renderKV(iterateCanvas, null),
 });
 
 /* ============================================================

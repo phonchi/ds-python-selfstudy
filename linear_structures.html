@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -530,9 +531,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
         </div>
         <div class="status-banner" id="introStatus"><span class="status-icon">›</span><span class="status-text">按下方按鈕，把同一串資料 4→7→2 分別放進 stack 與 queue，再全部取出，觀察順序差異。</span></div>
         <div class="controls-bar">
-          <button class="btn" onclick="introDemo('push')">放入 4, 7, 2</button>
-          <button class="btn" onclick="introDemo('pop')">全部取出</button>
-          <button class="btn" onclick="introDemo('reset')">重置</button>
+          <span class="mono" style="font-size:.78rem;">固定對照：Stack 反轉、Queue 保序</span>
         </div>
       </div>
     </div>
@@ -704,8 +703,9 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
         </div>
         <div class="controls-bar">
           <input id="parInput" class="mono" style="width:200px;padding:.35rem .5rem;border:1px solid var(--card-border);border-radius:6px;" value="{[()()]}">
-          <button class="btn" onclick="parStart()">▶ 開始</button>
-          <button class="btn" onclick="parPlayer &amp;&amp; parPlayer.step()">→ 單步</button>
+          <button class="btn" onclick="parStart()">▶ 播放／暫停</button><button class="btn" onclick="parPlayer &amp;&amp; parPlayer.prev()">←</button>
+          <button class="btn" onclick="parPlayer &amp;&amp; parPlayer.step()">→</button><button class="btn" onclick="parPlayer &amp;&amp; parPlayer.reset()">↺</button>
+          <select id="parSpeed"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
           <button class="btn" onclick="parLoad('(()')">試試 (()</button>
           <button class="btn" onclick="parLoad('())(')">試試 ())(</button>
         </div>
@@ -769,8 +769,9 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
           <select id="baseSel" class="mono" style="padding:.35rem;border-radius:6px;border:1px solid var(--card-border);">
             <option value="2" selected>base 2</option><option value="8">base 8</option><option value="16">base 16</option>
           </select>
-          <button class="btn" onclick="baseStart()">▶ 開始</button>
-          <button class="btn" onclick="basePlayer &amp;&amp; basePlayer.step()">→ 單步</button>
+          <button class="btn" onclick="baseStart()">▶ 播放／暫停</button><button class="btn" onclick="basePlayer &amp;&amp; basePlayer.prev()">←</button>
+          <button class="btn" onclick="basePlayer &amp;&amp; basePlayer.step()">→</button><button class="btn" onclick="basePlayer &amp;&amp; basePlayer.reset()">↺</button>
+          <select id="baseSpeed"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
         </div>
       </div>
     </div>
@@ -898,8 +899,9 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
             <option value="( A + B ) * C - ( D - E ) * ( F + G )">( A + B ) * C - ( D - E ) * ( F + G )</option>
             <option value="5 * 3 ^ ( 4 - 2 )">5 * 3 ^ ( 4 - 2 )</option>
           </select>
-          <button class="btn" onclick="i2pStart()">▶ 開始</button>
-          <button class="btn" onclick="i2pPlayer &amp;&amp; i2pPlayer.step()">→ 單步</button>
+          <button class="btn" onclick="i2pStart()">▶ 播放／暫停</button><button class="btn" onclick="i2pPlayer &amp;&amp; i2pPlayer.prev()">←</button>
+          <button class="btn" onclick="i2pPlayer &amp;&amp; i2pPlayer.step()">→</button><button class="btn" onclick="i2pPlayer &amp;&amp; i2pPlayer.reset()">↺</button>
+          <select id="i2pSpeed"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
         </div>
       </div>
       <div class="viz-panel" style="margin-top:1rem;">
@@ -911,8 +913,9 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
           <div class="status-banner" id="pevalStatus" style="flex:1;"><span class="status-icon">›</span><span class="status-text">用 7 8 + 3 2 + / 走一次後序求值。</span></div>
         </div>
         <div class="controls-bar">
-          <button class="btn" onclick="pevalStart()">▶ 開始（7 8 + 3 2 + /）</button>
-          <button class="btn" onclick="pevalPlayer &amp;&amp; pevalPlayer.step()">→ 單步</button>
+          <button class="btn" onclick="pevalStart()">▶ 播放／暫停</button><button class="btn" onclick="pevalPlayer &amp;&amp; pevalPlayer.prev()">←</button>
+          <button class="btn" onclick="pevalPlayer &amp;&amp; pevalPlayer.step()">→</button><button class="btn" onclick="pevalPlayer &amp;&amp; pevalPlayer.reset()">↺</button>
+          <select id="pevalSpeed"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
         </div>
       </div>
     </div>
@@ -928,7 +931,7 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 <span class="line" data-l="8">        <span class="kw">elif</span> token == <span class="str">&quot;)&quot;</span>:</span>
 <span class="line" data-l="9">            pop 並輸出，直到遇見 <span class="str">&quot;(&quot;</span></span>
 <span class="line" data-l="10">        <span class="kw">else</span>:   <span class="com"># 運算子</span></span>
-<span class="line" data-l="11">            <span class="kw">while</span> <span class="kw">not</span> op_stack.<span class="fn">is_empty</span>() <span class="kw">and</span> prec[op_stack.<span class="fn">peek</span>()] &gt;= prec[token]: 輸出 pop</span>
+<span class="line" data-l="11">            <span class="kw">while</span> stack 頂優先權較高，或同級且 token 不是右結合的 ^：輸出 pop</span>
 <span class="line" data-l="12">            op_stack.<span class="fn">push</span>(token)</span></div></div>
       <div class="info-card"><div class="ic-title">postfix 求值 <span class="ic-badge">CODE</span></div><div class="pseudo-code" id="pevalCode">
 <span class="line" data-l="1"><span class="kw">def</span> <span class="fn">postfix_eval</span>(postfix_expr):</span>
@@ -1138,9 +1141,11 @@ A B + C * D E - F G + * -</pre></div>
         <div class="status-banner" id="hpStatus"><span class="status-icon">›</span><span class="status-text">Bill、David、Susan、Jane、Kent、Brad 圍圈，num=7。按「開始」看誰活到最後。</span></div>
         <div class="controls-bar">
           <label class="mono" style="font-size:.8rem;">num: <input id="hpNum" type="number" min="1" max="20" value="7" style="width:60px;padding:.3rem;border:1px solid var(--card-border);border-radius:6px;"></label>
-          <button class="btn" onclick="hpStart()">▶ 開始</button>
+          <button class="btn" onclick="hpStart(this)">▶ 開始</button>
+          <button class="btn" onclick="hpPlayer &amp;&amp; hpPlayer.prev()">← 上一步</button>
           <button class="btn" onclick="hpPlayer &amp;&amp; hpPlayer.step()">→ 單步</button>
-          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度<input id="hpSpeed" type="range" min="120" max="1200" value="450" style="vertical-align:middle;"></span>
+          <button class="btn" onclick="hpPlayer &amp;&amp; hpPlayer.reset()">↺ 重置</button>
+          <select id="hpSpeed"><option value="2200">慢</option><option value="1200" selected>標準</option><option value="600">快</option></select>
         </div>
       </div>
     </div>
@@ -1238,6 +1243,7 @@ A B + C * D E - F G + * -</pre></div>
       <thead><tr><th>run</th><th>5 頁/分 平均等待（秒）</th><th>10 頁/分 平均等待（秒）</th></tr></thead>
       <tbody></tbody>
     </table>
+    <div id="printerTimeline" class="mono" style="font-size:.7rem;line-height:1.8;margin-top:.55rem;min-width:520px;"></div>
     </div>
     <div class="status-banner" id="printerStatus"><span class="status-icon">›</span><span class="status-text">按下方按鈕各跑 10 次 3600 秒的模擬（固定亂數種子，可重現），跟講義同規模。</span></div>
     <div class="controls-bar">
@@ -1299,8 +1305,9 @@ A B + C * D E - F G + * -</pre></div>
         <div class="status-banner" id="palStatus"><span class="status-icon">›</span><span class="status-text">radar 是迴文嗎？兩端同時取出比較。</span></div>
         <div class="controls-bar">
           <input id="palInput" class="mono" style="width:150px;padding:.35rem .5rem;border:1px solid var(--card-border);border-radius:6px;" value="radar">
-          <button class="btn" onclick="palStart()">▶ 開始</button>
-          <button class="btn" onclick="palPlayer &amp;&amp; palPlayer.step()">→ 單步</button>
+          <button class="btn" onclick="palStart()">▶ 播放／暫停</button><button class="btn" onclick="palPlayer &amp;&amp; palPlayer.prev()">←</button>
+          <button class="btn" onclick="palPlayer &amp;&amp; palPlayer.step()">→</button><button class="btn" onclick="palPlayer &amp;&amp; palPlayer.reset()">↺</button>
+          <select id="palSpeed"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
           <button class="btn" onclick="$('palInput').value='lsdkjfskf';palStart()">試試非迴文</button>
         </div>
       </div>
@@ -1457,26 +1464,73 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
-    this.frames = frames; this.apply = apply;
-    this.delayInput = delayInput; this.i = -1; this.timer = null;
-    this.onDone = onDone || (()=>{});
+  constructor({frames, apply, delayInput, delay=1800, onDone, onIndex, playButton}) {
+    this.frames = frames || []; this.apply = apply;
+    this.delayInput = delayInput; this.delay = delay; this.i = 0; this.timer = null;
+    this.onDone = onDone || (()=>{}); this.onIndex = onIndex || (()=>{});
+    this.progress = null; this.counter = null;
+    this.playButton = playButton || null;
+    this.playLabel = this.playButton ? this.playButton.textContent : '';
+    if (this.playButton) this.playButton.setAttribute('aria-pressed', 'false');
+    if (delayInput && delayInput.closest('.controls-bar')) {
+      const bar = delayInput.closest('.controls-bar');
+      bar.querySelectorAll('.player-progress,.player-counter').forEach(x=>x.remove());
+      this.counter = document.createElement('span'); this.counter.className='player-counter mono';
+      this.counter.style.fontSize='.72rem'; bar.appendChild(this.counter);
+      if (this.frames.length >= 8) {
+        this.progress=document.createElement('input'); this.progress.type='range';
+        this.progress.className='player-progress timeline-scrubber'; this.progress.min=0; this.progress.max=this.frames.length-1; this.progress.value=0;
+        this.progress.style.cssText='flex:1 1 120px;min-width:90px;';
+        this.progress.oninput=()=>this.seek(this.progress.value); bar.appendChild(this.progress);
+      }
+    }
+  }
+  currentDelay() {
+    return this.delayInput ? parseInt(this.delayInput.value, 10) : this.delay;
+  }
+  render() {
+    if (!this.frames.length) return;
+    this.apply(this.frames[this.i]); this.onIndex(this.i, this.frames.length);
+    if (this.counter) this.counter.textContent=(this.i+1)+'/'+this.frames.length;
+    if (this.progress) this.progress.value=this.i;
   }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
+    this.stop();
+    if (this.i + 1 >= this.frames.length) { this.onDone(); return false; }
+    this.i += 1; this.render(); return true;
+  }
+  prev() {
+    this.stop();
+    if (this.i <= 0) return false;
+    this.i -= 1; this.render(); return true;
+  }
+  seek(i) {
+    this.stop();
+    this.i = Math.max(0, Math.min(this.frames.length - 1, Number(i) || 0));
+    this.render();
   }
   play() {
-    this.stop();
+    if (this.timer) { this.stop(); return; }
+    if (!this.frames.length) return;
+    if (this.i >= this.frames.length - 1) { this.i = 0; this.render(); }
+    this.setPlaying(true);
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.render();
+      this.timer = setTimeout(tick, this.currentDelay());
     };
-    tick();
+    this.timer = setTimeout(tick, this.currentDelay());
   }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  setPlaying(playing) {
+    if (!this.playButton) return;
+    this.playButton.textContent = playing ? '⏸ 暫停' : this.playLabel;
+    this.playButton.setAttribute('aria-pressed', playing ? 'true' : 'false');
+  }
+  stop() {
+    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    this.setPlaying(false);
+  }
+  reset() { this.stop(); this.i = 0; this.render(); }
 }
 
 function setStatus(id, html) {
@@ -1541,27 +1595,8 @@ function introRender(msg) {
   renderBoxQueue('introQueue', introQ);
   if (msg) setStatus('introStatus', msg);
 }
-function introDemo(mode) {
-  if (mode === 'push') {
-    introS = []; introQ = [];
-    const vals = [4, 7, 2]; let i = 0;
-    const t = setInterval(() => {
-      if (i >= vals.length) { clearInterval(t); introRender('放入順序都是 4 → 7 → 2。現在按「全部取出」。'); return; }
-      introS.push(vals[i]); introQ.push(vals[i]); i++; introRender(`放入 ${vals[i-1]}`);
-    }, 500);
-  } else if (mode === 'pop') {
-    const outS = [], outQ = [];
-    const t = setInterval(() => {
-      let moved = false;
-      if (introS.length) { outS.push(introS.pop()); moved = true; }
-      if (introQ.length) { outQ.push(introQ.shift()); moved = true; }
-      introRender(`stack 取出：${outS.join(' ')}　|　queue 取出：${outQ.join(' ')}`);
-      if (!moved) { clearInterval(t);
-        setStatus('introStatus', `<strong>stack 取出 2 7 4（反轉！）；queue 取出 4 7 2（保序）。</strong>這就是 LIFO 與 FIFO 的全部差別。`); }
-    }, 600);
-  } else { introS = []; introQ = []; introRender('已重置。'); }
-}
-introRender();
+introS=[4,7,2]; introQ=[4,7,2];
+introRender('<strong>同樣放入 4 → 7 → 2：</strong>Stack 取出 2 → 7 → 4；Queue 取出 4 → 7 → 2。');
 
 /* ---------- P01 stack ---------- */
 let stackItems = [4, 'dog', true];
@@ -1589,7 +1624,7 @@ function s2Race() {
   for (let i = 0; i < n; i++) s2 += i;   // push #i shifts i elements
   for (let i = n - 1; i >= 0; i--) s2 += i;  // pop shifts the rest
   $('s2Out').innerHTML =
-    `Stack（top 在尾端）：搬移 <strong>${s1}</strong> 個元素<br>` +
+    `Stack（top 在尾端）：每次操作需平移既有元素 <strong>${s1}</strong> 個（append 偶爾仍會 resize）<br>` +
     `Stack2（top 在前端）：搬移 <strong>${s2.toLocaleString()}</strong> 個元素（約 n²）`;
   setStatus('s2Status', `n = ${n}：同樣的介面、同樣的答案，工作量差了 ${s2 === 0 ? 0 : s2.toLocaleString()} 倍不止。第 2 章會把這件事寫成 O(1) 對 O(n)。`);
 }
@@ -1640,7 +1675,11 @@ function parApply(f) {
   setStatus('parStatus', f.msg); hlLine('parCode', f.line);
 }
 function parStart() {
-  parPlayer = new Player({frames: parFrames($('parInput').value), apply: parApply});
+  if (parPlayer && parPlayer.timer) { parPlayer.stop(); return; }
+  const key=$('parInput').value;
+  if (parPlayer && parPlayer._key===key && parPlayer.i<parPlayer.frames.length-1) { parPlayer.play(); return; }
+  parPlayer = new Player({frames: parFrames($('parInput').value), apply: parApply, delayInput:$('parSpeed')});
+  parPlayer._key=key;
   parPlayer.reset(); parPlayer.play();
 }
 function parLoad(s) { $('parInput').value = s; parStart(); }
@@ -1656,7 +1695,6 @@ function baseFrames(n0, base) {
     st.push(digits[rem]); tr.push(`${n} ÷ ${base} = ${q} … 餘 <strong>${digits[rem]}</strong>`);
     frames.push({trace:[...tr], stack:[...st], out:'', msg:`餘數 ${digits[rem]} push 進 stack`, line:5});
     n = q;
-    frames.push({trace:[...tr], stack:[...st], out:'', msg:`商變成 ${n}`, line:6});
   }
   let out = '';
   const st2 = [...st];
@@ -1675,7 +1713,10 @@ function baseApply(f) {
 function baseStart() {
   const n = Math.max(1, parseInt($('baseInput').value || '233', 10));
   const b = parseInt($('baseSel').value, 10);
-  basePlayer = new Player({frames: baseFrames(n, b), apply: baseApply});
+  if (basePlayer && basePlayer.timer) { basePlayer.stop(); return; }
+  const key=n+':'+b;
+  if (basePlayer && basePlayer._key===key && basePlayer.i<basePlayer.frames.length-1) { basePlayer.play(); return; }
+  basePlayer = new Player({frames: baseFrames(n, b), apply: baseApply, delayInput:$('baseSpeed')}); basePlayer._key=key;
   basePlayer.reset(); basePlayer.play();
 }
 
@@ -1737,7 +1778,11 @@ function i2pApply(f) {
   setStatus('i2pStatus', f.msg); hlLine('i2pCode', f.line);
 }
 function i2pStart() {
-  i2pPlayer = new Player({frames: i2pFrames($('i2pSel').value), apply: i2pApply});
+  if (i2pPlayer && i2pPlayer.timer) { i2pPlayer.stop(); return; }
+  const key=$('i2pSel').value;
+  if (i2pPlayer && i2pPlayer._key===key && i2pPlayer.i<i2pPlayer.frames.length-1) { i2pPlayer.play(); return; }
+  i2pPlayer = new Player({frames: i2pFrames($('i2pSel').value), apply: i2pApply, delayInput:$('i2pSpeed')});
+  i2pPlayer._key=key;
   i2pPlayer.reset(); i2pPlayer.play();
 }
 function pevalFrames() {
@@ -1751,7 +1796,7 @@ function pevalFrames() {
       frames.push({i, stack:[...st], msg:`數字 ${t} push`, line:5});
     } else {
       const r = st.pop(), l = st.pop();
-      const v = t==='+'? l+r : t==='-'? l-r : t==='*'? l*r : Math.floor(l/r);
+      const v = t==='+'? l+r : t==='-'? l-r : t==='*'? l*r : l/r;
       st.push(v);
       frames.push({i, stack:[...st], msg:`pop 出 right=${r}、left=${l} → ${l} ${t} ${r} = ${v}，push 回去`, line:8});
     }
@@ -1765,7 +1810,9 @@ function pevalApply(f) {
   setStatus('pevalStatus', f.msg); hlLine('pevalCode', f.line);
 }
 function pevalStart() {
-  pevalPlayer = new Player({frames: pevalFrames(), apply: pevalApply});
+  if (pevalPlayer && pevalPlayer.timer) { pevalPlayer.stop(); return; }
+  if (pevalPlayer && pevalPlayer.i<pevalPlayer.frames.length-1) { pevalPlayer.play(); return; }
+  pevalPlayer = new Player({frames: pevalFrames(), apply: pevalApply, delayInput:$('pevalSpeed')});
   pevalPlayer.reset(); pevalPlayer.play();
 }
 
@@ -1804,10 +1851,13 @@ function hpApply(f) {
   renderBoxQueue('hpVis', f.q);
   setStatus('hpStatus', f.msg); hlLine('hpCode', f.line);
 }
-function hpStart() {
+function hpStart(button) {
   const names = ['Bill','David','Susan','Jane','Kent','Brad'];
   const num = Math.max(1, parseInt($('hpNum').value||'7',10));
-  hpPlayer = new Player({frames: hpFrames(names, num), apply: hpApply, delayInput: $('hpSpeed')});
+  if (hpPlayer && hpPlayer._key === num) { hpPlayer.play(); return; }
+  if (hpPlayer) hpPlayer.stop();
+  hpPlayer = new Player({frames: hpFrames(names, num), apply: hpApply, delayInput: $('hpSpeed'), playButton:button});
+  hpPlayer._key = num;
   hpPlayer.reset(); hpPlayer.play();
 }
 
@@ -1841,7 +1891,20 @@ function printerRun() {
   tb.insertAdjacentHTML('beforeend',
     `<tr style="font-weight:700;background:var(--highlight);"><td>平均</td><td>${(s5/RUNS).toFixed(1)}</td><td>${(s10/RUNS).toFixed(1)}</td></tr>`);
   setStatus('printerStatus', `同一組工作到達序列下，10 頁/分的平均等待約為 5 頁/分的 ${(s5/s10).toFixed(1)} 分之一。`);
+  printerTimeline();
 }
+function printerTimeline() {
+  const rand=lcg(42), q=[]; let task=null, remain=0; const snap=[];
+  for(let sec=0;sec<600;sec++){
+    if(Math.floor(rand()*180)===0) q.push({pages:1+Math.floor(rand()*20)});
+    if(!task&&q.length){task=q.shift();remain=task.pages;}
+    if(task){remain-=5/60;if(remain<=0)task=null;}
+    if(sec%30===29)snap.push({t:sec+1,q:q.length,busy:!!task});
+  }
+  $('printerTimeline').innerHTML='<strong>前10分鐘 timeline（5頁/分；每格30秒）</strong><br>'+snap.map(s=>
+    `<span style="display:inline-block;padding:.18rem;margin:.08rem;background:${s.busy?'#d5c9a8':'#eee'}">${(s.t/60).toFixed(1)}m:q${s.q}</span>`).join('');
+}
+printerTimeline();
 
 /* ---------- P08 deque / palindrome ---------- */
 let palPlayer = null;
@@ -1876,7 +1939,11 @@ function palApply(f) {
   setStatus('palStatus', f.msg); hlLine('palCode', f.line);
 }
 function palStart() {
-  palPlayer = new Player({frames: palFrames($('palInput').value.trim()), apply: palApply});
+  if (palPlayer && palPlayer.timer) { palPlayer.stop(); return; }
+  const key=$('palInput').value.trim();
+  if (palPlayer && palPlayer._key===key && palPlayer.i<palPlayer.frames.length-1) { palPlayer.play(); return; }
+  palPlayer = new Player({frames: palFrames($('palInput').value.trim()), apply: palApply, delayInput:$('palSpeed')});
+  palPlayer._key=key;
   palPlayer.reset(); palPlayer.play();
 }
 </script>

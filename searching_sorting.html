@@ -56,7 +56,8 @@ p{margin-bottom:1rem;}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -113,6 +114,8 @@ p{margin-bottom:1rem;}
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.trace-counter{white-space:nowrap;color:var(--muted);font-size:.78rem;}
+.trace-scrubber{flex:1 1 180px;min-width:120px;max-width:100%;}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -591,11 +594,12 @@ True False</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="seqPlay">▶ 開始</button>
+          <button class="btn btn-step" id="seqPrev">← 上一步</button>
           <button class="btn btn-step" id="seqStep">→ 單步</button>
           <button class="btn btn-reset" id="seqReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="seqSpeed" min="100" max="1500" step="50" value="600" style="flex:1;accent-color:var(--accent3);">
+            <select id="seqSpeed" aria-label="循序搜尋播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -684,11 +688,12 @@ True False</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="binPlay">▶ 開始</button>
+          <button class="btn btn-step" id="binPrev">← 上一步</button>
           <button class="btn btn-step" id="binStep">→ 單步</button>
           <button class="btn btn-reset" id="binReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="binSpeed" min="200" max="1800" step="50" value="800" style="flex:1;accent-color:var(--accent3);">
+            <select id="binSpeed" aria-label="二分搜尋播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -1023,11 +1028,12 @@ KeyError: &#x27;99 is not in the table&#x27;</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="bubblePlay">▶ 開始</button>
+          <button class="btn btn-step" id="bubblePrev">← 上一步</button>
           <button class="btn btn-step" id="bubbleStep">→ 單步</button>
           <button class="btn btn-reset" id="bubbleReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="bubbleSpeed" min="50" max="1200" step="50" value="350" style="flex:1;accent-color:var(--accent3);">
+            <select id="bubbleSpeed" aria-label="氣泡排序播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -1113,11 +1119,12 @@ KeyError: &#x27;99 is not in the table&#x27;</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="selPlay">▶ 開始</button>
+          <button class="btn btn-step" id="selPrev">← 上一步</button>
           <button class="btn btn-step" id="selStep">→ 單步</button>
           <button class="btn btn-reset" id="selReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="selSpeed" min="50" max="1200" step="50" value="350" style="flex:1;accent-color:var(--accent3);">
+            <select id="selSpeed" aria-label="選擇排序播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -1191,11 +1198,12 @@ KeyError: &#x27;99 is not in the table&#x27;</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="insPlay">▶ 開始</button>
+          <button class="btn btn-step" id="insPrev">← 上一步</button>
           <button class="btn btn-step" id="insStep">→ 單步</button>
           <button class="btn btn-reset" id="insReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="insSpeed" min="50" max="1200" step="50" value="350" style="flex:1;accent-color:var(--accent3);">
+            <select id="insSpeed" aria-label="插入排序播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -1271,11 +1279,12 @@ KeyError: &#x27;99 is not in the table&#x27;</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="shellPlay">▶ 開始</button>
+          <button class="btn btn-step" id="shellPrev">← 上一步</button>
           <button class="btn btn-step" id="shellStep">→ 單步</button>
           <button class="btn btn-reset" id="shellReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="shellSpeed" min="50" max="1200" step="50" value="300" style="flex:1;accent-color:var(--accent3);">
+            <select id="shellSpeed" aria-label="希爾排序播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -1369,11 +1378,12 @@ After increments of size 1 the list is [3, 5, 7, 8, 9, 11, 12, 16, 17, 19, 20]
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="mergePlay">▶ 開始</button>
+          <button class="btn btn-step" id="mergePrev">← 上一步</button>
           <button class="btn btn-step" id="mergeStep">→ 單步</button>
           <button class="btn btn-reset" id="mergeReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="mergeSpeed" min="100" max="1500" step="50" value="500" style="flex:1;accent-color:var(--accent3);">
+            <select id="mergeSpeed" aria-label="合併排序播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -1470,11 +1480,12 @@ Merging [17, 26, 54, 93]</pre></div>
         </div>
         <div class="controls-bar">
           <button class="btn btn-play" id="quickPlay">▶ 開始</button>
+          <button class="btn btn-step" id="quickPrev">← 上一步</button>
           <button class="btn btn-step" id="quickStep">→ 單步</button>
           <button class="btn btn-reset" id="quickReset">↺ 重置</button>
           <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:.5rem;">
             <span style="font-size:.78rem;color:var(--muted);">速度</span>
-            <input type="range" id="quickSpeed" min="100" max="1500" step="50" value="500" style="flex:1;accent-color:var(--accent3);">
+            <select id="quickSpeed" aria-label="快速排序播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
           </div>
         </div>
       </div>
@@ -2303,25 +2314,36 @@ class Animator {
     this.idx = 0;
     this.playing = false;
     this.timer = null;
+    this.runToken = 0;
     this.onFrame = opts.onFrame;
     this.onEnd = opts.onEnd;
     this.getDelay = opts.getDelay;
   }
 
   setFrames(frames) {
-    this.stop();
+    this.pause();
     this.frames = frames;
     this.idx = 0;
     if (frames.length) this.onFrame(frames[0], 0);
   }
 
   play() {
-    if (this.idx >= this.frames.length - 1) this.idx = 0;
+    if (!this.frames.length || this.playing) return;
+    if (this.idx >= this.frames.length - 1) {
+      this.idx = 0;
+      this.onFrame(this.frames[0], 0);
+    }
     this.playing = true;
-    this._tick();
+    const token = ++this.runToken;
+    this.timer = setTimeout(() => this._tick(token), this.getDelay());
   }
 
-  pause() { this.playing = false; clearTimeout(this.timer); }
+  pause() {
+    this.runToken++;
+    this.playing = false;
+    if (this.timer !== null) clearTimeout(this.timer);
+    this.timer = null;
+  }
   stop() { this.pause(); this.idx = 0; }
 
   step() {
@@ -2332,22 +2354,42 @@ class Animator {
     }
   }
 
+  prev() {
+    this.pause();
+    if (this.idx > 0) {
+      this.idx--;
+      this.onFrame(this.frames[this.idx], this.idx);
+    }
+  }
+
+  seek(idx) {
+    this.pause();
+    if (!this.frames.length) return;
+    this.idx = Math.max(0, Math.min(this.frames.length - 1, Number(idx) || 0));
+    this.onFrame(this.frames[this.idx], this.idx);
+  }
+
   reset() {
     this.pause();
     this.idx = 0;
     if (this.frames.length) this.onFrame(this.frames[0], 0);
   }
 
-  _tick() {
-    if (!this.playing) return;
+  _tick(token) {
+    if (!this.playing || token !== this.runToken) return;
     if (this.idx >= this.frames.length - 1) {
-      this.playing = false;
+      this.pause();
       if (this.onEnd) this.onEnd();
       return;
     }
     this.idx++;
     this.onFrame(this.frames[this.idx], this.idx);
-    this.timer = setTimeout(() => this._tick(), this.getDelay());
+    if (this.idx >= this.frames.length - 1) {
+      this.pause();
+      if (this.onEnd) this.onEnd();
+      return;
+    }
+    this.timer = setTimeout(() => this._tick(token), this.getDelay());
   }
 }
 
@@ -2374,8 +2416,12 @@ function genSequentialSearch(arr, target) {
 
 // --- Binary Search ---
 function genBinarySearch(arr, target) {
-  const sorted = [...arr].sort((a,b) => a - b);
+  const sorted = [...arr];
   const frames = [];
+  if (sorted.some((v,i)=>i>0 && sorted[i-1]>v)) {
+    frames.push({arr:sorted,origIdx:sorted.map((_,i)=>i),highlights:{},message:'輸入尚未排序；binary search 不會替你偷偷排序。請先排序後再套用。',stats:{cmp:0,low:'—',high:'—',mid:'—',result:'INVALID INPUT'},pcLine:1});
+    return frames;
+  }
   let cmp = 0;
   let first = 0, last = sorted.length - 1;
   const oi = sorted.map((_,i)=>i);
@@ -2632,7 +2678,7 @@ function genMergeSort(initial) {
     }
     const mid = Math.floor((lo + hi) / 2);
     treeNodes.push({level, from:lo, to:hi, status:'splitting'});
-    frames.push({arr:[...a], origIdx:[...oi], highlights:{}, message:`split [${lo}..${hi}] → [${lo}..${mid}] | [${mid+1}..${hi}]`, stats:{cmp,wr,phase:`split level ${level}`}, brackets:[{from:lo,to:mid,row:Math.min(level,4),label:'L',cls:'left'},{from:mid+1,to:hi,row:Math.min(level,4),label:'R',cls:'right'}], tree:[...treeNodes], pcLine:3});
+    frames.push({arr:[...a], origIdx:[...oi], highlights:{}, message:`split [${lo}..${hi}] → [${lo}..${mid}] | [${mid+1}..${hi}]`, stats:{cmp,wr,phase:`split level ${level}`}, brackets:[{from:lo,to:mid,row:Math.min(level,4),label:'L',cls:'left'},{from:mid+1,to:hi,row:Math.min(level,4),label:'R',cls:'right'}], tree:treeNodes.map(n=>({...n})), pcLine:3});
 
     mergeSortHelper(lo, mid, level + 1);
     mergeSortHelper(mid + 1, hi, level + 1);
@@ -2669,11 +2715,11 @@ function genMergeSort(initial) {
       a[k] = Rvals[j]; oi[k] = Roi[j]; wr++; k++; j++;
     }
     treeNodes.find(n => n.from === lo && n.to === hi).status = 'done';
-    frames.push({arr:[...a], origIdx:[...oi], highlights:{}, sorted:range(lo, hi+1), message:`✓ [${lo}..${hi}] 合併完成 → [${a.slice(lo,hi+1).join(',')}]`, stats:{cmp,wr,phase:`merged ${lo}..${hi}`}, brackets:[{from:lo,to:hi,row:0,label:`done`,cls:'merging'}], tree:[...treeNodes], pcLine:14});
+    frames.push({arr:[...a], origIdx:[...oi], highlights:{}, sorted:range(lo, hi+1), message:`✓ [${lo}..${hi}] 合併完成 → [${a.slice(lo,hi+1).join(',')}]`, stats:{cmp,wr,phase:`merged ${lo}..${hi}`}, brackets:[{from:lo,to:hi,row:0,label:`done`,cls:'merging'}], tree:treeNodes.map(n=>({...n})), pcLine:14});
   }
 
   mergeSortHelper(0, N - 1, 0);
-  frames.push({arr:[...a], origIdx:[...oi], highlights:{}, sorted:range(0, N), message:`★ 排序完成！${cmp} 次比較、${wr} 次寫入`, stats:{cmp,wr,phase:'完成'}, tree:[...treeNodes], pcLine:1});
+  frames.push({arr:[...a], origIdx:[...oi], highlights:{}, sorted:range(0, N), message:`★ 排序完成！${cmp} 次比較、${wr} 次寫入`, stats:{cmp,wr,phase:'完成'}, tree:treeNodes.map(n=>({...n})), pcLine:1});
   return frames;
 }
 
@@ -2768,11 +2814,23 @@ function wireSection(prefix, opts) {
   if (!canvas) { console.warn('Canvas not found for prefix', prefix); return null; }
 
   const playBtn  = $(prefix + 'Play');
+  const prevBtn  = $(prefix + 'Prev');
   const stepBtn  = $(prefix + 'Step');
   const resetBtn = $(prefix + 'Reset');
   const speed    = $(prefix + 'Speed');
   const status   = $(prefix + 'Status');
   const codeEl   = $(prefix + 'Code');
+  const controls = playBtn && playBtn.closest('.controls-bar');
+  const counter = document.createElement('span');
+  counter.className = 'trace-counter mono';
+  counter.id = prefix + 'Counter';
+  counter.setAttribute('aria-live', 'polite');
+  const scrubber = document.createElement('input');
+  scrubber.type = 'range'; scrubber.className = 'trace-scrubber';
+  scrubber.id = prefix + 'Scrubber';
+  scrubber.min = 0; scrubber.value = 0;
+  scrubber.setAttribute('aria-label', '選擇播放步驟');
+  if (controls) { controls.appendChild(counter); controls.appendChild(scrubber); }
 
   const vis = new BarVis(canvas);
   vis.setData(opts.initialArr);
@@ -2793,6 +2851,8 @@ function wireSection(prefix, opts) {
       }
       // tree (merge sort)
       if (opts.renderTree && frame.tree) opts.renderTree(frame.tree);
+      counter.textContent = `${i + 1}/${animator.frames.length}`;
+      scrubber.value = i;
       // play button label
       if (playBtn) playBtn.textContent = animator.playing ? '⏸ 暫停' : '▶ 開始';
     },
@@ -2804,6 +2864,8 @@ function wireSection(prefix, opts) {
     const arr = opts.getArr();
     vis.setData(arr);
     const frames = opts.gen(arr);
+    scrubber.max = Math.max(0, frames.length - 1);
+    scrubber.hidden = frames.length < 8;
     animator.setFrames(frames);
     if (playBtn) playBtn.textContent = '▶ 開始';
   }
@@ -2812,8 +2874,19 @@ function wireSection(prefix, opts) {
     if (animator.playing) { animator.pause(); playBtn.textContent = '▶ 繼續'; }
     else { animator.play(); playBtn.textContent = '⏸ 暫停'; }
   };
-  if (stepBtn)  stepBtn.onclick  = () => { animator.step(); if (playBtn) playBtn.textContent = '▶ 繼續'; };
+  if (prevBtn)  prevBtn.onclick  = () => {
+    animator.prev();
+    if (playBtn) playBtn.textContent = animator.idx === 0 ? '▶ 開始' : '▶ 繼續';
+  };
+  if (stepBtn)  stepBtn.onclick  = () => {
+    animator.step();
+    if (playBtn) playBtn.textContent = animator.idx >= animator.frames.length - 1 ? '▶ 重播' : '▶ 繼續';
+  };
   if (resetBtn) resetBtn.onclick = () => { animator.reset(); if (playBtn) playBtn.textContent = '▶ 開始'; };
+  scrubber.oninput = () => {
+    animator.seek(scrubber.value);
+    if (playBtn) playBtn.textContent = animator.idx >= animator.frames.length - 1 ? '▶ 重播' : animator.idx === 0 ? '▶ 開始' : '▶ 繼續';
+  };
 
   return { vis, animator, regen };
 }

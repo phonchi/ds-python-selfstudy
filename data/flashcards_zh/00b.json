@@ -13,7 +13,7 @@
 },
 {
 "front": "執行階段（Runtime）",
-"back": "實際跑你程式的那個行程與它的記憶體狀態。Colab 的 runtime 閒置太久會被回收，屆時已安裝的套件與變數都會消失，需要重跑安裝與初始化的儲存格。"
+"back": "實際跑程式的行程、記憶體狀態與所在 VM。Restart session / kernel 會清掉 Python 變數與匯入，但同一台 VM 的檔案與 pip 安裝通常還在；Disconnect and delete runtime 或 VM 被回收／換新時，暫存檔案與臨時安裝才會消失。"
 },
 {
 "front": "套件管理工具（Package Manager, pip / conda）",

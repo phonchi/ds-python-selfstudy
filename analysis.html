@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -716,8 +717,11 @@ Sum is 5000000050000000 required  0.0000005 seconds</pre></div>
         <div class="controls-bar">
           <input id="anaS1" class="mono" style="width:110px;padding:.35rem .5rem;border:1px solid var(--card-border);border-radius:6px;" value="earth">
           <input id="anaS2" class="mono" style="width:110px;padding:.35rem .5rem;border:1px solid var(--card-border);border-radius:6px;" value="heart">
-          <button class="btn" onclick="anaStart()">▶ 開始（解法 4）</button>
-          <button class="btn" onclick="anaPlayer &amp;&amp; anaPlayer.step()">→ 單步</button>
+          <button class="btn" onclick="anaStart(this)">▶ 開始（解法 4）</button>
+          <button class="btn" onclick="anaPlayer &amp;&amp; anaPlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="anaPlayer &amp;&amp; anaPlayer.step()">→ 下一步</button>
+          <button class="btn" onclick="anaPlayer &amp;&amp; anaPlayer.reset()">↺ 重置</button>
+          <select id="anaSpeed" class="mono"><option value="3000">慢</option><option value="1800" selected>標準</option><option value="900">快</option></select>
         </div>
       </div>
     </div>
@@ -944,7 +948,7 @@ list range              0.00 seconds</pre></div>
         </table>
         </div>
         <div class="status-banner" id="hashStatus"><span class="status-icon">›</span><span class="status-text">按按鈕模擬「在 10 萬元素中查 1000 次」的操作次數比較。</span></div>
-        <div class="controls-bar"><button class="btn" onclick="hashRace()">▶ 查找次數比賽</button></div>
+        <div class="controls-bar"><span class="mono" style="font-size:.78rem;color:var(--muted);">複雜度比較不冒充固定探查次數</span></div>
         <div class="mono" id="hashOut" style="font-size:.86rem;line-height:2;"></div>
       </div>
     </div>
@@ -1106,26 +1110,73 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
-    this.frames = frames; this.apply = apply;
-    this.delayInput = delayInput; this.i = -1; this.timer = null;
-    this.onDone = onDone || (()=>{});
+  constructor({frames, apply, delayInput, delay=1800, onDone, onIndex, playButton}) {
+    this.frames = frames || []; this.apply = apply;
+    this.delayInput = delayInput; this.delay = delay; this.i = 0; this.timer = null;
+    this.onDone = onDone || (()=>{}); this.onIndex = onIndex || (()=>{});
+    this.progress = null; this.counter = null;
+    this.playButton = playButton || null;
+    this.playLabel = this.playButton ? this.playButton.textContent : '';
+    if (this.playButton) this.playButton.setAttribute('aria-pressed', 'false');
+    if (delayInput && delayInput.closest('.controls-bar')) {
+      const bar = delayInput.closest('.controls-bar');
+      bar.querySelectorAll('.player-progress,.player-counter').forEach(x=>x.remove());
+      this.counter = document.createElement('span'); this.counter.className='player-counter mono';
+      this.counter.style.fontSize='.72rem'; bar.appendChild(this.counter);
+      if (this.frames.length >= 8) {
+        this.progress=document.createElement('input'); this.progress.type='range';
+        this.progress.className='player-progress timeline-scrubber'; this.progress.min=0; this.progress.max=this.frames.length-1; this.progress.value=0;
+        this.progress.style.cssText='flex:1 1 120px;min-width:90px;';
+        this.progress.oninput=()=>this.seek(this.progress.value); bar.appendChild(this.progress);
+      }
+    }
+  }
+  currentDelay() {
+    return this.delayInput ? parseInt(this.delayInput.value, 10) : this.delay;
+  }
+  render() {
+    if (!this.frames.length) return;
+    this.apply(this.frames[this.i]); this.onIndex(this.i, this.frames.length);
+    if (this.counter) this.counter.textContent=(this.i+1)+'/'+this.frames.length;
+    if (this.progress) this.progress.value=this.i;
   }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
+    this.stop();
+    if (this.i + 1 >= this.frames.length) { this.onDone(); return false; }
+    this.i += 1; this.render(); return true;
+  }
+  prev() {
+    this.stop();
+    if (this.i <= 0) return false;
+    this.i -= 1; this.render(); return true;
+  }
+  seek(i) {
+    this.stop();
+    this.i = Math.max(0, Math.min(this.frames.length - 1, Number(i) || 0));
+    this.render();
   }
   play() {
-    this.stop();
+    if (this.timer) { this.stop(); return; }
+    if (!this.frames.length) return;
+    if (this.i >= this.frames.length - 1) { this.i = 0; this.render(); }
+    this.setPlaying(true);
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.render();
+      this.timer = setTimeout(tick, this.currentDelay());
     };
-    tick();
+    this.timer = setTimeout(tick, this.currentDelay());
   }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  setPlaying(playing) {
+    if (!this.playButton) return;
+    this.playButton.textContent = playing ? '⏸ 暫停' : this.playLabel;
+    this.playButton.setAttribute('aria-pressed', playing ? 'true' : 'false');
+  }
+  stop() {
+    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    this.setPlaying(false);
+  }
+  reset() { this.stop(); this.i = 0; this.render(); }
 }
 
 function setStatus(id, html) {
@@ -1209,15 +1260,14 @@ function growthDraw() {
   ctx.clearRect(0,0,W,H);
   const maxN = parseInt($('growthMax').value, 10);
   const active = Array.from(document.querySelectorAll('.gcb:checked')).map(c => c.value);
-  let maxY = 10;
-  active.forEach(k => { const v = GFUNCS[k].f(maxN); if (v < 1e6 && v > maxY) maxY = v; });
-  maxY = Math.min(maxY, 1e6);
+  const maxLog = Math.max(1, ...active.map(k => Math.log10(Math.max(1, GFUNCS[k].f(maxN)))));
   // axes
   ctx.strokeStyle = '#999'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(pad, 10); ctx.lineTo(pad, H-pad); ctx.lineTo(W-10, H-pad); ctx.stroke();
   ctx.fillStyle = '#666'; ctx.font = '12px JetBrains Mono';
   ctx.fillText('n →', W-40, H-pad+16);
   ctx.fillText('T(n)', 6, 20);
+  ctx.fillText('log scale', 6, 36);
   ctx.fillText(String(maxN), W-30, H-pad+30);
   active.forEach(k => {
     const {f, color, label} = GFUNCS[k];
@@ -1226,15 +1276,13 @@ function growthDraw() {
     for (let px = 0; px <= W - pad - 12; px++) {
       const n = 1 + (px / (W - pad - 12)) * (maxN - 1);
       const y = f(n);
-      if (y > maxY) break;
-      const X = pad + px, Y = (H - pad) - (y / maxY) * (H - pad - 16);
+      const X = pad + px, Y = (H - pad) - (Math.log10(Math.max(1,y)) / maxLog) * (H - pad - 16);
       if (!started) { ctx.moveTo(X, Y); started = true; } else ctx.lineTo(X, Y);
     }
     ctx.stroke();
     // label at end of curve
     let nEnd = maxN, yEnd = f(maxN);
-    while (yEnd > maxY && nEnd > 1) { nEnd -= maxN/100; yEnd = f(nEnd); }
-    const X = pad + ((nEnd - 1)/(maxN - 1)) * (W - pad - 12), Y = (H - pad) - (yEnd / maxY) * (H - pad - 16);
+    const X = pad + ((nEnd - 1)/(maxN - 1)) * (W - pad - 12), Y = (H - pad) - (Math.log10(Math.max(1,yEnd)) / maxLog) * (H - pad - 16);
     ctx.fillStyle = color; ctx.fillText(label, Math.min(X, W-70), Math.max(14, Y - 6));
   });
 }
@@ -1245,19 +1293,19 @@ growthDraw();
 /* ---------- P03 anagram sol.4 ---------- */
 let anaPlayer = null;
 function anaFrames(s1, s2) {
-  const frames = [];
-  const c1 = {}, c2 = {};
+  const c1 = Array(26).fill(0), c2 = Array(26).fill(0);
+  const frames = [{i1:-1,i2:-1,c1:[...c1],c2:[...c2],msg:'初態：兩個 26 格計數陣列全為 0。',line:3}];
+  if (!/^[a-z]*$/.test(s1+s2)) return [{...frames[0],msg:'只接受 a–z；請移除空白、標點或其他字元。'}];
+  if (s1.length !== s2.length) return [{...frames[0],msg:'長度不同，直接回傳 False。',line:2}];
   for (let i = 0; i < s1.length; i++) {
-    c1[s1[i]] = (c1[s1[i]] || 0) + 1;
-    frames.push({i1:i, i2:-1, c1:{...c1}, c2:{...c2}, msg:`c1['${s1[i]}'] → ${c1[s1[i]]}`, line:7});
+    const k=s1.charCodeAt(i)-97; c1[k]++;
+    frames.push({i1:i, i2:-1, c1:[...c1], c2:[...c2], msg:`c1[${k}]（${s1[i]}）→ ${c1[k]}`, line:7});
   }
   for (let i = 0; i < s2.length; i++) {
-    c2[s2[i]] = (c2[s2[i]] || 0) + 1;
-    frames.push({i1:-1, i2:i, c1:{...c1}, c2:{...c2}, msg:`c2['${s2[i]}'] → ${c2[s2[i]]}`, line:8});
+    const k=s2.charCodeAt(i)-97; c2[k]++;
+    frames.push({i1:-1, i2:i, c1:[...c1], c2:[...c2], msg:`c2[${k}]（${s2[i]}）→ ${c2[k]}`, line:8});
   }
-  const keys = new Set([...Object.keys(c1), ...Object.keys(c2)]);
-  let ok = true;
-  for (const k of keys) if ((c1[k]||0) !== (c2[k]||0)) ok = false;
+  const ok=c1.every((v,i)=>v===c2[i]);
   frames.push({i1:-1, i2:-1, c1, c2, line:9,
     msg: ok ? '<strong>26 格計數全等 → 是變位詞 ✓（總工作量 2n + 26 → O(n)）</strong>'
             : '<strong>計數不等 → 不是變位詞 ✗</strong>'});
@@ -1274,12 +1322,21 @@ function anaApply(f) {
     }
   };
   paint('anaStrip1', s1, f.i1); paint('anaStrip2', s2, f.i2);
-  const fmt = o => Object.entries(o).sort().map(([k,v]) => `${k}:${v}`).join(' ');
+  const fmt = o => o.map((v,i)=>v?`${String.fromCharCode(97+i)}:${v}`:'').filter(Boolean).join(' ');
   $('anaCount').innerHTML = `c1 = { ${fmt(f.c1)} }<br>c2 = { ${fmt(f.c2)} }`;
   setStatus('anaStatus', f.msg); hlLine('anaCode', f.line);
 }
-function anaStart() {
-  anaPlayer = new Player({frames: anaFrames($('anaS1').value.toLowerCase(), $('anaS2').value.toLowerCase()), apply: anaApply});
+function anaStart(button) {
+  const key = `${$('anaS1').value.toLowerCase()}\u0000${$('anaS2').value.toLowerCase()}`;
+  if (anaPlayer && anaPlayer._key === key) { anaPlayer.play(); return; }
+  if (anaPlayer) anaPlayer.stop();
+  anaPlayer = new Player({
+    frames: anaFrames($('anaS1').value.toLowerCase(), $('anaS2').value.toLowerCase()),
+    apply: anaApply,
+    delayInput:$('anaSpeed'),
+    playButton:button
+  });
+  anaPlayer._key = key;
   anaPlayer.reset(); anaPlayer.play();
 }
 
@@ -1319,17 +1376,14 @@ function vecReset() { vec = {size:0, cap:1, moves:0}; vecRender('已重置：siz
 vecReset();
 
 /* ---------- P05 hash race ---------- */
-function hashRace() {
-  const n = 100000, q = 1000;
-  const linear = n/2 * q;
-  const binary = Math.ceil(Math.log2(n)) * q;
-  const hash = 1.2 * q;
+function initHashSummary() {
   $('hashOut').innerHTML =
-    `list 線性查找（in）：約 <strong>${linear.toLocaleString()}</strong> 次比較<br>` +
-    `排序 + binary search：約 <strong>${binary.toLocaleString()}</strong> 次比較<br>` +
-    `set／dict：約 <strong>${Math.round(hash).toLocaleString()}</strong> 次（平均每查 1.2 次探查）`;
-  setStatus('hashStatus', '同樣 1000 次查詢，三種容器差了 4 個數量級：資料一大，容器選擇就是生死題。');
+    '<table class="cmp-table" style="width:100%;font-size:.8rem;"><thead><tr><th>結構</th><th>單次查找</th><th>前置成本</th></tr></thead><tbody>'+
+    '<tr><td>未排序 list</td><td>O(n)</td><td>無</td></tr><tr><td>排序 list + binary search</td><td>O(log n)</td><td>排序 O(n log n)</td></tr>'+
+    '<tr><td>set / dict</td><td>平均 O(1)、最差 O(n)</td><td>建表 O(n)、需額外空間</td></tr></tbody></table>';
+  setStatus('hashStatus', '複雜度是成長級別，不把無來源的平均探查次數寫成精確常數。');
 }
+initHashSummary();
 </script>
 <script>
 const FLASHCARDS = [{"front": "可讀性（Readability）", "back": "人類讀者理解原始碼的目的、控制流程與運作方式的容易程度，衡量程式碼好不好懂、好不好維護。"}, {"front": "演算法分析（Algorithm Analysis）", "back": "判定演算法計算複雜度的過程：衡量一個演算法用掉多少計算資源（時間與空間）。"}, {"front": "基準測試（Benchmark Analysis）", "back": "用一系列標準測試實際執行程式來評估效能，比較不同實作之間的相對表現。"}, {"front": "空間複雜度（Space Complexity）", "back": "演算法執行所需的記憶體空間量，表示成輸入長度的函數。"}, {"front": "時間複雜度（Time Complexity）", "back": "描述演算法執行所需時間的計算複雜度，通常表示成輸入大小的函數。"}, {"front": "Big-O 記號（Big-O）", "back": "表達演算法時間或空間複雜度上界的記號，描述輸入變大時演算法的成長趨勢，只保留主導項、忽略常數。"}, {"front": "平均情況效能（Average-Case Performance）", "back": "把所有可能輸入納入考量後，演算法的期望時間或空間複雜度，反映典型情況下的效率。"}, {"front": "最壞情況效能（Worst-Case Performance）", "back": "演算法在所有可能輸入中最大的時間或空間複雜度，代表最不利條件下的效率保證。"}, {"front": "暴力法（Brute-Force）", "back": "把所有可能的解全部試過一遍來找答案的演算法策略：實作簡單，但通常效率不佳。"}, {"front": "時間與空間取捨（Time and Space Trade-offs）", "back": "「用空間換時間」或「用時間換空間」的概念：多用一些記憶體可能讓演算法更快，省記憶體則可能付出變慢的代價。"}, {"front": "索引（Indexing）", "back": "建立索引以加速資料檢索的過程，讓資料結構中的資料能被有效率地定位與存取。"}, {"front": "包含檢查（Contains Operator）", "back": "檢查某個元素是否存在於資料結構中的操作：Python 的 in 運算子。在 list 裡是線性搜尋 O(n)，在 set／dict 裡平均 O(1)。"}];

@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -563,44 +564,45 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
 <section id="inherit">
   <div class="section-number">PART 01 · 繼承</div>
   <h2>is-a：子類別自動拿到父類別的一切 <span class="sec-badge">DRY</span></h2>
-  <p>「有序串列<strong>是一種</strong>串列」—— 這種 is-a 關係就用繼承。子類別自動擁有父類別所有的屬性與方法，只需要寫「不一樣的那部分」。</p>
+  <p>當一個類別真的<strong>是另一個類別的特殊版本</strong>時，可以用繼承共用狀態與方法。不過「都是串列」不代表其中一個必然要繼承另一個；還要以實際程式碼的類別宣告為準。</p>
+
+  <div class="info-box">
+    <div class="info-label"><code>pythonds3</code> 的鏈結串列繼承關係</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.8rem;">
+      <div style="grid-column:1/-1;border:2px solid var(--accent2);border-radius:10px;padding:.7rem;text-align:center;"><strong><code>LinkedList(ABC)</code></strong><br>共用 <code>_head</code>、<code>_count</code>、<code>__len__()</code>與 <code>__str__()</code></div>
+      <div style="border:2px solid var(--accent3);border-radius:10px;padding:.7rem;"><strong>↳ <code>UnorderedList</code></strong><br>繼承 <code>LinkedList</code><br>實作無序的 <code>add()</code>、<code>search()</code></div>
+      <div style="border:2px solid var(--accent3);border-radius:10px;padding:.7rem;"><strong>↳ <code>OrderedList</code></strong><br>繼承 <code>LinkedList</code><br>實作有序的 <code>add()</code>、<code>search()</code></div>
+    </div>
+    <p style="margin:.7rem 0 0;"><code>UnorderedList</code> 與 <code>OrderedList</code> 是<strong>兄弟類別</strong>，不是父子類別。它們各自沿 MRO 往共同父類別 <code>LinkedList</code> 查找共用方法。</p>
+  </div>
 
   <div class="deck-extra">
-  <div class="dx-label">OrderedList 繼承 UnorderedList，只覆寫 add()</div>
-  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">class</span> UnorderedList:</span>
+  <div class="dx-label">套件實作的重點（簡化）</div>
+  <div class="pseudo-code" style="font-size:.8rem;"><span class="line"><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod</span>
+<span class="line"> </span>
+<span class="line"><span class="kw">class</span> LinkedList(ABC):</span>
 <span class="line">    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="fn">self</span>):</span>
-<span class="line">        <span class="fn">self</span>._items = []</span>
+<span class="line">        <span class="fn">self</span>._head = <span class="kw">None</span></span>
+<span class="line">        <span class="fn">self</span>._count = <span class="num">0</span></span>
 <span class="line"> </span>
-<span class="line">    <span class="kw">def</span> <span class="fn">add</span>(<span class="fn">self</span>, item):</span>
-<span class="line">        <span class="fn">self</span>._items.insert(<span class="num">0</span>, item)      <span class="com"># 無序：一律插在最前面</span></span>
-<span class="line"> </span>
-<span class="line">    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="fn">self</span>):</span>
-<span class="line">        <span class="kw">return</span> <span class="str">"</span><span class="str"> -&gt; </span><span class="str">"</span>.join(<span class="fn">map</span>(<span class="fn">str</span>, <span class="fn">self</span>._items))</span>
+<span class="line">    <span class="fn">@abstractmethod</span></span>
+<span class="line">    <span class="kw">def</span> <span class="fn">add</span>(<span class="fn">self</span>, value): ...</span>
 <span class="line"> </span>
 <span class="line"> </span>
-<span class="line"><span class="kw">class</span> OrderedList(UnorderedList):        <span class="com"># ← 括號裡是父類別</span></span>
-<span class="line">    <span class="kw">def</span> <span class="fn">add</span>(<span class="fn">self</span>, item):                 <span class="com"># ← 覆寫：同名方法，不同做法</span></span>
-<span class="line">        i = <span class="num">0</span></span>
-<span class="line">        <span class="kw">while</span> i &lt; <span class="fn">len</span>(<span class="fn">self</span>._items) and <span class="fn">self</span>._items[i] &lt; item:</span>
-<span class="line">            i += <span class="num">1</span></span>
-<span class="line">        <span class="fn">self</span>._items.insert(i, item)      <span class="com"># 有序：插到該在的位置</span></span>
+<span class="line"><span class="kw">class</span> UnorderedList(LinkedList):</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">add</span>(<span class="fn">self</span>, value): ...    <span class="com"># 插在鏈結串列前端</span></span>
 <span class="line"> </span>
 <span class="line"> </span>
-<span class="line">u, o = UnorderedList(), OrderedList()</span>
-<span class="line"><span class="kw">for</span> v in [<span class="num">31</span>, <span class="num">17</span>, <span class="num">93</span>, <span class="num">26</span>]:</span>
-<span class="line">    u.add(v)</span>
-<span class="line">    o.add(v)</span>
+<span class="line"><span class="kw">class</span> OrderedList(LinkedList):</span>
+<span class="line">    <span class="kw">def</span> <span class="fn">add</span>(<span class="fn">self</span>, value): ...    <span class="com"># 尋找正確位置後插入</span></span>
 <span class="line"> </span>
-<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">UnorderedList:</span><span class="str">"</span>, u)</span>
-<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">OrderedList  :</span><span class="str">"</span>, o)</span>
-<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">是子類別嗎:</span><span class="str">"</span>, <span class="fn">issubclass</span>(OrderedList, UnorderedList))</span>
-<span class="line"><span class="fn">print</span>(<span class="str">"</span><span class="str">MRO:</span><span class="str">"</span>, [c.__name__ <span class="kw">for</span> c in OrderedList.__mro__])</span>
+<span class="line"> </span>
+<span class="line"><span class="fn">print</span>(<span class="fn">issubclass</span>(OrderedList, UnorderedList))</span>
+<span class="line"><span class="fn">print</span>([c.__name__ <span class="kw">for</span> c in OrderedList.__mro__])</span>
 <span class="line"> </span></div>
-  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>UnorderedList: 26 -&gt; 93 -&gt; 17 -&gt; 31
-OrderedList  : 17 -&gt; 26 -&gt; 31 -&gt; 93
-是子類別嗎: True
-MRO: [&#x27;OrderedList&#x27;, &#x27;UnorderedList&#x27;, &#x27;object&#x27;]</pre></div>
-  <p class="dx-note">兩個類別的 <code>__init__</code> 與 <code>__str__</code> 完全共用，只有 <code>add</code> 不同。<code>__mro__</code>（Method Resolution Order）就是<a href='p8_oop_basics.html#attrs'>屬性查找順序</a>：先找 OrderedList，沒有才往 UnorderedList 找，最後是 object。</p>
+  <div class="expected-out"><span class="eo-tag">預期輸出</span><pre>False
+[&#x27;OrderedList&#x27;, &#x27;LinkedList&#x27;, &#x27;ABC&#x27;, &#x27;object&#x27;]</pre></div>
+  <p class="dx-note">課堂講義為了逐步介紹鏈結串列，把 <code>UnorderedList</code> 與 <code>OrderedList</code> 各自寫成完整類別；安裝的 <code>pythonds3</code> 套件則抽出共同的抽象父類別 <code>LinkedList</code>。兩種呈現的結構不同，但都<strong>沒有</strong>讓 <code>OrderedList</code> 繼承 <code>UnorderedList</code>。</p>
 </div>
 
   <h3 style="font-family:'Noto Serif TC',serif;font-size:1.12rem;margin:1.3rem 0 .5rem;color:var(--accent2);"><code>super()</code>：擴充而不是取代</h3>
@@ -753,19 +755,23 @@ total_ordering 送的 &gt;= : True</pre></div>
   <p class="dx-note">只寫了兩個方法，就換到 <code>sorted</code>、<code>min</code>、<code>heapq</code> 全部能用。<code>@functools.total_ordering</code> 會用你的 <code>__lt__</code> 與 <code>__eq__</code> 自動補出 <code>&gt;</code>、<code>&lt;=</code>、<code>&gt;=</code>——這門課的 notebook 有 import <code>functools</code>，就是這個用途。</p>
 </div>
 
-  <p>下面這個逐步器把 <code>sorted()</code> 拆開來看：每一次比較都是一次 <code>__lt__</code> 呼叫。</p>
+  <p>下面用<strong>插入排序</strong>作為透明的示意：它不是 CPython <code>sorted()</code> 內部使用的 Timsort，但兩者在比較自訂物件時都會透過比較協定呼叫 <code>__lt__</code>。</p>
 
   <div class="viz-layout">
     <div>
       <div class="viz-panel">
         <div id="ltStage" style="min-height:150px;"></div>
-        <div class="status-banner" id="ltStatus"><span class="status-icon">›</span><span class="status-text">按「開始」看排序過程中每一次 __lt__ 被呼叫的樣子。</span></div>
+        <div class="status-banner" id="ltStatus" aria-live="polite"><span class="status-icon">›</span><span class="status-text">按「下一步」看插入排序何時呼叫 __lt__。</span></div>
         <div class="controls-bar">
-          <button class="btn btn-play" onclick="ltStart()">▶ 開始排序</button>
-          <button class="btn btn-step" onclick="ltPlayer &amp;&amp; ltPlayer.step()">→ 單步</button>
+          <button class="btn btn-step" onclick="ltPlayer &amp;&amp; ltPlayer.prev()">← 上一步</button>
+          <button class="btn btn-play" id="ltPlay" onclick="ltPlayer &amp;&amp; ltPlayer.play()">▶ 播放</button>
+          <button class="btn btn-step" onclick="ltPlayer &amp;&amp; ltPlayer.step()">下一步 →</button>
           <button class="btn btn-reset" onclick="ltReset()">⟲ 重設</button>
+          <select id="ltSpeed" aria-label="播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select>
+          <span class="mono" id="ltCounter">0 / 18</span>
           <span class="mono" style="font-size:.78rem;color:var(--muted);">已呼叫 __lt__：<b id="ltCount">0</b> 次</span>
         </div>
+        <input type="range" id="ltSeek" min="0" max="18" value="0" step="1" aria-label="排序步驟" style="width:100%;">
       </div>
     </div>
     <div class="side-panel">
@@ -888,7 +894,7 @@ for 迴圈  -&gt; [&#x27;紅&#x27;, &#x27;綠&#x27;, &#x27;藍&#x27;]</pre></div
   <div class="info-box purple">
     <div class="info-label">🎯 判斷法則</div>
     <p style="margin-bottom:0;">問自己一句：<strong>「父類別的每一個方法，用在子類別身上都說得通嗎？」</strong>只要有一個說不通（例如對 Deque 呼叫 <code>sort()</code>），就不要繼承，改用組合。<br>
-    <code>OrderedList</code> 繼承 <code>UnorderedList</code> 是合理的（父類別的每個方法對它都成立）；<code>Deque</code> 繼承 <code>list</code> 不合理。</p>
+    <code>pythonds3</code> 把 <code>OrderedList</code> 與 <code>UnorderedList</code> 設計成共同繼承 <code>LinkedList</code> 的兄弟類別；<code>Deque</code> 繼承 <code>list</code> 則會暴露不該有的操作，應改用組合。</p>
   </div>
 
   <div class="ds-hook"><div class="dh-title">🔗 這在資料結構課哪裡會用到 · 第 05 章</div>pythonds3 的 <code>Stack</code>、<code>Queue</code>、<code>Deque</code> 全部採用組合而非繼承 list——現在你知道為什麼了。</div>
@@ -1202,26 +1208,33 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
+  constructor({frames, apply, delayInput, playButton, counter, seek, onDone, onReset}) {
     this.frames = frames; this.apply = apply;
     this.delayInput = delayInput; this.i = -1; this.timer = null;
+    this.playButton = playButton; this.counter = counter; this.seek = seek;
     this.onDone = onDone || (()=>{});
+    this.onReset = onReset || (()=>{}); this.updateMeta();
   }
+  updateMeta() { if (this.counter) this.counter.textContent = `${this.i + 1} / ${this.frames.length}`; if (this.seek) this.seek.value = String(this.i + 1); }
   step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
-  }
-  play() {
     this.stop();
+    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
+    this.i += 1; this.apply(this.frames[this.i]); this.updateMeta();
+  }
+  prev() { this.stop(); if (this.i >= 0) { this.i -= 1; if (this.i >= 0) this.apply(this.frames[this.i]); else this.onReset(); this.updateMeta(); } }
+  play() {
+    if (this.timer) { this.stop(); return; }
+    if (this.playButton) this.playButton.textContent = '⏸ 暫停';
     const tick = () => {
       if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+      this.i += 1; this.apply(this.frames[this.i]); this.updateMeta();
+      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 1200);
     };
     tick();
   }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } if (this.playButton) this.playButton.textContent = '▶ 播放'; }
+  reset() { this.stop(); this.i = -1; this.onReset(); this.updateMeta(); }
+  go(k) { this.stop(); this.i = Math.max(-1, Math.min(this.frames.length - 1, k)); if (this.i >= 0) this.apply(this.frames[this.i]); else this.onReset(); this.updateMeta(); }
 }
 
 function setStatus(id, html) {
@@ -1340,28 +1353,29 @@ function ltFrames() {
   return frames;
 }
 
-function ltStart() {
+function ltLoad() {
   if (ltPlayer) ltPlayer.stop();
   ltPlayer = new Player({
     frames: ltFrames(),
+    delayInput: $('ltSpeed'), playButton: $('ltPlay'), counter: $('ltCounter'), seek: $('ltSeek'),
     apply: f => {
       $('ltStage').innerHTML = f.html;
       $('ltCount').textContent = f.calls;
       hlLine('ltCode', f.line);
       setStatus('ltStatus', f.msg);
-    },
+    }, onReset: ltResetView,
   });
-  ltPlayer.play();
+  $('ltSeek').oninput = () => ltPlayer.go(parseInt($('ltSeek').value, 10) - 1);
+  ltResetView();
 }
 
-function ltReset() {
-  if (ltPlayer) ltPlayer.stop();
-  ltPlayer = null;
+function ltResetView() {
   $('ltStage').innerHTML = ltRenderList(LT_TASKS);
   $('ltCount').textContent = '0';
   hlLine('ltCode', null);
-  setStatus('ltStatus', '按「開始排序」，看每一次 <code>__lt__</code> 被呼叫的樣子。');
+  setStatus('ltStatus', '按「下一步」，看插入排序每一次何時呼叫 <code>__lt__</code>。');
 }
+function ltReset() { if (ltPlayer) ltPlayer.reset(); }
 
 /* ---------- P05 容器協定對照表 ---------- */
 const DUNDERS = [
@@ -1398,15 +1412,16 @@ const DUNDERS = [
     $('dnDetail').innerHTML = d.detail;
     setStatus('dnStatus', `<code>${d.syn}</code> 其實是在呼叫 <code>${d.dun}</code>。`);
   });
+  tbody.querySelector('tr[data-i="0"]')?.click();
 })();
 
 (function () {
-  if ($('ltStage')) ltReset();
+  if ($('ltStage')) ltLoad();
 })();
 
 </script>
 <script>
-const FLASHCARDS = [{"front": "繼承（Inheritance）", "back": "讓子類別自動取得父類別全部屬性與方法的機制，用來表達「是一種」的關係。子類別只需要寫不一樣的那部分。"}, {"front": "父類別／子類別（Superclass / Subclass）", "back": "被繼承的一方稱為父類別（基底類別），繼承別人的一方稱為子類別（衍生類別）。OrderedList 繼承 UnorderedList，前者是子類別。"}, {"front": "呼叫父類別（super()）", "back": "在子類別裡取得父類別版本的方法。最常見的用法是在子類別 __init__ 的第一行呼叫 super().__init__(...)，先讓父類別把它的欄位設好，再補上自己的。忘記呼叫是繼承最常見的錯誤。"}, {"front": "方法覆寫（Method Overriding）", "back": "子類別定義一個與父類別同名的方法，取代父類別的版本。之所以有效，是因為屬性查找順序會先找到子類別的那一份。"}, {"front": "方法解析順序（MRO, Method Resolution Order）", "back": "Python 尋找方法時走訪類別的固定順序，可用 類別.__mro__ 查看。有多重繼承時它決定了哪個父類別的版本會勝出。"}, {"front": "多型（Polymorphism）", "back": "同一段呼叫端程式碼可以接受不同類別的物件，只要它們提供相同的操作。第 07 章六種排序法都長成 sort(a_list)，因此可以互換。"}, {"front": "鴨子型別（Duck Typing）", "back": "「走起來像鴨子、叫起來像鴨子，就當它是鴨子。」Python 不檢查型別，只在真正呼叫時看方法在不在，所以多型甚至不需要繼承關係。"}, {"front": "運算子重載（Operator Overloading）", "back": "透過實作特殊方法，讓內建運算子對自訂物件也有意義。例如定義 __add__ 之後就能寫 a + b，定義 __lt__ 之後就能寫 a < b。"}, {"front": "相等判斷（__eq__）", "back": "決定 a == b 結果的特殊方法。預設只有「是同一個物件」才相等；定義它之後可以改成「內容相同就相等」，但同時會讓物件失去預設的 __hash__。"}, {"front": "雜湊值（__hash__）", "back": "回傳物件雜湊值的特殊方法，set 與 dict 的鍵都需要它。鐵則是 a == b 為真時 hash(a) 必須等於 hash(b)，所以雜湊值要從決定相等的那些欄位算出來。"}, {"front": "小於比較（__lt__）", "back": "決定 a < b 結果的特殊方法，也是 sorted、min、max、heapq、二元堆積與所有排序演算法唯一依賴的比較方法。沒有它，第一次比較就會拋 TypeError。"}, {"front": "全序裝飾器（functools.total_ordering）", "back": "只要類別定義了 __eq__ 與 __lt__，加上這個裝飾器就會自動補齊 >、<=、>= 等其餘比較運算子，省下重複的樣板程式碼。"}, {"front": "容器協定（Container Protocol）", "back": "一組讓自訂類別能像內建容器一樣使用的特殊方法：__len__ 對應 len()、__getitem__ 對應下標讀取、__setitem__ 對應下標寫入、__delitem__ 對應 del、__contains__ 對應 in、__iter__ 對應 for 迴圈。"}, {"front": "可走訪（__iter__）", "back": "讓物件可以被 for 迴圈走訪的特殊方法，要回傳一個迭代器。最省事的寫法是回傳內部容器的迭代器，或直接用 yield 寫成產生器；樹的中序走訪很適合這樣寫。"}, {"front": "資料類別（Dataclass）", "back": "以 @dataclass 裝飾的類別，自動生成 __init__、__repr__ 與 __eq__；加上 order=True 連比較運算子都有了，比較時按照欄位宣告順序。適合單純裝資料的類別。"}, {"front": "組合優於繼承（Composition over Inheritance）", "back": "設計原則：不確定該用哪個時選組合。判斷法則是問「父類別的每一個方法用在子類別身上都說得通嗎」，只要有一個說不通就別繼承——例如對雙端佇列呼叫 sort()。"}, {"front": "自訂例外（Custom Exception）", "back": "繼承 Exception 而來的自訂錯誤類別，通常連內容都不必寫。好處是呼叫端可以精準地只接住這一種錯誤，而不是用一個 except 把所有問題一起吞掉。"}];
+const FLASHCARDS = [{"front": "繼承（Inheritance）", "back": "讓子類別自動取得父類別全部屬性與方法的機制，用來表達「是一種」的關係。子類別只需要寫不一樣的那部分。"}, {"front": "父類別／子類別（Superclass / Subclass）", "back": "被繼承的一方稱為父類別（基底類別），繼承別人的一方稱為子類別（衍生類別）。pythonds3 裡的 OrderedList 與 UnorderedList 都繼承 LinkedList，兩者是兄弟類別。"}, {"front": "呼叫父類別（super()）", "back": "在子類別裡取得父類別版本的方法。最常見的用法是在子類別 __init__ 的第一行呼叫 super().__init__(...)，先讓父類別把它的欄位設好，再補上自己的。忘記呼叫是繼承最常見的錯誤。"}, {"front": "方法覆寫（Method Overriding）", "back": "子類別定義一個與父類別同名的方法，取代父類別的版本。之所以有效，是因為屬性查找順序會先找到子類別的那一份。"}, {"front": "方法解析順序（MRO, Method Resolution Order）", "back": "Python 尋找方法時走訪類別的固定順序，可用 類別.__mro__ 查看。有多重繼承時它決定了哪個父類別的版本會勝出。"}, {"front": "多型（Polymorphism）", "back": "同一段呼叫端程式碼可以接受不同類別的物件，只要它們提供相同的操作。第 07 章六種排序法都長成 sort(a_list)，因此可以互換。"}, {"front": "鴨子型別（Duck Typing）", "back": "「走起來像鴨子、叫起來像鴨子，就當它是鴨子。」Python 不檢查型別，只在真正呼叫時看方法在不在，所以多型甚至不需要繼承關係。"}, {"front": "運算子重載（Operator Overloading）", "back": "透過實作特殊方法，讓內建運算子對自訂物件也有意義。例如定義 __add__ 之後就能寫 a + b，定義 __lt__ 之後就能寫 a < b。"}, {"front": "相等判斷（__eq__）", "back": "決定 a == b 結果的特殊方法。預設只有「是同一個物件」才相等；定義它之後可以改成「內容相同就相等」，但同時會讓物件失去預設的 __hash__。"}, {"front": "雜湊值（__hash__）", "back": "回傳物件雜湊值的特殊方法，set 與 dict 的鍵都需要它。鐵則是 a == b 為真時 hash(a) 必須等於 hash(b)，所以雜湊值要從決定相等的那些欄位算出來。"}, {"front": "小於比較（__lt__）", "back": "決定 a < b 結果的特殊方法，也是 sorted、min、max、heapq、二元堆積與所有排序演算法唯一依賴的比較方法。沒有它，第一次比較就會拋 TypeError。"}, {"front": "全序裝飾器（functools.total_ordering）", "back": "只要類別定義了 __eq__ 與 __lt__，加上這個裝飾器就會自動補齊 >、<=、>= 等其餘比較運算子，省下重複的樣板程式碼。"}, {"front": "容器協定（Container Protocol）", "back": "一組讓自訂類別能像內建容器一樣使用的特殊方法：__len__ 對應 len()、__getitem__ 對應下標讀取、__setitem__ 對應下標寫入、__delitem__ 對應 del、__contains__ 對應 in、__iter__ 對應 for 迴圈。"}, {"front": "可走訪（__iter__）", "back": "讓物件可以被 for 迴圈走訪的特殊方法，要回傳一個迭代器。最省事的寫法是回傳內部容器的迭代器，或直接用 yield 寫成產生器；樹的中序走訪很適合這樣寫。"}, {"front": "資料類別（Dataclass）", "back": "以 @dataclass 裝飾的類別，自動生成 __init__、__repr__ 與 __eq__；加上 order=True 連比較運算子都有了，比較時按照欄位宣告順序。適合單純裝資料的類別。"}, {"front": "組合優於繼承（Composition over Inheritance）", "back": "設計原則：不確定該用哪個時選組合。判斷法則是問「父類別的每一個方法用在子類別身上都說得通嗎」，只要有一個說不通就別繼承——例如對雙端佇列呼叫 sort()。"}, {"front": "自訂例外（Custom Exception）", "back": "繼承 Exception 而來的自訂錯誤類別，通常連內容都不必寫。好處是呼叫端可以精準地只接住這一種錯誤，而不是用一個 except 把所有問題一起吞掉。"}];
 
 /* ===== Flashcards engine ===== */
 (function(){

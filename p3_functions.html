@@ -78,7 +78,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 .side-panel{display:flex;flex-direction:column;gap:.85rem;}
 .info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
@@ -102,6 +103,11 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.runner-counter{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:auto}.runner-speed{font:600 .74rem 'JetBrains Mono',monospace;padding:.35rem;border:1px solid var(--card-border);border-radius:6px;background:var(--card);color:var(--ink)}.runner-scrubber{flex-basis:100%;width:100%}
+.scope-frame{padding:.45rem;margin:.35rem 0;border:1px solid var(--card-border);border-left:4px solid var(--accent2);border-radius:6px;background:var(--paper)}
+.module-map{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:center;margin:1rem 0}.module-map>div{display:flex;flex-direction:column;gap:.35rem;padding:.8rem;border:1px solid var(--card-border);border-top:4px solid var(--accent3);border-radius:8px;background:var(--card)}.module-map>b{font-size:.8rem;color:var(--accent2)}.dragon-optional>summary{cursor:pointer;font-weight:700;color:var(--accent2);padding:.7rem 0}
+@media(max-width:390px){.module-map{grid-template-columns:1fr}.module-map>b{text-align:center}.game-box{padding:1rem}.game-input-row input{width:100%}}
+@media(max-width:390px){.controls-bar{gap:.4rem}.controls-bar .btn{padding:.42rem .62rem}.runner-counter{margin-left:0;width:100%}.runner-speed{max-width:118px}.viz-panel{padding:.8rem}.side-panel{min-width:0}}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -871,6 +877,9 @@ NameError: name 'eggs' is not defined</div></div>
   <h3>🎮 遊戲時間：龍與洞穴（notebook 練習 2）</h3>
   <p>練習 2 要你完成一支會匯入自訂模組 <code>game</code> 的主程式：用 <code>import game</code> 載入模組，再呼叫模組裡的 <code>game.displayIntro()</code>、<code>game.chooseCave()</code>、<code>game.checkCave()</code>——正是上表「import 模組」那一列的實際案例。故事開場文字照著遊戲模組的 <code>displayIntro()</code>：土地上充滿了龍，兩個洞穴裡，一個住著友善的龍，另一個住著貪婪飢餓的龍。選一個洞穴，賭賭看：</p>
 
+  <div class="module-map"><div><strong>word_game.py</strong><code>import game</code><code>game.checkCave(n)</code></div><b aria-hidden="true">→ 查找並呼叫 →</b><div><strong>game.py</strong><code>displayIntro()</code><code>chooseCave()</code><code>checkCave()</code></div></div>
+
+  <details class="dragon-optional"><summary>選做：展開「龍與洞穴」遊戲</summary>
   <div class="game-box">
     <div class="gb-tag">GAME · 取自課本練習 2</div>
     <h3>🐉 龍與洞穴</h3>
@@ -936,6 +945,7 @@ NameError: name 'eggs' is not defined</div></div>
     </details>
     <p class="game-note">玩上癮了？打開 <code>03_Function.ipynb</code> 練習 2，自己把它做出來——這是你的「這是我做出來的」時刻。</p>
   </div>
+  </details>
 </section>
 
 <!-- ============================================================ -->
@@ -1115,7 +1125,7 @@ function StepRunner(prefix, steps, opts) {
   const playBtn = document.getElementById(prefix + 'Play');
   const stepBtn = document.getElementById(prefix + 'Step');
   const resetBtn= document.getElementById(prefix + 'Reset');
-  let idx = -1, timer = null;
+  let idx=-1,timer=null;const spatial=opts.kind==='spatial',vals=spatial?[600,1200,2200]:[900,1800,3000],names=spatial?['快 600ms','正常 1200ms','慢 2200ms']:['快 900ms','正常 1800ms','慢 3000ms'];const controls=playBtn&&playBtn.closest('.controls-bar');let prevBtn=null,counter=null,speed=null,scrubber=null;if(controls){prevBtn=document.createElement('button');prevBtn.className='btn btn-step';prevBtn.textContent='◂ 上一步';controls.insertBefore(prevBtn,stepBtn);if(stepBtn)stepBtn.textContent='下一步 ▸';counter=document.createElement('span');counter.className='runner-counter';controls.appendChild(counter);speed=document.createElement('select');speed.className='runner-speed';speed.setAttribute('aria-label','播放速度');vals.forEach((v,i)=>{const o=document.createElement('option');o.value=v;o.textContent=names[i];if(i===1)o.selected=true;speed.appendChild(o)});controls.appendChild(speed);if(steps.length>=8){scrubber=document.createElement('input');scrubber.type='range';scrubber.min=0;scrubber.max=steps.length;scrubber.value=0;scrubber.className='runner-scrubber';scrubber.setAttribute('aria-label','執行步驟');controls.appendChild(scrubber)}}if(statusEl)statusEl.setAttribute('aria-live','polite');if(outEl)outEl.setAttribute('aria-live','polite');
 
   function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
 
@@ -1128,6 +1138,7 @@ function StepRunner(prefix, steps, opts) {
       if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
       if (outEl) outEl.innerHTML = '';
       if (opts.onReset) opts.onReset();
+      if(counter)counter.textContent=`第 0 / ${steps.length} 步`;if(scrubber)scrubber.value=0;
       return;
     }
     const s = steps[idx];
@@ -1149,6 +1160,7 @@ function StepRunner(prefix, steps, opts) {
       outEl.scrollTop = outEl.scrollHeight;
     }
     if (opts.onStep) opts.onStep(s, idx);
+    if(counter)counter.textContent=`第 ${idx+1} / ${steps.length} 步`;if(scrubber)scrubber.value=idx+1;
   }
 
   function step() {
@@ -1156,24 +1168,24 @@ function StepRunner(prefix, steps, opts) {
     if (idx >= steps.length - 1) stopPlay();
   }
   function stopPlay(){
-    if (timer) { clearInterval(timer); timer = null; }
+    if (timer) { clearTimeout(timer); timer = null; }
     if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
   }
   function play(){
     if (timer) { stopPlay(); return; }
     if (idx >= steps.length - 1) { idx = -1; render(); }
     playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
-    timer = setInterval(()=>{
-      if (idx >= steps.length - 1) stopPlay(); else step();
-    }, opts.interval || 1600);
+    const tick=()=>{if(idx>=steps.length-1){stopPlay();return}step();if(idx<steps.length-1)timer=setTimeout(tick,Number(speed?.value||vals[1]))};tick();
   }
   function reset(){ stopPlay(); idx = -1; render(); }
 
   if (playBtn) playBtn.addEventListener('click', play);
   if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if(prevBtn)prevBtn.addEventListener('click',()=>{stopPlay();if(idx>=0){idx--;render()}});
   if (resetBtn) resetBtn.addEventListener('click', reset);
+  if(scrubber)scrubber.addEventListener('input',()=>{stopPlay();idx=Number(scrubber.value)-1;render()});
   render();
-  return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
+  return {reset,play,setSteps(newSteps){stopPlay();steps=newSteps;idx=-1;if(scrubber)scrubber.max=steps.length;render()}};
 }
 
 /** Quiz 引擎：data = [{question, code, multi, answers:[{answer, correct, feedback}]}] */
@@ -1209,6 +1221,7 @@ StepRunner('stack', [
   { line:3, out:['9'], newOut:true, note:'print(total) → 印出 9',
     frames:{ frames:[ {global:true, vars:[['total','9']]} ] } },
 ], {
+  kind:'spatial',
   onStep: s => renderStack(s.frames),
   onReset: () => renderStack(null),
 });
@@ -1282,12 +1295,13 @@ function renderScope(state) {
   if (!state.local) {
     l.innerHTML = '<div class="var-empty">目前在全域範圍</div>';
   } else {
-    l.innerHTML = `<div style="font-size:.72rem;color:var(--accent2);font-weight:700;margin-bottom:.3rem;">${state.local.name}() 的區域範圍</div>` +
-      (state.local.vars.length
-        ? '<table class="var-table">' + state.local.vars.map(v =>
+    const frames=state.local.stack||[state.local];
+    l.innerHTML = frames.map(frame=>`<div class="scope-frame"><div style="font-size:.72rem;color:var(--accent2);font-weight:700;margin-bottom:.3rem;">${frame.name}() 的區域範圍</div>` +
+      (frame.vars.length
+        ? '<table class="var-table">' + frame.vars.map(v =>
             `<tr${v[2]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td></tr>`
           ).join('') + '</table>'
-        : '<div class="var-empty">（尚無區域變數）</div>');
+        : '<div class="var-empty">（尚無區域變數）</div>')+'</div>').join('');
   }
 }
 StepRunner('scope', [
@@ -1304,16 +1318,17 @@ StepRunner('scope', [
   { line:5, out:['bacon local'], newOut:true, note:"print(eggs) 讀取 bacon() 自己的區域變數 → 印出 'bacon local'",
     scope:{ global:[['eggs',"'global'"]], local:{name:'bacon', vars:[['eggs',"'bacon local'"]]} } },
   { line:6, out:['bacon local'], note:'呼叫 spam()：bacon() 的區域範圍仍保留，但又建立了另一個新的區域範圍',
-    scope:{ global:[['eggs',"'global'"]], local:{name:'spam', vars:[]} } },
+    scope:{ global:[['eggs',"'global'"]], local:{stack:[{name:'bacon',vars:[['eggs',"'bacon local'"]]},{name:'spam', vars:[]}]} } },
   { line:1, out:['bacon local'], note:"spam() 內 eggs = 'spam local' → 這是 spam() 自己的區域變數，跟 bacon() 的 eggs 完全無關",
-    scope:{ global:[['eggs',"'global'"]], local:{name:'spam', vars:[['eggs',"'spam local'",1]]} } },
+    scope:{ global:[['eggs',"'global'"]], local:{stack:[{name:'bacon',vars:[['eggs',"'bacon local'"]]},{name:'spam', vars:[['eggs',"'spam local'",1]]}]} } },
   { line:2, out:['bacon local','spam local'], newOut:true, note:"print(eggs) 印出 spam() 的區域變數 → 'spam local'",
-    scope:{ global:[['eggs',"'global'"]], local:{name:'spam', vars:[['eggs',"'spam local'"]]} } },
+    scope:{ global:[['eggs',"'global'"]], local:{stack:[{name:'bacon',vars:[['eggs',"'bacon local'"]]},{name:'spam', vars:[['eggs',"'spam local'"]]}]} } },
   { line:7, out:['bacon local','spam local','bacon local'], newOut:true, note:"spam() 執行完畢，區域範圍被銷毀；回到 bacon()，這裡的 eggs 仍是 'bacon local'",
     scope:{ global:[['eggs',"'global'"]], local:{name:'bacon', vars:[['eggs',"'bacon local'"]]} } },
   { line:10, out:['bacon local','spam local','bacon local','global'], newOut:true, note:"bacon() 執行完畢，區域範圍被銷毀；回到全域範圍，印出全域 eggs → 'global'",
     scope:{ global:[['eggs',"'global'"]], local:null } },
 ], {
+  kind:'spatial',
   onStep: s => renderScope(s.scope),
   onReset: () => renderScope(null),
 });
@@ -1418,23 +1433,12 @@ StepRunner('scope', [
     setChoiceEnabled(false);
     log('> 你選擇了洞穴 ' + chosen, 'g-me');
     const seq = ['你慢慢地走向洞穴...', '裡面又黑又陰森...', '一隻巨大的龍突然跳了出來！牠張開大嘴，然後...'];
-    let i = 0;
-    (function next(){
-      if (i < seq.length) {
-        log(seq[i], 'g-sys');
-        i++;
-        setTimeout(next, 850);
-      } else {
-        const friendlyCave = Math.floor(Math.random() * 2) + 1;
-        if (String(chosen) === String(friendlyCave)) {
-          log('牠把財寶送給了你！', 'g-win');
-        } else {
-          log('牠一口就把你吞下去了！', 'g-lose');
-        }
-        log('你想再玩一次嗎？（是或否）', 'g-sys');
-        replay.style.display = '';
-      }
-    })();
+    seq.forEach(x=>log(x,'g-sys'));
+    const friendlyCave = Math.floor(Math.random() * 2) + 1;
+    if (String(chosen) === String(friendlyCave)) log('牠把財寶送給了你！', 'g-win');
+    else log('牠一口就把你吞下去了！', 'g-lose');
+    log('你想再玩一次嗎？（是或否）', 'g-sys');
+    replay.style.display = '';
   }
   cave1.addEventListener('click', () => checkCave(1));
   cave2.addEventListener('click', () => checkCave(2));

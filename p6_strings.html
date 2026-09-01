@@ -78,7 +78,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(44,6
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 .side-panel{display:flex;flex-direction:column;gap:.85rem;}
 .info-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:.85rem 1rem;box-shadow:0 2px 8px rgba(0,0,0,.04);}
@@ -569,9 +570,10 @@ footer a{color:var(--accent2);}
     <div class="sandbox-label">🧪 SANDBOX · 跳脫字元預覽器</div>
     <div class="input-row">
       <label>字串內容：</label>
-      <input type="text" id="escInput" value="Say hi to Bob\'s mother.">
+      <input type="text" id="escInput" value="Say hi to Bob\'s mother." readonly aria-describedby="escScope">
     </div>
     <div class="preset-row" id="escPresets"></div>
+    <p id="escScope" style="font-size:.78rem;color:var(--muted);">此預覽器只重現下方五個課本 preset 中使用的 <code>\\n</code>、<code>\\t</code>、引號與反斜線；它不是完整的 Python 字串解析器。</p>
     <div class="preset-row">
       <button class="preset-btn" id="rawToggle">原始字串 r'...'：關閉</button>
     </div>
@@ -657,9 +659,9 @@ footer a{color:var(--accent2);}
         <option value="big">big = 12345678（int）</option>
       </select>
       <label>寬度：</label>
-      <input type="text" id="fmtWidth" placeholder="例如 10" style="max-width:80px;flex:none;">
+      <input type="number" id="fmtWidth" min="0" max="40" step="1" placeholder="0–40" style="max-width:80px;flex:none;">
       <label>小數位數：</label>
-      <input type="text" id="fmtPrecision" placeholder="例如 2" style="max-width:80px;flex:none;">
+      <input type="number" id="fmtPrecision" min="0" max="10" step="1" placeholder="0–10" style="max-width:80px;flex:none;">
       <label>對齊：</label>
       <select id="fmtAlign">
         <option value="">預設</option>
@@ -747,11 +749,14 @@ footer a{color:var(--accent2);}
 <span class="line">step2 = step1.upper()</span>
 <span class="line">step3 = step2.split()</span>
 <span class="line"><span class="fn">print</span>(step3)</span></div>
-      <div class="status-banner"><span class="status-icon">▸</span><span class="status-text" id="methodsStatus">按「單步 ▸」開始</span></div>
+      <div class="status-banner" aria-live="polite"><span class="status-icon">▸</span><span class="status-text" id="methodsStatus">按「下一步」開始</span></div>
       <div class="controls-bar">
+        <button class="btn btn-step" id="methodsPrev">← 上一步</button>
         <button class="btn btn-play" id="methodsPlay">▶ 播放</button>
-        <button class="btn btn-step" id="methodsStep">單步 ▸</button>
+        <button class="btn btn-step" id="methodsStep">下一步 →</button>
         <button class="btn btn-reset" id="methodsReset">↺ 重設</button>
+        <select id="methodsSpeed" aria-label="播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select>
+        <span class="mono" id="methodsCounter">0 / 5</span>
       </div>
     </div>
     <div class="side-panel">
@@ -947,8 +952,11 @@ function StepRunner(prefix, steps, opts) {
   const varsEl  = document.getElementById(prefix + 'Vars');
   const outEl   = document.getElementById(prefix + 'Out');
   const playBtn = document.getElementById(prefix + 'Play');
+  const prevBtn = document.getElementById(prefix + 'Prev');
   const stepBtn = document.getElementById(prefix + 'Step');
   const resetBtn= document.getElementById(prefix + 'Reset');
+  const speedEl = document.getElementById(prefix + 'Speed');
+  const counterEl = document.getElementById(prefix + 'Counter');
   let idx = -1, timer = null;
 
   function lines(){ return codeEl ? codeEl.querySelectorAll('.line') : []; }
@@ -958,53 +966,57 @@ function StepRunner(prefix, steps, opts) {
       l.classList.toggle('active', idx>=0 && steps[idx].line===i);
     });
     if (idx < 0) {
-      if (statusEl) statusEl.textContent = '按「單步 ▸」開始';
+      if (statusEl) statusEl.textContent = '按「下一步」開始';
       if (varsEl) varsEl.innerHTML = '<div class="var-empty">尚未執行</div>';
       if (outEl) outEl.innerHTML = '';
       if (opts.onReset) opts.onReset();
-      return;
-    }
-    const s = steps[idx];
-    if (statusEl) statusEl.textContent = s.note || '';
-    if (varsEl) {
-      if (s.vars && s.vars.length) {
-        varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
-          `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
-        ).join('') + '</table>';
-      } else {
-        varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
+    } else {
+      const s = steps[idx];
+      if (statusEl) statusEl.textContent = s.note || '';
+      if (varsEl) {
+        if (s.vars && s.vars.length) {
+          varsEl.innerHTML = '<table class="var-table">' + s.vars.map(v =>
+            `<tr${v[3]?' class="changed"':''}><td class="vname">${v[0]}</td><td class="vval">${v[1]}</td><td class="vtype">${v[2]}</td></tr>`
+          ).join('') + '</table>';
+        } else varsEl.innerHTML = '<div class="var-empty">（無變數）</div>';
       }
+      if (outEl) {
+        outEl.innerHTML = (s.out||[]).map((o,i)=>{
+          const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
+          return `<div class="${cls}">${o}</div>`;
+        }).join('');
+        outEl.scrollTop = outEl.scrollHeight;
+      }
+      if (opts.onStep) opts.onStep(s, idx);
     }
-    if (outEl) {
-      outEl.innerHTML = (s.out||[]).map((o,i)=>{
-        const cls = o.startsWith('⌨') ? 'in-line' : (i === (s.out.length-1) && s.newOut ? 'out-line new' : 'out-line');
-        return `<div class="${cls}">${o}</div>`;
-      }).join('');
-      outEl.scrollTop = outEl.scrollHeight;
-    }
-    if (opts.onStep) opts.onStep(s, idx);
+    if (counterEl) counterEl.textContent = `${idx + 1} / ${steps.length}`;
   }
 
   function step() {
+    stopPlay();
     if (idx < steps.length - 1) { idx++; render(); }
-    if (idx >= steps.length - 1) stopPlay();
   }
+  function prev(){ stopPlay(); if (idx >= 0) { idx--; render(); } }
   function stopPlay(){
-    if (timer) { clearInterval(timer); timer = null; }
+    if (timer) { clearTimeout(timer); timer = null; }
     if (playBtn){ playBtn.classList.remove('active'); playBtn.textContent = '▶ 播放'; }
   }
   function play(){
     if (timer) { stopPlay(); return; }
     if (idx >= steps.length - 1) { idx = -1; render(); }
     playBtn.classList.add('active'); playBtn.textContent = '⏸ 暫停';
-    timer = setInterval(()=>{
-      if (idx >= steps.length - 1) stopPlay(); else step();
-    }, opts.interval || 1600);
+    const tick = ()=>{
+      if (idx >= steps.length - 1) { stopPlay(); return; }
+      idx++; render();
+      timer = setTimeout(tick, speedEl ? parseInt(speedEl.value,10) : 1800);
+    };
+    tick();
   }
   function reset(){ stopPlay(); idx = -1; render(); }
 
   if (playBtn) playBtn.addEventListener('click', play);
-  if (stepBtn) stepBtn.addEventListener('click', ()=>{ stopPlay(); step(); });
+  if (prevBtn) prevBtn.addEventListener('click', prev);
+  if (stepBtn) stepBtn.addEventListener('click', step);
   if (resetBtn) resetBtn.addEventListener('click', reset);
   render();
   return { reset, setSteps(newSteps){ stopPlay(); steps = newSteps; idx = -1; render(); } };
@@ -1123,6 +1135,15 @@ function StepRunner(prefix, steps, opts) {
     const prec  = precIn.value.trim();
     const align = alignSel.value;
     const comma = commaCk.checked;
+
+    const widthNum = width === '' ? null : Number(width);
+    const precNum = prec === '' ? null : Number(prec);
+    if ((widthNum !== null && (!Number.isInteger(widthNum) || widthNum < 0 || widthNum > 40)) ||
+        (precNum !== null && (!Number.isInteger(precNum) || precNum < 0 || precNum > 10))) {
+      codeEl.innerHTML = '<span class="line">寬度限 0–40；小數位數限 0–10。</span>';
+      outEl.innerHTML = '<span class="bad">請修正格式範圍</span>';
+      return;
+    }
 
     let specStr = '';
     if (align) specStr += align;

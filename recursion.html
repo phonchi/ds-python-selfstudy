@@ -63,7 +63,8 @@ strong{color:var(--ink);}
 
 /* Viz layout */
 .viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.3rem;margin:1.2rem 0;align-items:start;}
-@media(max-width:900px){.viz-layout{grid-template-columns:1fr;}}
+@media(max-width:900px){.viz-layout{grid-template-columns:minmax(0,1fr);}.viz-layout>*{min-width:0;max-width:100%;}.viz-panel,.side-panel,.info-card{min-width:0;max-width:100%;}}
+@media(max-width:600px){.controls-bar{width:100%;max-width:100%;min-width:0;flex-wrap:wrap;}.controls-bar>*{max-width:100%;}.controls-bar input:not([type="range"]),.controls-bar select{min-width:0;}}
 
 .viz-panel{background:linear-gradient(160deg,#fffdf7 0%,#f4efe3 100%);border:1px solid var(--card-border);border-radius:12px;padding:1rem;box-shadow:0 4px 18px rgba(0,0,0,.06);position:relative;}
 
@@ -105,6 +106,8 @@ strong{color:var(--ink);}
 
 /* Controls */
 .controls-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--card-border);}
+.player-counter{white-space:nowrap;color:var(--muted);font-size:.78rem;}
+.player-progress{flex:1 1 180px;min-width:120px;max-width:100%;}
 .btn{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;padding:.45rem 1rem;border-radius:6px;border:none;cursor:pointer;transition:all .2s;}
 .btn-play{background:var(--accent3);color:#fff;}
 .btn-play:hover{background:#22845c;}
@@ -513,8 +516,11 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
         <div class="mono" id="sumTrace" style="font-size:.95rem;line-height:2.2;min-height:150px;"></div>
         <div class="status-banner" id="sumStatus"><span class="status-icon">›</span><span class="status-text">按「開始」看 listSum([1,3,5,7,9]) 怎麼展開再收合。</span></div>
         <div class="controls-bar">
-          <button class="btn" onclick="sumStart()">▶ 開始</button>
-          <button class="btn" onclick="sumPlayer &amp;&amp; sumPlayer.step()">→ 單步</button>
+          <button class="btn" id="sumPlay" onclick="sumStart()">▶ 開始</button>
+          <button class="btn" onclick="sumPlayer &amp;&amp; sumPlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="sumPlayer &amp;&amp; sumPlayer.step()">→ 下一步</button>
+          <button class="btn" onclick="sumPlayer &amp;&amp; sumPlayer.reset()">↺ 重置</button>
+          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度 <select id="sumSpeed" aria-label="串列加總播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select></span>
         </div>
       </div>
     </div>
@@ -577,8 +583,11 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
           <select id="tostrB" class="mono" style="padding:.35rem;border-radius:6px;border:1px solid var(--card-border);">
             <option value="10" selected>base 10</option><option value="2">base 2</option><option value="16">base 16</option>
           </select>
-          <button class="btn" onclick="tostrStart()">▶ 開始</button>
-          <button class="btn" onclick="tostrPlayer &amp;&amp; tostrPlayer.step()">→ 單步</button>
+          <button class="btn" id="tostrPlay" onclick="tostrStart()">▶ 開始</button>
+          <button class="btn" onclick="tostrPlayer &amp;&amp; tostrPlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="tostrPlayer &amp;&amp; tostrPlayer.step()">→ 下一步</button>
+          <button class="btn" onclick="tostrReset()">↺ 重置</button>
+          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度 <select id="tostrSpeed" aria-label="進位轉換播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select></span>
         </div>
       </div>
     </div>
@@ -637,8 +646,11 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
         <div class="bs-stack" id="frameVis" style="min-height:230px;"></div>
         <div class="status-banner" id="frameStatus"><span class="status-icon">›</span><span class="status-text">觀察 fact(4) 的 frame 推入與彈出。</span></div>
         <div class="controls-bar">
-          <button class="btn" onclick="frameStart()">▶ fact(4)</button>
-          <button class="btn" onclick="framePlayer &amp;&amp; framePlayer.step()">→ 單步</button>
+          <button class="btn" id="framePlay" onclick="frameStart()">▶ fact(4)</button>
+          <button class="btn" onclick="framePlayer &amp;&amp; framePlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="framePlayer &amp;&amp; framePlayer.step()">→ 下一步</button>
+          <button class="btn" onclick="framePlayer &amp;&amp; framePlayer.reset()">↺ 重置</button>
+          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度 <select id="frameSpeed" aria-label="呼叫堆疊播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select></span>
         </div>
       </div>
     </div>
@@ -818,9 +830,11 @@ footer{text-align:center;padding:2rem;font-size:.85rem;color:var(--muted);border
           <select id="hanoiN" class="mono" style="padding:.35rem;border-radius:6px;border:1px solid var(--card-border);">
             <option value="3" selected>3 盤</option><option value="4">4 盤</option><option value="5">5 盤</option>
           </select>
-          <button class="btn" onclick="hanoiStart()">▶ 開始</button>
-          <button class="btn" onclick="hanoiPlayer &amp;&amp; hanoiPlayer.step()">→ 單步</button>
-          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度<input id="hanoiSpeed" type="range" min="120" max="1000" value="420" style="vertical-align:middle;"></span>
+          <button class="btn" id="hanoiPlay" onclick="hanoiStart()">▶ 開始</button>
+          <button class="btn" onclick="hanoiPlayer &amp;&amp; hanoiPlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="hanoiPlayer &amp;&amp; hanoiPlayer.step()">→ 下一步</button>
+          <button class="btn" onclick="hanoiReset()">↺ 重置</button>
+          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度 <select id="hanoiSpeed" aria-label="河內塔播放速度"><option value="600">快</option><option value="1200" selected>標準</option><option value="2200">慢</option></select></span>
         </div>
       </div>
     </div>
@@ -879,9 +893,11 @@ moving disk from A to B</pre></div>
         <div id="mazeVis" class="mono" style="line-height:1.15;font-size:1.05rem;letter-spacing:.1em;padding:.5rem;"></div>
         <div class="status-banner" id="mazeStatus"><span class="status-icon">›</span><span class="status-text">S=起點；按「開始」看探索與回溯。</span></div>
         <div class="controls-bar">
-          <button class="btn" onclick="mazeStart()">▶ 開始</button>
-          <button class="btn" onclick="mazePlayer &amp;&amp; mazePlayer.step()">→ 單步</button>
-          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度<input id="mazeSpeed" type="range" min="60" max="600" value="180" style="vertical-align:middle;"></span>
+          <button class="btn" id="mazePlay" onclick="mazeStart()">▶ 開始</button>
+          <button class="btn" onclick="mazePlayer &amp;&amp; mazePlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="mazePlayer &amp;&amp; mazePlayer.step()">→ 下一步</button>
+          <button class="btn" onclick="mazePlayer &amp;&amp; mazePlayer.reset()">↺ 重置</button>
+          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度 <select id="mazeSpeed" aria-label="迷宮播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select></span>
         </div>
         <div class="mono" style="font-size:.78rem;color:var(--muted);">圖例：<span style="color:#f39c12;">●</span> 目前｜<span style="color:#1a6b4a;">＋</span> 路徑｜<span style="color:#c0392b;">−</span> 死路</div>
       </div>
@@ -988,8 +1004,11 @@ moving disk from A to B</pre></div>
         <div class="char-strip" id="dpStrip" style="max-width:100%;overflow-x:auto;flex-wrap:nowrap;"></div>
         <div class="status-banner" id="dpStatus"><span class="status-icon">›</span><span class="status-text">按「開始」填 0~23 分的最少硬幣表（示範用 23 分）。</span></div>
         <div class="controls-bar">
-          <button class="btn" onclick="dpStart()">▶ 填表（coins = 1,5,10,21,25；target 23）</button>
-          <button class="btn" onclick="dpPlayer &amp;&amp; dpPlayer.step()">→ 單步</button>
+          <button class="btn" id="dpPlay" onclick="dpStart()">▶ 填表（coins = 1,5,10,21,25；target 23）</button>
+          <button class="btn" onclick="dpPlayer &amp;&amp; dpPlayer.prev()">← 上一步</button>
+          <button class="btn" onclick="dpPlayer &amp;&amp; dpPlayer.step()">→ 下一步</button>
+          <button class="btn" onclick="dpPlayer &amp;&amp; dpPlayer.reset()">↺ 重置</button>
+          <span class="mono" style="font-size:.8rem;color:var(--muted);">速度 <select id="dpSpeed" aria-label="動態規劃播放速度"><option value="900">快</option><option value="1800" selected>標準</option><option value="3000">慢</option></select></span>
         </div>
       </div>
     </div>
@@ -1131,26 +1150,52 @@ function hlLine(rootId, n) {
 
 /* step player: frames = [{...}], apply(frame) renders */
 class Player {
-  constructor({frames, apply, delayInput, onDone}) {
-    this.frames = frames; this.apply = apply;
-    this.delayInput = delayInput; this.i = -1; this.timer = null;
-    this.onDone = onDone || (()=>{});
+  constructor({frames,apply,delayInput,delay=1800,onDone,bar,playButton}) {
+    this.frames=frames||[]; this.apply=apply; this.delayInput=delayInput; this.delay=delay;
+    this.i=0; this.timer=null; this.playing=false; this.runToken=0;
+    this.onDone=onDone||(()=>{}); this.bar=bar; this.playButton=playButton;
+    this.mount(); this.render(); this.syncButton('▶ 開始');
   }
-  step() {
-    if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-    this.i += 1; this.apply(this.frames[this.i]);
+  mount() {
+    if(!this.bar)return;
+    this.bar.querySelectorAll('.player-progress,.player-counter').forEach(x=>x.remove());
+    this.counter=document.createElement('span'); this.counter.className='player-counter mono';
+    if(this.playButton)this.counter.id=this.playButton.id.replace(/Play$/,'Counter');
+    this.counter.setAttribute('aria-live','polite'); this.bar.appendChild(this.counter);
+    if(this.frames.length>=8){
+      this.progress=document.createElement('input'); this.progress.type='range';
+      this.progress.className='player-progress'; this.progress.min=0;
+      if(this.playButton)this.progress.id=this.playButton.id.replace(/Play$/,'Scrubber');
+      this.progress.max=this.frames.length-1; this.progress.value=0;
+      this.progress.setAttribute('aria-label','選擇播放步驟');
+      this.progress.oninput=()=>this.seek(this.progress.value); this.bar.appendChild(this.progress);
+    }
   }
-  play() {
-    this.stop();
-    const tick = () => {
-      if (this.i + 1 >= this.frames.length) { this.stop(); this.onDone(); return; }
-      this.step();
-      this.timer = setTimeout(tick, this.delayInput ? parseInt(this.delayInput.value,10) : 700);
+  syncButton(label){if(this.playButton)this.playButton.textContent=label;}
+  render(){if(!this.frames.length)return;this.apply(this.frames[this.i]);if(this.counter)this.counter.textContent=(this.i+1)+'/'+this.frames.length;if(this.progress)this.progress.value=this.i;}
+  wait(){return this.delayInput?parseInt(this.delayInput.value,10):this.delay;}
+  pause(label='▶ 繼續'){this.runToken++;if(this.timer!==null)clearTimeout(this.timer);this.timer=null;this.playing=false;this.syncButton(label);}
+  step(){this.pause();if(this.i+1>=this.frames.length){this.syncButton('▶ 重播');return false;}this.i++;this.render();if(this.i>=this.frames.length-1)this.syncButton('▶ 重播');return true;}
+  prev(){this.pause();if(this.i<=0){this.syncButton('▶ 開始');return false;}this.i--;this.render();return true;}
+  seek(i){this.pause();this.i=Math.max(0,Math.min(this.frames.length-1,Number(i)||0));this.render();this.syncButton(this.i>=this.frames.length-1?'▶ 重播':this.i===0?'▶ 開始':'▶ 繼續');}
+  play(){
+    if(this.playing){this.pause();return;}
+    if(!this.frames.length)return;
+    if(this.i>=this.frames.length-1){this.i=0;this.render();}
+    this.playing=true; this.syncButton('⏸ 暫停');
+    const token=++this.runToken;
+    const tick=()=>{
+      if(!this.playing||token!==this.runToken)return;
+      if(this.i+1>=this.frames.length){this.pause('▶ 重播');this.onDone();return;}
+      this.i++;this.render();
+      if(this.i>=this.frames.length-1){this.pause('▶ 重播');this.onDone();return;}
+      this.timer=setTimeout(tick,this.wait());
     };
-    tick();
+    this.timer=setTimeout(tick,this.wait());
   }
-  stop() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } }
-  reset() { this.stop(); this.i = -1; if (this.frames.length) this.apply(this.frames[0]); }
+  toggle(){this.play();}
+  stop(){this.pause('▶ 開始');}
+  reset(){this.pause('▶ 開始');this.i=0;this.render();}
 }
 
 function setStatus(id, html) {
@@ -1235,10 +1280,14 @@ function sumFrames() {
   return frames;
 }
 function sumStart() {
+  if (!sumPlayer) sumReset();
+  sumPlayer.toggle();
+}
+function sumReset() {
+  if (sumPlayer) sumPlayer.stop();
   sumPlayer = new Player({frames: sumFrames(), apply: f => {
     $('sumTrace').innerHTML = f.html; setStatus('sumStatus', f.msg); hlLine('sumCode', f.line);
-  }});
-  sumPlayer.reset(); sumPlayer.play();
+  }, delayInput: $('sumSpeed'), bar: $('sumPlay').closest('.controls-bar'), playButton: $('sumPlay')});
 }
 
 /* ---------- P02 to_str ---------- */
@@ -1269,12 +1318,16 @@ function tostrFrames(n0, base) {
   return frames;
 }
 function tostrStart() {
+  if (!tostrPlayer) tostrReset();
+  tostrPlayer.toggle();
+}
+function tostrReset() {
+  if (tostrPlayer) tostrPlayer.stop();
   const n = Math.max(0, parseInt($('tostrN').value || '769', 10));
   const b = parseInt($('tostrB').value, 10);
   tostrPlayer = new Player({frames: tostrFrames(n, b), apply: f => {
     $('tostrTrace').innerHTML = f.html; setStatus('tostrStatus', f.msg); hlLine('tostrCode', f.line);
-  }});
-  tostrPlayer.reset(); tostrPlayer.play();
+  }, delayInput: $('tostrSpeed'), bar: $('tostrPlay').closest('.controls-bar'), playButton: $('tostrPlay')});
 }
 
 /* ---------- P03 call stack fact(4) ---------- */
@@ -1298,10 +1351,14 @@ function frameFrames() {
   return frames;
 }
 function frameStart() {
+  if (!framePlayer) frameReset();
+  framePlayer.toggle();
+}
+function frameReset() {
+  if (framePlayer) framePlayer.stop();
   framePlayer = new Player({frames: frameFrames(), apply: f => {
     renderBoxStack('frameVis', f.stack); setStatus('frameStatus', f.msg);
-  }});
-  framePlayer.reset(); framePlayer.play();
+  }, delayInput: $('frameSpeed'), bar: $('framePlay').closest('.controls-bar'), playButton: $('framePlay')});
 }
 
 /* ---------- P04 hanoi ---------- */
@@ -1310,14 +1367,14 @@ function hanoiRender(pegs, msg) {
   const el = $('hanoiVis'); el.innerHTML = '';
   ['A','B','C'].forEach((name, pi) => {
     const col = document.createElement('div');
-    col.style.cssText = 'display:flex;flex-direction:column-reverse;align-items:center;gap:3px;min-width:130px;';
+    col.style.cssText = 'display:flex;flex:1 1 0;flex-direction:column-reverse;align-items:center;gap:3px;min-width:0;';
     const base = document.createElement('div');
     base.className = 'mono'; base.style.cssText = 'font-size:.8rem;color:var(--muted);';
     base.textContent = name;
     col.appendChild(base);
     pegs[pi].forEach(d => {
       const disk = document.createElement('div');
-      disk.style.cssText = `height:20px;border-radius:5px;background:${['#5b7eb8','#2c3e7a','#1a6b4a','#8e44ad','#e67e22'][d-1]};width:${34 + d*18}px;color:#fff;font-size:.7rem;text-align:center;line-height:20px;`;
+      disk.style.cssText = `height:20px;border-radius:5px;background:${['#5b7eb8','#2c3e7a','#1a6b4a','#8e44ad','#e67e22'][d-1]};width:min(${34 + d*18}px,100%);color:#fff;font-size:.7rem;text-align:center;line-height:20px;`;
       disk.textContent = d;
       col.appendChild(disk);
     });
@@ -1342,11 +1399,15 @@ function hanoiFrames(n) {
   return frames;
 }
 function hanoiStart() {
+  if (!hanoiPlayer) hanoiReset();
+  hanoiPlayer.toggle();
+}
+function hanoiReset() {
+  if (hanoiPlayer) hanoiPlayer.stop();
   const n = parseInt($('hanoiN').value, 10);
   hanoiPlayer = new Player({frames: hanoiFrames(n), apply: f => {
     hanoiRender(f.pegs, f.msg); hlLine('hanoiCode', f.line);
-  }, delayInput: $('hanoiSpeed')});
-  hanoiPlayer.reset(); hanoiPlayer.play();
+  }, delayInput: $('hanoiSpeed'), bar: $('hanoiPlay').closest('.controls-bar'), playButton: $('hanoiPlay')});
 }
 hanoiRender([[3,2,1],[],[]], null);
 
@@ -1400,8 +1461,13 @@ function mazeApply(f) {
   setStatus('mazeStatus', f.msg); hlLine('mazeCode', f.line);
 }
 function mazeStart() {
-  mazePlayer = new Player({frames: mazeFrames(), apply: mazeApply, delayInput: $('mazeSpeed')});
-  mazePlayer.reset(); mazePlayer.play();
+  if (!mazePlayer) mazeReset();
+  mazePlayer.toggle();
+}
+function mazeReset() {
+  if (mazePlayer) mazePlayer.stop();
+  mazePlayer = new Player({frames: mazeFrames(), apply: mazeApply, delayInput: $('mazeSpeed'),
+    bar: $('mazePlay').closest('.controls-bar'), playButton: $('mazePlay')});
 }
 mazeApply({grid: MAZE_ROWS.map(r=>r.split('')), cur: null, msg: 'S=起點、E=出口。', line: 1});
 
@@ -1436,9 +1502,20 @@ function dpApply(f) {
   setStatus('dpStatus', f.msg); hlLine('dpCode', f.line);
 }
 function dpStart() {
-  dpPlayer = new Player({frames: dpFrames(), apply: dpApply});
-  dpPlayer.reset(); dpPlayer.play();
+  if (!dpPlayer) dpReset();
+  dpPlayer.toggle();
 }
+function dpReset() {
+  if (dpPlayer) dpPlayer.stop();
+  dpPlayer = new Player({frames: dpFrames(), apply: dpApply, delayInput: $('dpSpeed'),
+    bar: $('dpPlay').closest('.controls-bar'), playButton: $('dpPlay')});
+}
+
+// Every trace starts by showing its complete frame 1 and waits one full interval before advancing.
+sumReset(); tostrReset(); frameReset(); hanoiReset(); mazeReset(); dpReset();
+$('tostrN').addEventListener('change', tostrReset);
+$('tostrB').addEventListener('change', tostrReset);
+$('hanoiN').addEventListener('change', hanoiReset);
 
 /* ---------- P04 spiral + fractal tree ---------- */
 let spiralTimer = null;
@@ -1448,14 +1525,13 @@ function spiralStart() {
   ctx.strokeStyle = '#2c3e7a'; ctx.lineWidth = 2;
   let x = 90, y = 90, angle = 0, len = 210;
   if (spiralTimer) clearInterval(spiralTimer);
-  spiralTimer = setInterval(() => {
-    if (len <= 0) { clearInterval(spiralTimer);
-      setStatus('vizStatus', '螺旋畫完：每次遞迴長度減 5，直到歸零（base case）。總共呼叫了 43 次。'); return; }
+  while (len > 0) {
     const rad = angle * Math.PI / 180;
     const nx = x + len * Math.cos(rad), ny = y + len * Math.sin(rad);
     ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
     x = nx; y = ny; angle += 90; len -= 5;
-  }, 60);
+  }
+  setStatus('vizStatus', '靜態完成圖：每次遞迴長度減 5，直到歸零；共 43 次呼叫。');
 }
 function treeDraw() {
   const cv = $('treeCv'), ctx = cv.getContext('2d');

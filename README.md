@@ -60,6 +60,11 @@ NSYSU 資料結構課程的互動自學配套網站（Python 版）：兩章課�
 | `tools/inject_quiz_py.py` | 第 07–09 章的題庫自測區注入；同上 |
 | `tools/inject_prereq_py.py` | 課前章 00A／00B 與先備頁 P1–P9 的同類注入（冪等） |
 | `tools/check_links_py.py` | 全站錨點、頁面連結與注入前置條件檢查 |
+| `tools/check_visuals_py.py` | 20 頁視覺合約、速度級距、scrubber、錯誤敘述與 inline JavaScript 靜態檢查 |
+| `tools/browser_check_py.py` | Playwright 操作播放器並檢查 390 px 視覺／控制列溢位與 runtime error |
 
 新增一頁的流程：撰寫頁面本體 → 在 `inject_prereq_py.py` 的 `PPAGES` 登記 → 跑該腳本 →
-在 `apply_zh.py` 的 `FC`／`BQ` 登記並補上 `data/` 母檔 → 跑 `apply_zh.py` → 跑 `check_links_py.py`。
+在 `apply_zh.py` 的 `FC`／`BQ` 登記並補上 `data/` 母檔 → 跑 `apply_zh.py` → 依序跑
+`check_links_py.py`、`check_contrast.py`、`check_visuals_py.py` 與 `browser_check_py.py`。
+
+視覺保留／替換的逐頁決策與播放器合約見 [`tools/VISUAL_AUDIT.md`](tools/VISUAL_AUDIT.md)。
